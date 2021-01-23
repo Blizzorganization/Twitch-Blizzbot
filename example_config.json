@@ -1,0 +1,13 @@
+{
+  "opts": {
+   "identity": {
+      "username": "",
+      "password": ""
+    },
+    "channels": [ "" ]
+  },
+  "discord": {
+    "token": "",
+    "blchannel": ""
+  }
+}

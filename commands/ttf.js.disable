@@ -1,0 +1,15 @@
+exports.help = false
+exports.run = (client, target, context, msg, self, args) => {
+    if (!context.mod) return
+    const tiktok = require('tiktok-app-api')
+    let followers
+    (async () => {
+        let tiktokApp = await tiktok()
+        const user = await tiktokApp.getUserByName('blizzor')
+        const userInfo = await tiktokApp.getUserInfo(user)
+        console.log(userInfo)
+        followers = userInfo.followerCount
+        console.log(followers)
+    })()
+//    client.say(target, `Blizzor hat ${followers} TikTok Follower.`)
+}
