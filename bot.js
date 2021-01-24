@@ -60,7 +60,11 @@ fs.readdir("./functions/", (err, files) => {
   })
 })
 // Register our event handlers (defined below)
-client.on('connected', onConnectedHandler);
+client.on('connected', (addr, port) => {
+  console.log(`* Connected to ${addr}:${port}`);
+  if (client.discord.started) client.discord.channel.send("Bot wurde gestartet.")
+  client.started = true
+});
 client.once("connected", () => {
     rl.on("line", (line) => {
         if (line.startsWith("|")) return eval(line.slice(1))
@@ -77,25 +81,14 @@ function checkModAction(client, msg, ctx) {
   checkmsg = ` ${message} `
   if (delbl.some((a) => checkmsg.includes(` ${a}`))) client.deletemessage("#blizzor96", ctx.id)
 }
-// Called every time a message comes in
-let onMessageHandler = async (target, context, msg, self) => {
+
+client.on("message", async (target, context, msg, self) => {
   if (self) { return; } // Ignore messages from the bot
 
   // Remove whitespace from chat message
   let args = msg.trim().split(" ");
   checkModAction(client, msg, context)
   const commandName = args.shift().toLowerCase();
-/*  console.log(target);
-  console.log("____");
-  console.log(context);
-  console.log("____");
-  console.log(msg);
-  console.log("____");
-  console.log(self);
-  console.log("____");
-  console.log(context.badges);
-  console.log("____");
-*/
   let cmd = client.commands.get(commandName)
   if (cmd) {
     cmd.run(client, target, context, msg, self, args)
@@ -108,13 +101,4 @@ let onMessageHandler = async (target, context, msg, self) => {
       console.log(`* Executed ${commandName} Customcommand`)
     }
   }
-}
-// Function called when the "dice" command is issued
-
-// Called every time the bot connects to Twitch chat
-function onConnectedHandler (addr, port) {
-  console.log(`* Connected to ${addr}:${port}`);
-  if (client.discord.started) client.discord.channel.send("Bot wurde gestartet.")
-  client.started = true
-}
-client.on("message", onMessageHandler)
+})
