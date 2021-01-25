@@ -83,7 +83,7 @@ function checkModAction(client, msg, ctx) {
 }
 
 client.on("message", async (target, context, msg, self) => {
-  if (self) { return; } // Ignore messages from the bot
+  if (self) return; // Ignore messages from the bot
 
   // Remove whitespace from chat message
   let args = msg.trim().split(" ");
