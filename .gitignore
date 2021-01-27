@@ -1,0 +1,7 @@
+node_modules
+logs
+data
+config.json
+start.sh
+commands/info.js
+commands/random.js
