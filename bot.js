@@ -27,20 +27,20 @@ if (config.discord) {
   discordClient.started = false
   clients.discord = discordClient
   discordClient.clients = clients
-  fs.readdir("./discordEvents/", (err, files) => {
+  fs.readdir("./events/discord/", (err, files) => {
     if (err) return console.error("Error reading discord events directory:", err);
     files.forEach(file => {
       if (!file.endsWith(".js")) return;
-      const event = require(`./discordEvents/${file}`);
+      const event = require(`./events/discord/${file}`);
       let eventname = file.split(".")[0];
       discordClient.on(eventname, event.bind(null, discordClient));
     });
   });
-  fs.readdir("./discordCommands/", (err, files) => {
+  fs.readdir("./commands/discord/", (err, files) => {
     if (err) return console.error(err)
     files.forEach(file => {
       if (!file.endsWith(".js")) return
-      let props = require("./discordCommands/"+file)
+      let props = require("./commands/discord/"+file)
       let command = "!"+file.split(".")[0]
       console.log(`Attempting to load Command ${command}`)
       discordClient.commands.set(command, props)
@@ -63,11 +63,11 @@ twitchClient.blacklist.ensure("delmsg", [])
 twitchClient.commands = new enmap()
 twitchClient.cmds = []
 rl.commands = new enmap()
-fs.readdir("./twitchCommands/commands/", (err, files) => {
+fs.readdir("./commands/twitch/commands/", (err, files) => {
   if (err) return console.error(err)
   files.forEach(file => {
     if (!file.endsWith(".js")) return
-    let props = require("./twitchCommands/commands/"+file)
+    let props = require("./commands/twitch/commands/"+file)
     let command = "!"+file.split(".")[0]
     console.log(`Attempting to load Command ${command}`)
     twitchClient.commands.set(command, props)
@@ -79,11 +79,11 @@ fs.readdir("./twitchCommands/commands/", (err, files) => {
     })
   })
 })
-fs.readdir("./twitchCommands/functions/", (err, files) => {
+fs.readdir("./commands/twitch/functions/", (err, files) => {
   if (err) return console.error(err)
   files.forEach(file => {
     if (!file.endsWith(".js")) return
-    let props = require("./twitchCommands/functions/"+file)
+    let props = require("./commands/twitch/functions/"+file)
     let command = "!"+file.split(".")[0]
     console.log(`Attempting to load Command ${command}`)
     twitchClient.commands.set(command, props)
@@ -95,11 +95,11 @@ fs.readdir("./twitchCommands/functions/", (err, files) => {
     })
   })
 })
-fs.readdir("./consoleCommands/", (err, files) => {
+fs.readdir("./commands/console/", (err, files) => {
   if (err) return console.error(err)
   files.forEach(file => {
     if (!file.endsWith(".js")) return
-    let props = require("./consoleCommands/"+file)
+    let props = require("./commands/console/"+file)
     let command = file.split(".")[0]
     console.log(`Attempting to load Command ${command}`)
     rl.commands.set(command, props)
@@ -110,20 +110,20 @@ fs.readdir("./consoleCommands/", (err, files) => {
     })
   })
 })
-fs.readdir("./twitchEvents/", (err, files) => {
+fs.readdir("./events/twitch/", (err, files) => {
   if (err) return console.error("Error reading twitch events directory:", err);
   files.forEach(file => {
       if (!file.endsWith(".js")) return;
-      const event = require(`./twitchEvents/${file}`);
+      const event = require(`./events/twitch/${file}`);
       let eventname = file.split(".")[0];
       twitchClient.on(eventname, event.bind(null, twitchClient));
   });
 });
-fs.readdir("./consoleEvents/", (err, files) => {
+fs.readdir("./events/console/", (err, files) => {
   if (err) return console.error("Error reading console events directory:", err);
   files.forEach(file => {
       if (!file.endsWith(".js")) return;
-      const event = require(`./consoleEvents/${file}`);
+      const event = require(`./events/console/${file}`);
       let eventname = file.split(".")[0];
       rl.on(eventname, event.bind(null, clients));
   });
