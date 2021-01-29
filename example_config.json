@@ -1,5 +1,5 @@
 {
-  "opts": {
+  "twitch": {
    "identity": {
       "username": "",
       "password": ""
@@ -8,6 +8,9 @@
   },
   "discord": {
     "token": "",
-    "blchannel": ""
+    "blchannel": "",
+    "relaychannel": "",
+    "statuschannel": "",
+    "commandchannel": ""
   }
 }
