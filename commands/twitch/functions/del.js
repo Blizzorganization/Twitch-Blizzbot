@@ -1,6 +1,6 @@
 exports.help = false
+exports.perm = true
 exports.run = (client, target, context, msg, self, args) => {
-  if (!context.mod) return client.say(target, "Du hast keine Rechte!")
   if (args.length==0) return
   if (client.ccmds.has(args[0])) {
     client.ccmds.delete(args[0])

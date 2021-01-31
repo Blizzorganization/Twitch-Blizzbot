@@ -1,6 +1,6 @@
 exports.help = false
+exports.perm = true
 exports.run = (client, target, context, msg, self, args) => {
-  if (!context.mod) return client.say(target, "Du hast keine Rechte!")
   if (args.length>1) {
     let newcmd = args.shift().toLowerCase()
     let res = args.join(" ")
