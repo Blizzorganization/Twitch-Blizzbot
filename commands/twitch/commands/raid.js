@@ -8,7 +8,6 @@ exports.run = async (client, target, context, msg, self) => {
     client.say(target, `/me Der Follower Modus wurde für die nächsten ${minutes} Minuten deaktiviert.`)
     client.say(target, `/followersoff`)
 
-    setTimeout (Ende, 60*minutes*1000);
     function Ende()
     {
         client.say(target, `/followers 0`)
