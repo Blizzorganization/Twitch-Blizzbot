@@ -4,7 +4,8 @@
       "username": "",
       "password": ""
     },
-    "channels": [ "" ]
+    "channels": [ "" ],
+    "minutes": 0 
   },
   "discord": {
     "token": "",
