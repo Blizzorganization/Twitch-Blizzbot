@@ -2,7 +2,8 @@ Moderation - Befehle für den Twitchchatbot
 
 Alle Commands, die über !add(!del) hinzugefügt werden. Werden automatisch in der letzter Stelle der Commandsliste hinzugefügt/gelöscht
 
-Commands hinzufügen/editieren/löschen``__
+
+Commands hinzufügen/editieren/löschen
 
 Hinzufügen eines neuen Commands.
     !add   !(Befehlsname) (Text)    
