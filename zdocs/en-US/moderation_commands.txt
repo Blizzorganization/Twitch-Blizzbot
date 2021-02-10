@@ -4,6 +4,7 @@ Moderation - commands for the Twitchchatbot
 
 All commands that are added via !add (!del). Are automatically added / deleted in the last position of the command list
 
+
 Add / edit / delete commands
 
 Adding a new command.
@@ -33,7 +34,7 @@ Display the words on the blacklist in the selected DC channel.
     !blacklist
 
 
-Alias ​​function
+Alias function
 
 Adds a new alias.
     !addalias (new alias) (main command)
