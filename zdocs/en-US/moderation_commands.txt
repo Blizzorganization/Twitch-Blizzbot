@@ -33,12 +33,12 @@ Display the words on the blacklist in the selected DC channel.
     !blacklist
 
 
-Alias ​​function
+Alias function
 
 Adds a new alias.
     !addalias (new alias) (main command)
-          e.g. !addalias !testing !test
+          z.B  !addalias !testing !test
 
 Removes an alias from the command list.
     !delalias (alias) (main command)
-          e.g.!delalias !testing !test
+          z.B  !delalias !testing !test
