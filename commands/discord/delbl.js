@@ -4,5 +4,5 @@ exports.run = (client, message, args) => {
     if (!client.clients.twitch.blacklist.includes("delmsg", blremove)) return message.channel.send(`"${blremove}" wird nicht gelöscht, kann also auch nicht aus der Blacklist entfernt werden.`)
     client.clients.twitch.blacklist.remove("delmsg", blremove)
     message.channel.send(`"${blremove}" wurde von der Blacklist entfernt`)
-    console.log(`* Remove "${blword}" from Blacklist`)
+    console.log(`* Remove "${blremove}" from Blacklist`)
 }
