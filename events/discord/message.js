@@ -1,5 +1,6 @@
 module.exports = (client, message) => {
     if (message.author.id==client.user.id) return;
+    if (message.author.bot) return;
     let args = message.content.split(" ")
     switch(message.channel.id) {
         case client.config.relaychannel:
