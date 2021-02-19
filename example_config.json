@@ -5,7 +5,7 @@
       "password": ""
     },
     "channels": [ "" ],
-    "minutes": 0 
+    "Raidminutes": 0 
   },
   "discord": {
     "token": "",
