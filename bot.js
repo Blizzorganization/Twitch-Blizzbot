@@ -63,6 +63,7 @@ twitchClient.blacklist.ensure("delmsg", [])
 twitchClient.commands = new enmap()
 twitchClient.cmds = []
 rl.commands = new enmap()
+//twitch
 fs.readdir("./commands/twitch/commands/", (err, files) => {
   if (err) return console.error(err)
   files.forEach(file => {
@@ -95,6 +96,25 @@ fs.readdir("./commands/twitch/functions/", (err, files) => {
     })
   })
 })
+fs.readdir("./events/twitch/", (err, files) => {
+  if (err) return console.error("Error reading twitch events directory:", err);
+  files.forEach(file => {
+      if (!file.endsWith(".js")) return;
+      const event = require(`./events/twitch/${file}`);
+      let eventname = file.split(".")[0];
+      twitchClient.on(eventname, event.bind(null, twitchClient));
+  });
+});
+//console
+fs.readdir("./events/console/", (err, files) => {
+  if (err) return console.error("Error reading console events directory:", err);
+  files.forEach(file => {
+      if (!file.endsWith(".js")) return;
+      const event = require(`./events/console/${file}`);
+      let eventname = file.split(".")[0];
+      rl.on(eventname, event.bind(null, clients));
+  });
+});
 fs.readdir("./commands/console/", (err, files) => {
   if (err) return console.error(err)
   files.forEach(file => {
@@ -110,23 +130,5 @@ fs.readdir("./commands/console/", (err, files) => {
     })
   })
 })
-fs.readdir("./events/twitch/", (err, files) => {
-  if (err) return console.error("Error reading twitch events directory:", err);
-  files.forEach(file => {
-      if (!file.endsWith(".js")) return;
-      const event = require(`./events/twitch/${file}`);
-      let eventname = file.split(".")[0];
-      twitchClient.on(eventname, event.bind(null, twitchClient));
-  });
-});
-fs.readdir("./events/console/", (err, files) => {
-  if (err) return console.error("Error reading console events directory:", err);
-  files.forEach(file => {
-      if (!file.endsWith(".js")) return;
-      const event = require(`./events/console/${file}`);
-      let eventname = file.split(".")[0];
-      rl.on(eventname, event.bind(null, clients));
-  });
-});
 // Connect to Twitch:
 twitchClient.connect();
