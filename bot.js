@@ -106,15 +106,6 @@ fs.readdir("./events/twitch/", (err, files) => {
   });
 });
 //console
-fs.readdir("./events/console/", (err, files) => {
-  if (err) return console.error("Error reading console events directory:", err);
-  files.forEach(file => {
-      if (!file.endsWith(".js")) return;
-      const event = require(`./events/console/${file}`);
-      let eventname = file.split(".")[0];
-      rl.on(eventname, event.bind(null, clients));
-  });
-});
 fs.readdir("./commands/console/", (err, files) => {
   if (err) return console.error(err)
   files.forEach(file => {
@@ -129,6 +120,15 @@ fs.readdir("./commands/console/", (err, files) => {
       rl.commands.set(a, props)
     })
   })
-})
+});
+fs.readdir("./events/console/", (err, files) => {
+  if (err) return console.error("Error reading console events directory:", err);
+  files.forEach(file => {
+      if (!file.endsWith(".js")) return;
+      const event = require(`./events/console/${file}`);
+      let eventname = file.split(".")[0];
+      rl.on(eventname, event.bind(null, clients));
+  });
+});
 // Connect to Twitch:
 twitchClient.connect();
