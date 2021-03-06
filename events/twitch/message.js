@@ -25,7 +25,8 @@ function checkModAction(client, msg, ctx, target) {
     let message = msg.toLowerCase()
     let delbl = client.blacklist.get("delmsg")
     checkmsg = ` ${message} `
-    if (delbl.some((a) => checkmsg.includes(` ${a} `))) client.deletemessage(target, ctx.id)
+    if (delbl.some((a) => checkmsg.includes(` ${a} `))) return client.deletemessage(target, ctx.id)
+    if (ctx["message-type"]=="action") return client.deletemessage(target, ctx.id)
 }
 function hasPerm(ctx) {
     if (ctx.mod) return true
