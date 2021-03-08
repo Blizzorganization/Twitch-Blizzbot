@@ -55,7 +55,7 @@ if (config.discord) {
 }
 twitchClient.channellogs = []
 if (!fs.existsSync("./channellogs")) fs.mkdirSync("./channellogs")
-let dateString = new Date().toLocaleTimeString().replace(/T/, ' ').replace(/\..+/, '').replace(" ", "_")
+let dateString = new Date().toLocaleTimeString().replace(/T/, ' ').replace(/\..+/, '').replace(" ", "_").replace(/:/g, "-")
 config.twitch.channels.forEach(channel => {
     channel = channel.replace("#","")
     if (!fs.existsSync(`./channellogs/${channel}/`)) fs.mkdirSync(`./channellogs/${channel}`)
