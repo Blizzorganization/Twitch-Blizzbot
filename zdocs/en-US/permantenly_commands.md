@@ -22,3 +22,6 @@ Show the current title
 	
 Follower-mode switch in case of a raid (mod only)
 	!raid
+
+shows information about the streamer (viewer,follower,subs)
+	!info

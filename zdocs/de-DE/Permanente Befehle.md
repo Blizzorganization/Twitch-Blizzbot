@@ -17,3 +17,6 @@ Anzeigen vom Aktuellen Titel
 
 follower-mode switch im fall von einem Raid  (mod only)
 	!raid	
+
+zeigt Informationen zu dem Streamer (viewer,follower,subs)
+	!info
