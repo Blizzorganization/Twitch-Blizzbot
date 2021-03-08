@@ -1,13 +1,18 @@
 module.exports = async (client, target, context, msg, self) => {
+    if (!client.channellogs[target.slice(1)]) {
+        console.error("channellogs for channel " + target + " is not available!")
+    } else {
+        client.channellogs[target.slice(1)].write(`${context["display-name"]}: ${message}\n`)
+    }
     if (self) return; // Ignore messages from the bot
     let args = msg.trim().split(" ");
     checkModAction(client, msg, context, target)
     const commandName = args.shift().toLowerCase();
     let cmd = client.commands.get(commandName)
     if (cmd) {
-        if (cmd.perm &&(hasPerm(context)==false)) {
+        if (cmd.perm && (hasPerm(context) == false)) {
             if (!cmd.silent) client.say(target, "Du hast keine Rechte!")
-            return 
+            return
         }
         cmd.run(client, target, context, msg, self, args)
         console.log(`* Executed ${commandName} command`);
@@ -26,7 +31,7 @@ function checkModAction(client, msg, ctx, target) {
     let delbl = client.blacklist.get("delmsg")
     checkmsg = ` ${message} `
     if (delbl.some((a) => checkmsg.includes(` ${a} `))) return client.deletemessage(target, ctx.id)
-    if (ctx["message-type"]=="action") return client.deletemessage(target, ctx.id)
+    if (ctx["message-type"] == "action") return client.deletemessage(target, ctx.id)
 }
 function hasPerm(ctx) {
     if (ctx.mod) return true

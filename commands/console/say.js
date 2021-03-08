@@ -1,6 +1,6 @@
 exports.run = (clients, args) => {
     let channel;
-    if (clients.twitch.config.channels.length==1) {
+    if (clients.twitch.config.channels.length == 1) {
         channel = clients.twitch.config.channels[0];
     } else {
         channel = args.shift();

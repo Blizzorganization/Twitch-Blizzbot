@@ -1,17 +1,19 @@
 {
-  "twitch": {
-   "identity": {
-      "username": "",
-      "password": ""
+    "twitch": {
+        "identity": {
+            "username": "",
+            "password": ""
+        },
+        "channels": [
+            ""
+        ],
+        "Raidminutes": 0
     },
-    "channels": [ "" ],
-    "Raidminutes": 0 
-  },
-  "discord": {
-    "token": "",
-    "blchannel": "",
-    "relaychannel": "",
-    "statuschannel": "",
-    "commandchannel": ""
-  }
+    "discord": {
+        "token": "",
+        "blchannel": "",
+        "relaychannel": "",
+        "statuschannel": "",
+        "commandchannel": ""
+    }
 }
