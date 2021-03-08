@@ -57,6 +57,7 @@ twitchClient.channellogs = []
 if (!fs.existsSync("./channellogs")) fs.mkdirSync("./channellogs")
 let dateString = new Date().toLocaleTimeString().replace(/T/, ' ').replace(/\..+/, '').replace(" ", "_")
 config.twitch.channels.forEach(channel => {
+    channel = channel.replace("#","")
     if (!fs.existsSync(`./channellogs/${channel}/`)) fs.mkdirSync(`./channellogs/${channel}`)
     twitchClient.channellogs[channel] = fs.createWriteStream(`./channellogs/${channel}/${dateString}.chatlog.txt`)
 })

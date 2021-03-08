@@ -5,3 +5,4 @@ config.json
 start.sh
 commands/info.js
 commands/random.js
+channellogs/
