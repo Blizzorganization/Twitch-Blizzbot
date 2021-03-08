@@ -3,14 +3,14 @@
 Alle Commands, die über !add(!del) hinzugefügt werden. Werden automatisch in der letzter Stelle der Commandsliste hinzugefügt/gelöscht
 
 
-Commands hinzufügen/editieren/löschen
+**Commands hinzufügen/editieren/löschen**
 
 Hinzufügen eines neuen Commands.<br>
-    !add   !(Befehlsname) (Text)   
+    !add   ! (Befehlsname) (Text)   
           z.B !add !test Das ist ein Test
 
 Ändern eines eingespeicherten Commands.<br>
-    !edit  !(Befehlsname) (Text)<br>    
+    !edit  ! (Befehlsname) (Text)<br>    
           z.B !edit !test Das ist ein neuer Text 
       
 Entfernen eines eingespeicherten Commands. <br>
@@ -18,7 +18,7 @@ Entfernen eines eingespeicherten Commands. <br>
           z.B !del !test 
 
 
-Blacklist  hinzufügen/löschen
+**Blacklist  hinzufügen/löschen**
 
 Einfügen eines Worts zur Blacklist.<br>
     !addbl (Wort)<br>   
@@ -29,11 +29,10 @@ Entfernen eines eingespeicherten Worts von der Blacklist<br>
           z.B !delbl Test 
           
 Anzeigen lassen der Wörter auf der Blacklist, im ausgewählten DC Channel.<br>
-
     !blacklist
 
 
-Alias Funktion
+**Alias Funktion**
 
 Fügt ein neuen Alias hinzu.<br>
     !addalias (neuealias) (hauptcommand)<br>

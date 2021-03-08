@@ -3,22 +3,22 @@
 
 All commands that are added via !add (!del). Are automatically added / deleted in the last position of the command list
 
-Add / edit / delete commands
+**Add / edit / delete commands**
 
 Adding a new command.<br>
-	!add !(command name) (text)
+	!add ! (command name) (text)
           z.B !add !test This is a test
 
 Changing a saved command.<br>
-    !edit !(command name) (text)
+    !edit ! (command name) (text)
           z.B !edit !test This is a new text
       
 Removing a saved command.<br>
-    !del !(command name)
+    !del ! (command name)
           z.B !del !test 
     
 
-Add / delete blacklist 
+**Add / delete blacklist**
 
 Add a word to the blacklist.<br>
     !addbl (word)
@@ -32,7 +32,7 @@ Display the words on the blacklist in the selected DC channel.<br>
     !blacklist
 
 
-Alias function
+**Alias function**
 
 Adds a new alias.<br>
     !addalias (new alias) (main command)
