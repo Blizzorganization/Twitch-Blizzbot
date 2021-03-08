@@ -2,7 +2,7 @@ module.exports = async (client, target, context, msg, self) => {
     if (!client.channellogs[target.slice(1)]) {
         console.error("channellogs for channel " + target.slice(1) + " is not available!")
     } else {
-        client.channellogs[target.slice(1)].write(`${context["display-name"]}: ${message}\n`)
+        client.channellogs[target.slice(1)].write(`${context["display-name"]}: ${msg}\n`)
     }
     if (self) return; // Ignore messages from the bot
     let args = msg.trim().split(" ");
