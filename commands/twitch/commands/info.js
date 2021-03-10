@@ -1,5 +1,5 @@
 const fetch = require("node-fetch")
-exports.help = false
+exports.help = true
 exports.run = async (client, target, context, msg, self) => {
     let viewerrequest = await fetch(`https://decapi.me/twitch/viewercount/${target.slice(1)}`)
     let viewer = await viewerrequest.text()

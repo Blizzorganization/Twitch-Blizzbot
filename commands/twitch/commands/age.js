@@ -3,6 +3,6 @@ exports.help = true
 exports.run = async (client, target, context, msg, self) => {
     let resp = await fetch(`https://decapi.me/twitch/accountage/${context["display-name"]}`)
     let age = await resp.text()
-    age = age.replace("years", "Jahre").replace("year", "Jahr").replace("months", "Monate").replace("month", "Monat").replace("weeks", "Wochen").replace("week", "Woche")
+    age = age.replace("years", "Jahre").replace("year", "Jahr").replace("months", "Monaten").replace("month", "Monat").replace("weeks", "Wochen").replace("week", "Woche")
     client.say(target, `Der Account wurde vor ${age} erstellt.`)
 }
