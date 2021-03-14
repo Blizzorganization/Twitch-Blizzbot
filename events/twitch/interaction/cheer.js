@@ -4,7 +4,7 @@ module.exports = (client, channel, userstate, message) => {
     console.log(` ${userstate.username} cheered ${userstate.bits} bits`)
     client.say(channel, `/me Danke ${userstate.username} für die ${userstate.bits} bits!`)
 
-    if(!message==null) {
+    if(message!=null) {
         client.say(channel, `Mit der Nachricht: ${message}`)
     } 
 }

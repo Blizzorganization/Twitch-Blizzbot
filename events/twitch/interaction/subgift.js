@@ -3,5 +3,5 @@ module.exports = (client, channel, username, streakMonths, recipient, methods, u
     
 //message for Action
     console.log(` ${username} giftet ${recipient} subscription.`)
-    client.say(channel, `/me ${username} hat ${recipient} einen Sub geschenkt.`)
+    client.say(channel, ` ${username} hat ${recipient} einen Sub geschenkt.`)
 }
