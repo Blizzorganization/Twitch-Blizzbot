@@ -1,22 +1,16 @@
 # Permanente Befehle die nicht entfernt werden können.
 
-Anzeige wie lange Blizzor online ist<br>
+#### Anzeige wie lange der Streamer online ist
     !uptime   
-
-Anzeige wie lang man Blizzor schon folgt<br>
+#### Anzeige wie lang man  schon folgt
     !followage    
-
-Anzeige wie lange ein Account schon existiert.<br>
+#### Anzeige wie lange ein Account schon existiert.<br>
 	!age 
-
-Anzeige welches Game gerade ist<br>
+#### Anzeige welches Game gerade ist
 	!game
-	
-Anzeigen vom Aktuellen Titel<br>
+#### Anzeigen vom Aktuellen Titel
 	!title
-
-follower-mode switch im fall von einem Raid  (mod only)<br>
+#### follower-mode switch im fall von einem Raid  (mod only)<br>
 	!raid	
-
-zeigt Informationen zu dem Streamer (viewer,follower,subs)<br>
+#### zeigt Informationen zu dem Streamer (viewer,follower,subs)<br>
 	!info

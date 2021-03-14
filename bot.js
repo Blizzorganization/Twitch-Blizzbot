@@ -113,6 +113,15 @@ fs.readdir("./events/twitch/", (err, files) => {
         twitchClient.on(eventname, event.bind(null, twitchClient));
     });
 });
+fs.readdir("./events/twitch/interaction/", (err, files) => {
+    if (err) return console.error("Error reading twitch events directory:", err);
+    files.forEach(file => {
+        if (!file.endsWith(".js")) return;
+        const event = require(`./events/twitch/interaction/${file}`);
+        let eventname = file.split(".")[0];
+        twitchClient.on(eventname, event.bind(null, twitchClient));
+    });
+});
 //console
 fs.readdir("./commands/console/", (err, files) => {
     if (err) return console.error(err)
@@ -140,3 +149,4 @@ fs.readdir("./events/console/", (err, files) => {
 });
 // Connect to Twitch:
 twitchClient.connect();
+
