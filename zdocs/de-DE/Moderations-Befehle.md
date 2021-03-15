@@ -4,19 +4,19 @@
 
 ## **Commands hinzufügen/editieren/löschen**
 
-Hinzufügen eines neuen Commands.<br>
+#### Hinzufügen eines neuen Commands.<br>
 
 ```
 !add !(Befehlsname) (Text)  
     z.B !add !test Das ist ein Test
 ```
-Ändern eines eingespeicherten Commands<br>
+#### Ändern eines eingespeicherten Commands<br>
 
 ```
 !edit  !(Befehlsname) (Text)  
     z.B !edit !test Das ist ein neuer Text 
  ```     
-Entfernen eines eingespeicherten Commands.<br>
+#### Entfernen eines eingespeicherten Commands.<br>
 
 ```
 !del  !(Befehlsname)<br>    
@@ -24,19 +24,19 @@ Entfernen eines eingespeicherten Commands.<br>
 ```
 ## **Blacklist  hinzufügen/löschen**
 
-Einfügen eines Worts zur Blacklist.<br>
+#### Einfügen eines Worts zur Blacklist.<br>
 
 ```
 !addbl (Wort)   
-        z.B !addbl Test
+    z.B !addbl Test
 ```      
-Entfernen eines eingespeicherten Worts von der Blacklist<br>
+#### Entfernen eines eingespeicherten Worts von der Blacklist<br>
 
 ```
 !delbl (Wort)
     z.B !delbl Test 
 ```      
-Anzeigen lassen der Wörter auf der Blacklist, im ausgewählten DC Channel.<br>
+#### Anzeigen lassen der Wörter auf der Blacklist, im ausgewählten DC Channel.<br>
 
 ```
 !blacklist
@@ -44,13 +44,13 @@ Anzeigen lassen der Wörter auf der Blacklist, im ausgewählten DC Channel.<br>
 
 ## **Alias Funktion**
 
-Fügt ein neuen Alias hinzu.<br>
+#### Fügt ein neuen Alias hinzu.<br>
 
 ```
 !addalias (neuealias) (hauptcommand)
     z.B !addalias !testing !test
 ```
-Entfernt einen Alias von der Command-List.<br>
+#### Entfernt einen Alias von der Command-List.<br>
 
 ```
 !delalias (alias) (hauptcommand)
