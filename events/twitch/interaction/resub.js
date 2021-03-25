@@ -7,7 +7,7 @@ module.exports = (client, channel, username, _months, message, userstate, method
     
 //message for Action 
     {
-    client.say(channel,` Vielen Dank ${username} für einen ${streakMonths} in folge ,${username}! ${message}`);
+    client.say(channel,` /me Vielen Dank ${username} für einen ${sharedStreak} in Folge! ${message}`);
     }
     else {
        client.say(channel, `/me Danke ${username} für deinen insgesamt ${cumulativeMonths}. Monat.`)

@@ -66,7 +66,9 @@ twitchClient.dicecooldown = false
 //setup customcommand database
 twitchClient.aliases = new enmap({ name: "aliases" })
 twitchClient.ccmds = new enmap({ name: "customcommands" })
+twitchClient.coms = new enmap ({ name: "coms"})
 twitchClient.blacklist = new enmap({ name: "blacklist" })
+twitchClient.watchtime = new enmap({name: "watchtime"})
 twitchClient.blacklist.ensure("delmsg", [])
 twitchClient.commands = new enmap()
 twitchClient.cmds = []
@@ -149,4 +151,3 @@ fs.readdir("./events/console/", (err, files) => {
 });
 // Connect to Twitch:
 twitchClient.connect();
-

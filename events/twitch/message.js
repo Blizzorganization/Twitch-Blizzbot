@@ -1,8 +1,12 @@
 module.exports = async (client, target, context, msg, self) => {
-    if (!client.channellogs[target.slice(1)]) {
-        console.error("channellogs for channel " + target.slice(1) + " is not available!")
-    } else {
-        client.channellogs[target.slice(1)].write(`${context["display-name"]}: ${msg}\n`)
+    switch (target[0]) {
+        case "#":
+            if (!client.channellogs[target.slice(1)]) {
+                console.error("channellogs for channel " + target.slice(1) + " is not available!")
+            } else {
+                client.channellogs[target.slice(1)].write(`${context["display-name"]}: ${msg}\n`)
+            }
+            break;
     }
     if (self) return; // Ignore messages from the bot
     let args = msg.trim().split(" ");
@@ -22,7 +26,15 @@ module.exports = async (client, target, context, msg, self) => {
         if (cmd) {
             client.say(target, cmd);
             console.log(`* Executed ${commandName} Customcommand`)
+        } else {
+            cmd = client.coms.get(commandName)
+            if (cmd){
+                if (!hasPerm(context)) return
+                client.say(target, cmd);
+                console.log(`* Executed ${commandName} Customcommand`)
+            }
         }
+    
     }
 }
 function checkModAction(client, msg, ctx, target) {

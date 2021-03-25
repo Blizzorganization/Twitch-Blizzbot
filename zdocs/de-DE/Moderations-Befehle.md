@@ -13,13 +13,13 @@
 #### Ändern eines eingespeicherten Commands<br>
 
 ```
-!edit  !(Befehlsname) (Text)  
+!edit !(Befehlsname) (Text)  
     z.B !edit !test Das ist ein neuer Text 
  ```     
 #### Entfernen eines eingespeicherten Commands.<br>
 
 ```
-!del  !(Befehlsname)<br>    
+!del !(Befehlsname)
     z.B !del !test
 ```
 ## **Blacklist  hinzufügen/löschen**
@@ -55,4 +55,13 @@
 ```
 !delalias (alias) (hauptcommand)
     z.B !delalias !testing !test 
+```
+
+## **Watchtime Funktion**
+
+#### Zeigt die Zeit an wie lange jemand zuschaut.<br>
+
+```
+!uwtime (name)
+    z.B !uwtime username
 ```

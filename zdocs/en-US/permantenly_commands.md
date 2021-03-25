@@ -12,5 +12,7 @@
 	!title	
 #### Follower-mode switch in case of a raid (mod only)
     !raid
-#### shows information about the streamer (viewer,follower,subs)
+#### shows information about the streamer (viewer, follower, subs)
 	!info
+#### Shows how long you have been watching the streamer
+	!watchtime

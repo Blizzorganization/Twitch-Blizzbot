@@ -19,7 +19,7 @@
 #### Removing a saved command.<br>
 
 ```
-!del !(command name)<br>
+!del !(command name)
     z.B !del !test 
 ```    
 
@@ -48,11 +48,19 @@
 
 ```
 !addalias (new alias) (main command)
-    z.B  !addalias !testing !test
+    z.B !addalias !testing !test
 ```
 #### Removes an alias from the command list.<br>
 
 ```
 !delalias (alias) (main command)
-    z.B  !delalias !testing !test
+    z.B !delalias !testing !test
+```
+## **Watchtime function**
+
+Shows the time how long someone is watching. <br>
+
+```
+!uwtime (name)
+    z.B !uwtime username
 ```
