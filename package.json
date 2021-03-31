@@ -13,7 +13,6 @@
     "discord.js": "^12.5.1",
     "enmap": "^5.8.4",
     "node-fetch": "^2.6.1",
-    "tiktok-app-api": "^1.4.1",
-    "tmi.js": "^1.7.1"
+    "tmi.js": "^1.7.5"
   }
 }
