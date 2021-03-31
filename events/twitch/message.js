@@ -4,7 +4,7 @@ module.exports = async (client, target, context, msg, self) => {
             if (!client.channellogs[target.slice(1)]) {
                 console.error("channellogs for channel " + target.slice(1) + " is not available!")
             } else {
-                client.channellogs[target.slice(1)].write(`${context["display-name"]}: ${msg}\n`)
+                client.channellogs[target.slice(1)].write(`[${(new Date()).toLocaleTimeString()}]${context["display-name"]}: ${msg}\n`)
             }
             break;
     }
