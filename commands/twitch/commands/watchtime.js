@@ -1,6 +1,6 @@
 exports.help = true
 exports.run = async (client, target, context, msg, self) => {
-    var watchtime = client.watchtime.get(target, context["display-name"])
+    var watchtime = client.watchtime.get(target, context["display-name"].toLowerCase())
     if (!watchtime) watchtime = 1
     var timeTotalMinutes = Math.floor(watchtime/2)
     var timeMinutes = timeTotalMinutes%60
