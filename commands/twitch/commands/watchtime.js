@@ -7,5 +7,5 @@ exports.run = async (client, target, context, msg, self) => {
     var timeHours = (timeTotalMinutes%1440)-timeMinutes
     var timeDays = (timeTotalMinutes-timeMinutes)-timeHours
     timeHours /= 60
-    client.say(target, `Du schaust ${target.slice(1)} schon seit ${timeDays} Tag(en), ${timeHours} Stunde(n) und ${timeMinutes} Minute(n)`)
+    client.say(target, `${context["display-name"]} schaut ${target.slice(1)} schon seit ${timeDays} Tag(en), ${timeHours} Stunde(n) und ${timeMinutes} Minute(n)`)
 }
