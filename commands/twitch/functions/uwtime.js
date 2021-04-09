@@ -13,5 +13,6 @@ exports.run = (client, target, context, msg, self, args) => {
     var timeHours = (timeTotalMinutes%1440)-timeMinutes
     var timeDays = (timeTotalMinutes-timeMinutes)-timeHours
     timeHours /= 60
+    timeDays/=1440
     client.say(target, `${user} schaut ${target.slice(1)} schon seit ${timeDays} Tag(en), ${timeHours} Stunde(n) und ${timeMinutes} Minute(n)`)
 }
