@@ -1,11 +1,11 @@
 exports.help = false
 exports.perm = true
-exports.run = (client, target, context, msg, self, args) => {
+exports.run =(client, target, context, msg, self, args) => {
     if (args.length > 1) {
         let newcmd = args.shift().toLowerCase()
         let res = args.join(" ")
         if (!res || res == "") return client.say(target, "Du musst angeben, was die Antwort sein soll.")
-        client.coms.set(newcmd, res)
+        client.db.newCom(newcmd, res)
         client.say(target, `Befehl ${newcmd} wurde hinzugefügt.`)
         console.log(`* Added Customcommand ${newcmd}`)
     } else {

@@ -1,6 +1,4 @@
-const { client } = require("tmi.js");
-
-exports.run = (clients, args) => {
-    console.log("Bot wird gestoppt.")
+exports.run = async (clients, args) => {
+    await clients.stop()
     process.exit(0)
 }

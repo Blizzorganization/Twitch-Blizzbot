@@ -1,5 +1,6 @@
-const fetch = require("node-fetch")
-exports.help = true
+const fetch = require("node-fetch");
+
+exports.help = true;
 exports.run = async (client, target, context, msg, self) => {
     let resp = await fetch(`https://decapi.me/twitch/title/${target.slice(1)}`)
     let title = await resp.text()

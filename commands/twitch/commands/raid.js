@@ -1,4 +1,3 @@
-const fetch = require("tmi.js")
 exports.help = false
 exports.perm = true
 exports.run = async (client, target, context, msg, self) => {

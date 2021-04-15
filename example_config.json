@@ -9,11 +9,15 @@
         ],
         "Raidminutes": 0
     },
+    "useDiscord": true,
     "discord": {
         "token": "",
-        "blchannel": "",
-        "relaychannel": "",
-        "statuschannel": "",
-        "commandchannel": ""
+        "prefix": "!",
+        "channels": {
+            "blacklist": "",
+            "commands": "",
+            "status": "",
+            "relay": ""
+        }
     }
 }
