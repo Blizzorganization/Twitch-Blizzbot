@@ -3,7 +3,6 @@ exports.event = (client, message) => {
     if (message.author.id == client.user.id) return;
     if (message.author.bot) return;
     let args = message.content.split(" ")
-    console.log(args)
     switch (message.channel.id) {
         case client.config.channels.relay:
             let channel;
@@ -16,7 +15,6 @@ exports.event = (client, message) => {
             client.clients.twitch.say(channel, args.join(" "))
             break;
         case client.config.channels.commands:
-            console.log("commandchannel")
             let commandName = args.shift().toLowerCase()
             let cmd = client.commands.get(commandName)
             if (!cmd) return;

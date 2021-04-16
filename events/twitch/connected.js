@@ -9,7 +9,6 @@ exports.event = (client, addr, port) => {
         client.clients.twitch.db.newWatchtimeChannel(channel)
     })
     client.watchtime = setInterval(() => {
-//        console.log("fetching watchtime")
         client.config.channels.forEach(async (channel) => {
             let uptime = await (await fetch(`https://decapi.me/twitch/uptime/${channel.slice(1)}`)).text()
             if (`#${uptime}` !== `${channel} is offline`) {
