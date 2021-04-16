@@ -4,6 +4,10 @@
             "username": "",
             "password": ""
         },
+        "connection": {
+            "reconnect": true,
+            "secure": true
+        },
         "channels": [
             ""
         ],
