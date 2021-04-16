@@ -25,7 +25,7 @@ exports.DiscordClient = class DiscordClient extends Client {
                 if (err) return console.error(err);
                 files.forEach(file => {
                     if (!(file.endsWith(".js") || file.endsWith(".ts"))) return;
-                    let props = require(`./${commanddir}/${file.split(".")[0]}`);
+                    let props = require(`../${commanddir}/${file.split(".")[0]}`);
                     let command = this.config.prefix + file.split(".")[0]
                     console.log(`Attempting to load Command ${command}`)
                     commandmap.set(command, props)
@@ -47,7 +47,7 @@ exports.DiscordClient = class DiscordClient extends Client {
                 files.forEach(file => {
                     if (!(file.endsWith(".js") || file.endsWith(".ts"))) return;
                     let eventname = file.split(".")[0];
-                    const { event } = require(`./${eventdir}/${eventname}`);
+                    const { event } = require(`../${eventdir}/${eventname}`);
                     this.on(eventname, event.bind(null, this));
                 });
             });

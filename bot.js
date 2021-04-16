@@ -1,8 +1,8 @@
 const { readFileSync } = require("fs");
-const { Clients } = require("./clients");
-const { ConsoleClient } = require("./consoleclient");
-const { DiscordClient } = require("./discordclient");
-const { TwitchClient } = require("./twitchclient");
+const { Clients } = require("./modules/clients");
+const { ConsoleClient } = require("./modules/consoleclient");
+const { DiscordClient } = require("./modules/discordclient");
+const { TwitchClient } = require("./modules/twitchclient");
 
 const config = JSON.parse(readFileSync("./config.json").toString())
 var clients = new Clients()

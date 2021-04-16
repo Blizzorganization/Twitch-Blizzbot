@@ -1,5 +1,5 @@
 const { TextChannel } = require("discord.js")
-const { CustomError } = require("../../CustomError")
+const { CustomError } = require("../../modules/CustomError")
 
 exports.event = (client) => {
     console.log("Discord connected.")

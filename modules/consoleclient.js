@@ -37,7 +37,7 @@ exports.ConsoleClient = class ConsoleClient extends EventEmitter {
                 files.forEach(file => {
                     if (!(file.endsWith(".js") || file.endsWith(".ts"))) return;
                     let command = file.split(".")[0]
-                    let props = require(`./${commanddir}/${command}`);
+                    let props = require(`../${commanddir}/${command}`);
                     console.log(`Attempting to load Command ${command}`)
                     commandmap.set(command, props)
                     if (props.help && helplist) helplist.push(command)
