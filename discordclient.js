@@ -29,7 +29,7 @@ exports.DiscordClient = class DiscordClient extends Client {
                     let command = this.config.prefix + file.split(".")[0]
                     console.log(`Attempting to load Command ${command}`)
                     commandmap.set(command, props)
-                    if (props.help) helplist?.push(command)
+                    if (props.help && helplist) helplist.push(command)
                     if (!props.alias) return
                     props.alias.forEach((a) => {
                         console.log(`Adding alias !${a} for ${command}`)

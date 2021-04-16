@@ -40,7 +40,7 @@ exports.ConsoleClient = class ConsoleClient extends EventEmitter {
                     let props = require(`./${commanddir}/${command}`);
                     console.log(`Attempting to load Command ${command}`)
                     commandmap.set(command, props)
-                    if (props.help) helplist?.push(command)
+                    if (props.help && helplist) helplist.push(command)
                     if (!props.alias) return
 
                 })
