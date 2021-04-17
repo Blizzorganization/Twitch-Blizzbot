@@ -4,11 +4,8 @@ exports.event = (client, channel, username, months, message, userstate, methods)
     let streakMonths = userstate['msg-param-steak-Months'];
     let sharedStreak = userstate['msg-param-should-share-streak'];
     let resubmessage = (message != null)
-    if (sharedStreak) {
-        client.say(channel, `/me Vielen Dank ${username} für einen ${sharedStreak} in Folge! ${message}`);
-    }
-    else {
-        client.say(channel, `/me Danke ${username} für deinen insgesamt ${cumulativeMonths}. Monat${resubmessage ? " Mit der Nachricht: " + message : ""}.`)
-    }
+    
+    //message for Action
+    client.say(channel, `/me Danke ${username} fÃ¼r deinen insgesamt ${cumulativeMonths}. Monat${resubmessage ? " Mit der Nachricht: " + message : ""}.`)
     console.log(` ${username} resub ${cumulativeMonths}. month`)
 }
