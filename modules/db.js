@@ -99,8 +99,14 @@ exports.DB = class DB {
     }
     allCcmds() { return this.statements.get("allCcmds").all().map((row) => row.commandname) }
     allComs() { return this.statements.get("allComs").all().map((row) => row.commandname) }
-    getCcmd(commandname) { return this.statements.get("getCcmd").get({ commandname }).response }
-    getCom(commandname) { return this.statements.get("getCom").get({ commandname }).response }
+    getCcmd(commandname) {
+        data = this.statements.get("getCcmd").get({ commandname })
+        return data ? data.response : undefined
+    }
+    getCom(commandname) {
+        data = this.statements.get("getCom").get({ commandname })
+        return data ? data.response : undefined
+    }
     newCcmd(commandname, response) { this.statements.get("newCcmd").run({ commandname, response }) }
     newCom(commandname, response) { this.statements.get("newCom").run({ commandname, response }) }
     delCom(commandname) { this.statements.get("delCom").run({ commandname }) }
