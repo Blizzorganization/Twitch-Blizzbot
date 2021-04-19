@@ -2,8 +2,8 @@ exports.help = false
 exports.perm = true
 exports.run = (client, target, context, msg, self) => {
     let appHelp = ""
-    console.log(client.coms.keyArray().length)
-    if (client.coms.keyArray().length > 0) {
+    var coms = client.db.allComs()
+    if (coms.length > 0) {
         appHelp = `Es sind folgende Commands hinterlegt: ${client.coms.keyArray().join(", ")}`
     } else {
         appHelp = "Es sind keine Commands hinterlegt."

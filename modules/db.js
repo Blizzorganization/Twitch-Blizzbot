@@ -31,6 +31,7 @@ exports.DB = class DB {
         this.statements.set("getCcmd", this.customcommands.prepare("SELECT response FROM ccmds WHERE commandname = @commandname"))
         this.statements.set("getCom", this.customcommands.prepare("SELECT response FROM coms WHERE commandname = @commandname"))
         this.statements.set("allCcmds", this.customcommands.prepare("SELECT commandname FROM ccmds"))
+        this.statements.set("allComs", this.customcommands.prepare("SELECT commandname FROM coms"))
         this.statements.set("newCcmd", this.customcommands.prepare("INSERT INTO ccmds VALUES (@commandname, @response)"))
         this.statements.set("newCom", this.customcommands.prepare("INSERT INTO coms VALUES (@commandname, @response)"))
         this.statements.set("delCcmd", this.customcommands.prepare("DELETE FROM ccmds WHERE commandname = @commandname"))
@@ -97,8 +98,9 @@ exports.DB = class DB {
         return this.statements.get(`getMWatchtimeFor${channel}`).get({ user }).watchtime
     }
     allCcmds() { return this.statements.get("allCcmds").all().map((row) => row.commandname) }
+    allComs() { return this.statements.get("allComs").all().map((row) => row.commandname) }
     getCcmd(commandname) { return this.statements.get("getCcmd").get({ commandname }).response }
-    getCom(commandname) { return this.statements.get("getComs").get({ commandname }).response }
+    getCom(commandname) { return this.statements.get("getCom").get({ commandname }).response }
     newCcmd(commandname, response) { this.statements.get("newCcmd").run({ commandname, response }) }
     newCom(commandname, response) { this.statements.get("newCom").run({ commandname, response }) }
     delCom(commandname) { this.statements.get("delCom").run({ commandname }) }
