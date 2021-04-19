@@ -20,7 +20,7 @@ exports.TwitchClient = class TwitchClient extends client {
         super(opts);
         this.config = opts;
         if (!existsSync("./channellogs")) mkdirSync("./channellogs")
-        this.newChannellogs()
+        this.once("connected", () => this.newChannellogs(opts.channels))
         schedule.scheduleJob("newchannellogs", "0 17 * * *", this.newChannellogs)
         this.blacklist.ensure("delmsg", [])
         this.db = new DB()
@@ -30,7 +30,7 @@ exports.TwitchClient = class TwitchClient extends client {
         this.loadEvents("events/twitch/interaction")
         this.connect()
     }
-    newChannellogs() {
+    newChannellogs(channels=this.channels) {
         var date = new Date()
         var month = '' + (date.getMonth() + 1);
         var day = '' + date.getDate();
@@ -42,9 +42,9 @@ exports.TwitchClient = class TwitchClient extends client {
             day = '0' + day;
 
         var dateString = [year, month, day].join('-');
-        for (let channel of this.getChannels()) {
+        for (let channel of channels) {
             channel = channel.replace("#", "")
-            if (!existsSync(`./channellogs/${channel}/`)) mkdirSync(`./channellogs/${channel}`)
+            if (!existsSync(`./channellogs/${channel}`)) mkdirSync(`./channellogs/${channel}`)
             this.channellogs[channel] = createWriteStream(`./channellogs/${channel}/${dateString}.chatlog.txt`).destroy
         }
     }
