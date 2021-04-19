@@ -1,10 +1,12 @@
+const { WriteStream } = require("fs")
 exports.event = async (client, target, context, msg, self) => {
     switch (target[0]) {
         case "#":
-            if (!client.channellogs[target.slice(1)]) {
+            let channellog = client.channellogs[target.replace("#", "")]
+            if (!channellog || !(channellog instanceof WriteStream)) {
                 console.error("channellogs for channel " + target.slice(1) + " is not available!")
             } else {
-                client.channellogs[target.slice(1)].write(`[${(new Date()).toLocaleTimeString()}]${context["display-name"]}: ${msg}\n`)
+                channellog.write(`[${(new Date()).toLocaleTimeString()}]${context["display-name"]}: ${msg}\n`)
             }
             break;
     }

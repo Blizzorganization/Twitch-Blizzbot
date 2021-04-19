@@ -52,7 +52,10 @@ exports.DB = class DB {
         this.statements.set(`mwatchtimeListFor${channel}`, this.monthlyWatchtime.prepare("SELECT user, watchtime FROM <channel> ORDER BY watchtime DESC LIMIT @max".replace("<channel>", channel)))
     }
     newAlias(name, command) { return this.statements.get("newAlias").run({ name, command }) }
-    getAlias(name) { return this.statements.get("getAlias").get({ name }).command }
+    getAlias(name) {
+        let data = this.statements.get("getAlias").get({ name })
+        return data ? data.command : undefined
+    }
     deleteAlias(name) { return this.statements.get("deleteAlias").run({ name }) }
     getAliases() { return this.statements.get("getAliases").all().map((row) => row.name) }
     newWatchtimeChannel(channel) {
@@ -100,11 +103,11 @@ exports.DB = class DB {
     allCcmds() { return this.statements.get("allCcmds").all().map((row) => row.commandname) }
     allComs() { return this.statements.get("allComs").all().map((row) => row.commandname) }
     getCcmd(commandname) {
-        data = this.statements.get("getCcmd").get({ commandname })
+        let data = this.statements.get("getCcmd").get({ commandname })
         return data ? data.response : undefined
     }
     getCom(commandname) {
-        data = this.statements.get("getCom").get({ commandname })
+        let data = this.statements.get("getCom").get({ commandname })
         return data ? data.response : undefined
     }
     newCcmd(commandname, response) { this.statements.get("newCcmd").run({ commandname, response }) }
