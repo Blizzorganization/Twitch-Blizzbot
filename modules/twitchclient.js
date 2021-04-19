@@ -45,7 +45,7 @@ exports.TwitchClient = class TwitchClient extends client {
         for (let channel of channels) {
             channel = channel.replace("#", "")
             if (!existsSync(`./channellogs/${channel}`)) mkdirSync(`./channellogs/${channel}`)
-            this.channellogs[channel] = createWriteStream(`./channellogs/${channel}/${dateString}.chatlog.txt`)
+            this.channellogs[channel] = createWriteStream(`./channellogs/${channel}/${dateString}.chatlog.txt`, {flags: "a"})
         }
     }
     loadCommands(commandmap, commanddir, helplist) {
