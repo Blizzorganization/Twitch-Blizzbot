@@ -23,7 +23,9 @@ exports.loadCommands = (commandmap, commanddir, helplist) => {
                 commandmap.set(command, props)
                 if (props.help && helplist) helplist.push(command)
                 if (!props.alias) return
-
+                for (const alias of props.alias) {
+                    commandmap.set(alias, props)
+                }
             })
         })
     } else throw new CustomError("LoadError", `CommandDirectory ${commanddir} does not exist.`)
