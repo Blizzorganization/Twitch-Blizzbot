@@ -14,7 +14,7 @@ exports.run =(client, target, context, msg, self, args) => {
     if (args.length > 1) {
         let newcmd = args.shift().toLowerCase()
         let res = args.join(" ")
-        client.db.newCcmd(newcmd, res)
+        client.db.editCcmd(newcmd, res)
         client.say(target, `Befehl ${newcmd} wurde bearbeitet.`)
         console.log(`* Edited Customcommand ${newcmd}`)
     }

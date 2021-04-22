@@ -47,6 +47,8 @@ exports.DB = class DB {
         this.statements.set("allComs", this.customcommands.prepare("SELECT commandname FROM coms"))
         this.statements.set("newCcmd", this.customcommands.prepare("INSERT INTO ccmds VALUES (@commandname, @response)"))
         this.statements.set("newCom", this.customcommands.prepare("INSERT INTO coms VALUES (@commandname, @response)"))
+        this.statements.set("editCcmd", this.customcommands.prepare("UPDATE ccmds SET response = @response WHERE commandname = @commandname"))
+        this.statements.set("editCom", this.customcommands.prepare("UPDATE coms SET response = @response WHERE commandname = @commandname"))
         this.statements.set("delCcmd", this.customcommands.prepare("DELETE FROM ccmds WHERE commandname = @commandname"))
         this.statements.set("delCom", this.customcommands.prepare("DELETE FROM coms WHERE commandname = @commandname"))
         schedule.scheduleJob("newMonthlyWatchtime", "0 0 1 * *", async () => {
@@ -210,6 +212,18 @@ exports.DB = class DB {
      * @param {string} response 
      */
     newCom(commandname, response) { this.statements.get("newCom").run({ commandname, response }) }
+    /**
+    * Create new Customcommand/change its response
+    * @param {string} commandname 
+    * @param {string} response 
+    */
+    editCcmd(commandname, response) { this.statements.get("editCcmd").run({ commandname, response }) }
+    /**
+     * Create new mod Customcommand/change its response
+     * @param {string} commandname 
+     * @param {string} response 
+     */
+    editCom(commandname, response) { this.statements.get("editCom").run({ commandname, response }) }
     /**
      * delete a mod Customcommand
      * @param {string} commandname 
