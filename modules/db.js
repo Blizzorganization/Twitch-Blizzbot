@@ -213,13 +213,13 @@ exports.DB = class DB {
      */
     newCom(commandname, response) { this.statements.get("newCom").run({ commandname, response }) }
     /**
-    * Create new Customcommand/change its response
+    * Edit a Customcommand/change its response
     * @param {string} commandname 
     * @param {string} response 
     */
     editCcmd(commandname, response) { this.statements.get("editCcmd").run({ commandname, response }) }
     /**
-     * Create new mod Customcommand/change its response
+     * Edit a mod Customcommand/change its response
      * @param {string} commandname 
      * @param {string} response 
      */

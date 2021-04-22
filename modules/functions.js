@@ -1,4 +1,5 @@
 const { CustomError } = require("./CustomError")
+const {existsSync, readdir} = require("fs")
 /**
  * @module functions
  */
