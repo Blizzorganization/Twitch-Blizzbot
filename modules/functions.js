@@ -44,7 +44,7 @@ exports.loadEvents = (eventdir, eventemitter) => {
                 if (!(file.endsWith(".js"))) return;
                 let eventname = file.split(".")[0];
                 const { event } = require(`../${eventdir}/${eventname}`);
-                eventemitter.on(eventname, event.bind(null, this));
+                eventemitter.on(eventname, event.bind(null, eventemitter));
             });
         });
     } else throw new CustomError("LoadError", `EventDirectory ${eventdir} does not exist.`)

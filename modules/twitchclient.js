@@ -77,6 +77,7 @@ exports.TwitchClient = class TwitchClient extends client {
             this.channellogs[channel] = createWriteStream(`./channellogs/${channel}/${dateString}.chatlog.txt`, { flags: "a" })
         }
     }
+    
     /**
      * stops the Twitch Client
      */
