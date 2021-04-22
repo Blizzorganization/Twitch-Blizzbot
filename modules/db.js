@@ -102,7 +102,7 @@ exports.DB = class DB {
     newWatchtimeChannel(channel) {
         if (channel.includes("#")) channel = channel.replace("#", "")
         this.watchtimedb.prepare(`CREATE TABLE IF NOT EXISTS ${channel} (user text PRIMARY KEY, watchtime number);`).run()
-        this.statements.set(`getWachtimeFor${channel}`, this.watchtimedb.prepare(`SELECT watchtime FROM ${channel} WHERE user = @user`))
+        this.statements.set(`getWatchtimeFor${channel}`, this.watchtimedb.prepare(`SELECT watchtime FROM ${channel} WHERE user = @user`))
         this.statements.set(`watchtimeNewFor${channel}`, this.watchtimedb.prepare(`INSERT OR IGNORE INTO ${channel} VALUES (@user, 0);`))
         this.statements.set(`watchtimeIncFor${channel}`, this.watchtimedb.prepare(`UPDATE ${channel} SET watchtime = watchtime + 1 WHERE user = @user`))
         this.statements.set(`watchtimeListFor${channel}`, this.watchtimedb.prepare("SELECT user, watchtime FROM <channel> ORDER BY watchtime DESC LIMIT @max".replace("<channel>", channel)))

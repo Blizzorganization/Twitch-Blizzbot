@@ -15,9 +15,9 @@ exports.event = (client, addr, port) => {
         client.clients.discord.statuschannel.setTopic("Bot Online")
     }
     client.started = true
-    client.config.channels.forEach((channel) => {
+    for (const channel of client.config.channels) {
         client.clients.twitch.db.newWatchtimeChannel(channel)
-    })
+    }
     client.watchtime = setInterval(() => {
         client.config.channels.forEach(async (channel) => {
             let uptime = await (await fetch(`https://decapi.me/twitch/uptime/${channel.slice(1)}`)).text()
