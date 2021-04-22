@@ -56,6 +56,6 @@ exports.DiscordClient = class DiscordClient extends Client {
     async stop() {
         await this.statuschannel.send("Goodbye")
         await this.statuschannel.setTopic("Bot Offline")
-        return this.destroy()
+        this.destroy()
     }
 }
