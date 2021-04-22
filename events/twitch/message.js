@@ -21,7 +21,7 @@ exports.event = async (client, target, context, msg, self) => {
     if (self) return; // Ignore messages from the bot
     let args = msg.trim().split(" ");
     checkModAction(client, msg, context, target)
-    const commandName = args.shift().toLowerCase();
+    const commandName = args.shift().toLowerCase().slice(1);
     let cmd = client.commands.get(commandName)
     if (cmd) {
         if (cmd.perm && (hasPerm(context) == false)) {
@@ -31,13 +31,13 @@ exports.event = async (client, target, context, msg, self) => {
         cmd.run(client, target, context, msg, self, args)
         console.log(`* Executed ${commandName} command`);
     } else {
-        cmd = client.db.getCcmd(commandName);
+        cmd = client.db.getCcmd(`!${commandName}`);
         if (!cmd) cmd = client.db.getCcmd(client.db.getAlias(commandName))
         if (cmd) {
             client.say(target, cmd);
             console.log(`* Executed ${commandName} Customcommand`)
         } else {
-            cmd = client.db.getCom(commandName)
+            cmd = client.db.getCom(`${commandName}`)
             if (cmd) {
                 if (!hasPerm(context)) return
                 client.say(target, cmd);
