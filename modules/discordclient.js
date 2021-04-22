@@ -54,10 +54,10 @@ exports.DiscordClient = class DiscordClient extends Client {
         } else throw new CustomError("LoadError", `EventDirectory ${eventdir} does not exist.`)
     }
     async stop() {
+        this.statuschannel.setTopic("Bot Offline")
+        console.log("set status to offline")
         await this.statuschannel.send("Goodbye")
         console.log("sent goodbye message")
-        await this.statuschannel.setTopic("Bot Offline")
-        console.log("set status to offline")
         this.destroy()
         console.log("disconnected from discord")
     }
