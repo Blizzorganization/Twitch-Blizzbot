@@ -88,6 +88,6 @@ exports.TwitchClient = class TwitchClient extends client {
         clearInterval(this.watchtime)
         let disconnect = this.disconnect()
         let blacklist = this.blacklist.close()
-        return Promise.all(dbstop, disconnect, blacklist)
+        return [dbstop, disconnect, blacklist]
     }
 }
