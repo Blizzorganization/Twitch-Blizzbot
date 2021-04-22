@@ -2,13 +2,26 @@ const Database = require("better-sqlite3");
 const { existsSync, mkdirSync } = require("fs");
 const schedule = require("node-schedule")
 
+/**
+ * @typedef {Object} watchtimeuser
+ * @property {string} user
+ * @property {number} watchtime
+ */
+
+/**
+ * Database Class
+ * @class
+ * @property {Database} customcommands
+ * @property {Database} watchtimedb
+ * @property {Database} monthlyWatchtime
+ * @property {Map} statements
+ * @property {string[]} watchtimechannels
+ */
 exports.DB = class DB {
-    aliases;
     customcommands;
     watchtimedb;
     monthlyWatchtime;
     statements = new Map();
-    blacklist;
     watchtimechannels = [];
     constructor() {
         if (!(existsSync("./data"))) mkdirSync("./data");
@@ -44,6 +57,10 @@ exports.DB = class DB {
             }
         })
     }
+    /**
+     * setup monthly watchtime Table and prepare statements
+     * @param {string} channel Twitch Channel Name
+     */
     mWatchtimeSetup(channel) {
         this.monthlyWatchtime.prepare(`CREATE TABLE IF NOT EXISTS ${channel} (user text PRIMARY KEY, watchtime number);`).run()
         this.statements.set(`getMWachtimeFor${channel}`, this.monthlyWatchtime.prepare(`SELECT watchtime FROM ${channel} WHERE user = @user`))
@@ -51,13 +68,35 @@ exports.DB = class DB {
         this.statements.set(`mwatchtimeIncFor${channel}`, this.monthlyWatchtime.prepare(`UPDATE ${channel} SET watchtime = watchtime + 1 WHERE user = @user`))
         this.statements.set(`mwatchtimeListFor${channel}`, this.monthlyWatchtime.prepare("SELECT user, watchtime FROM <channel> ORDER BY watchtime DESC LIMIT @max".replace("<channel>", channel)))
     }
-    newAlias(name, command) { return this.statements.get("newAlias").run({ name, command }) }
+    /**
+     * adds an Alias to a custom command
+     * @param {string} name name of the Alias
+     * @param {string} command Command the alias refers to
+     */
+    newAlias(name, command) { this.statements.get("newAlias").run({ name, command }) }
+    /**
+     * resolve an alias
+     * @param {string} name 
+     * @returns {string|undefined} the command the alias refers to if the alias exists
+     */
     getAlias(name) {
         let data = this.statements.get("getAlias").get({ name })
         return data ? data.command : undefined
     }
-    deleteAlias(name) { return this.statements.get("deleteAlias").run({ name }) }
+    /**
+     * delete an alias
+     * @param {string} name Name of the Alias to delete
+     */
+    deleteAlias(name) { this.statements.get("deleteAlias").run({ name }) }
+    /**
+     * Get all existing aliases
+     * @returns {string[]} List of all Aliases
+     */
     getAliases() { return this.statements.get("getAliases").all().map((row) => row.name) }
+    /**
+     * Generate Watchtime Table and prepare statements
+     * @param {string} channel Twitch Channel Name
+     */
     newWatchtimeChannel(channel) {
         if (channel.includes("#")) channel = channel.replace("#", "")
         this.watchtimedb.prepare(`CREATE TABLE IF NOT EXISTS ${channel} (user text PRIMARY KEY, watchtime number);`).run()
@@ -68,14 +107,31 @@ exports.DB = class DB {
         this.mWatchtimeSetup(channel)
         this.watchtimechannels.push(channel);
     }
+    /**
+     * get a top list of watchtime
+     * @param {string} channel Twitch Channel Name
+     * @param {number} max Amount of Viewers to fetch
+     * @returns {watchtimeuser[]} Sorted Watchtime List
+     */
     watchtimeList(channel, max) {
         if (!("number" == typeof max)) throw new TypeError("You have to select how many entries you need as a number.")
         return this.statements.get(`watchtimeListFor${channel}`).all({ max })
     }
+    /**
+     * get a top list of watchtime
+     * @param {string} channel Twitch Channel Name
+     * @param {number} max Amount of Viewers to fetch
+     * @returns {watchtimeuser[]} Sorted Watchtime List
+     */
     mwatchtimeList(channel, max) {
         if (!("number" == typeof max)) throw new TypeError("You have to select how many entries you need as a number.")
         return this.statements.get(`mwatchtimeListFor${channel}`).all({ max })
     }
+    /**
+     * Default Watchtime Increase (and creation for new users)
+     * @param {string} channel Channel where to add Watchtime
+     * @param {string[]} chatters List of Users to add Watchtime to
+     */
     watchtime(channel, chatters) {
         if (channel.includes("#")) channel = channel.replace("#", "")
         var watchtimenewstatement = this.statements.get(`watchtimeNewFor${channel}`)
@@ -92,32 +148,89 @@ exports.DB = class DB {
         })
         transaction(chatters)
     }
+    /**
+     * get Watchtime for User on Channel
+     * @param {string} channel 
+     * @param {string} user 
+     * @returns {number|undefined} watchtime of the user
+     */
     getWatchtime(channel, user) {
         if (channel.includes("#")) channel = channel.replace("#", "")
-        return this.statements.get(`getWatchtimeFor${channel}`).get({ user }).watchtime
+        let data = this.statements.get(`getWatchtimeFor${channel}`).get({ user })
+        return data ? data.watchtime : undefined
     }
+    /**
+     * get monthly Watchtime for User on Channel
+     * @param {string} channel 
+     * @param {string} user 
+     * @returns {number|undefined} watchtime of the user
+     */
     getMWatchtime(channel, user) {
         if (channel.includes("#")) channel = channel.replace("#", "")
-        return this.statements.get(`getMWatchtimeFor${channel}`).get({ user }).watchtime
+        let data = this.statements.get(`getMWatchtimeFor${channel}`).get({ user })
+        return data ? data.watchtime : undefined;
     }
+    /**
+     * get all customcommands
+     * @returns {string[]} list of customcommands
+     */
     allCcmds() { return this.statements.get("allCcmds").all().map((row) => row.commandname) }
+    /**
+     * get all mod customcommands
+     * @returns {string[]} list of mod customcommands
+     */
     allComs() { return this.statements.get("allComs").all().map((row) => row.commandname) }
+    /**
+     * get response of customcommand
+     * @param {string} commandname 
+     * @returns {string|undefined} response
+     */
     getCcmd(commandname) {
         let data = this.statements.get("getCcmd").get({ commandname })
         return data ? data.response : undefined
     }
+    /**
+     * get mod customcommand response
+     * @param {string} commandname 
+     * @returns {string|undefined} response
+     */
     getCom(commandname) {
         let data = this.statements.get("getCom").get({ commandname })
         return data ? data.response : undefined
     }
+    /**
+     * Create new Customcommand/change its response
+     * @param {string} commandname 
+     * @param {string} response 
+     */
     newCcmd(commandname, response) { this.statements.get("newCcmd").run({ commandname, response }) }
+    /**
+     * Create new mod Customcommand/change its response
+     * @param {string} commandname 
+     * @param {string} response 
+     */
     newCom(commandname, response) { this.statements.get("newCom").run({ commandname, response }) }
+    /**
+     * delete a mod Customcommand
+     * @param {string} commandname 
+     */
     delCom(commandname) { this.statements.get("delCom").run({ commandname }) }
+    /**
+     * delete a Customcommand
+     * @param {string} commandname 
+     */
     delCcmd(commandname) {
         this.statements.get("delCcmd").run({ commandname })
         this.statements.get("delAliases").run({ command: commandname })
     }
+    /**
+     * delete an Alias
+     * @param {string} name 
+     */
     delAlias(name) { this.statements.get("delAlias").run({ name }) }
+    /**
+     * backup all databases
+     */
     async backup() {
         var date = new Date()
         var month = '' + (date.getMonth() + 1);
@@ -135,6 +248,9 @@ exports.DB = class DB {
         await this.customcommands.backup(`backup/${dateString}.customcommands.sqlite`)
         console.log("backed up customcommands")
     }
+    /**
+     * stop all Databases 
+     */
     stop() {
         var stopping = []
         stopping.push(this.customcommands.close())

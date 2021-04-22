@@ -1,5 +1,14 @@
 exports.help = false
 exports.perm = true
+/**
+ * @name delbl
+ * @module TwitchCommands
+ * @param {TwitchClient} client
+ * @param {string} target
+ * @param {ChatUserstate} context
+ * @param {string} msg
+ * @param {boolean} self
+ */
 exports.run =(client, target, context, msg, self, args) => {
     if (!args || args.length == 0) return client.say(target, "Du musst angeben, was du von der Blacklist entfernen willst!")
     let blremove = args.join(" ").toLowerCase()

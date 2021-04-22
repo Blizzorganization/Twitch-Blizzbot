@@ -1,6 +1,11 @@
 const { TextChannel } = require("discord.js")
 const { CustomError } = require("../../modules/CustomError")
 
+/**
+ * 
+ * @listens discord:ready
+ * @param {DiscordClient} client 
+ */
 exports.event = (client) => {
     console.log("Discord connected.")
     var blchannel = client.channels.resolve(client.config.channels.blacklist)

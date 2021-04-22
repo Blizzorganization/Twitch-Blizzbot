@@ -1,3 +1,12 @@
+const {Clients} = require("../../modules/clients")
+
+/**
+ * @title say
+ * @name say
+ * @module ConsoleCommands
+ * @param {Clients} clients 
+ * @param {string[]} args 
+ */
 exports.run = (clients, args) => {
     let channel;
     if (clients.twitch.config.channels.length == 1) {

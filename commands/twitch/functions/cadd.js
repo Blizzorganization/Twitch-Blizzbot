@@ -1,5 +1,14 @@
 exports.help = false
 exports.perm = true
+/**
+ * @name cadd
+ * @module TwitchCommands
+ * @param {TwitchClient} client
+ * @param {string} target
+ * @param {ChatUserstate} context
+ * @param {string} msg
+ * @param {boolean} self
+ */
 exports.run =(client, target, context, msg, self, args) => {
     if (args.length > 1) {
         let newcmd = args.shift().toLowerCase()

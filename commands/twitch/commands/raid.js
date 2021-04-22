@@ -1,13 +1,24 @@
 exports.help = false
 exports.perm = true
-exports.run = async (client, target, context, msg, self) => {
+/**
+ * @name raid
+ * @module TwitchCommands
+ * @param {TwitchClient} client
+ * @param {string} target
+ * @param {ChatUserstate} context
+ * @param {string} msg
+ * @param {boolean} self
+ */
+exports.run = (client, target, context, msg, self) => {
     let minutes = client.config.Raidminutes
-    setTimeout(Ende, 60000 * minutes)
+    setTimeout(ende, 60000 * minutes)
 
     client.say(target, `/me Der Follower Modus wurde für die nächsten ${minutes} Minuten deaktiviert.`)
     client.say(target, `/followersoff`)
-
-    function Ende() {
+    /**
+     * starts follower only mode after timeout
+     */
+    function ende() {
         client.say(target, `/followers 0`)
         client.say(target, `/me Der Follower Modus wurde Aktiviert.`)
     }

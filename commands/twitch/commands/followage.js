@@ -1,5 +1,14 @@
 const fetch = require("node-fetch");
 exports.help = true
+/**
+ * @name followage
+ * @module TwitchCommands
+ * @param {TwitchClient} client
+ * @param {string} target
+ * @param {ChatUserstate} context
+ * @param {string} msg
+ * @param {boolean} self
+ */
 exports.run = async (client, target, context, msg, self) => {
     let resp = await fetch(`https://2g.be/twitch/following.php?user=${context["display-name"]}&channel=${target.slice(1)}&format=mwdhms`)
     let followage = (await resp.text())

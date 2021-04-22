@@ -1,4 +1,9 @@
-
+/**
+ * 
+ * @listens discord:message
+ * @param {DiscordClient} client 
+ * @param {Message} message 
+ */
 exports.event = (client, message) => {
     if (message.author.id == client.user.id) return;
     if (message.author.bot) return;

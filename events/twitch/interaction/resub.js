@@ -1,3 +1,13 @@
+/**
+ * @listens resub
+ * @param {TwitchClient} client
+ * @param {string} channel
+ * @param {string} username
+ * @param {number} months
+ * @param {string} message
+ * @param {SubUserstate} userstate
+ * @param {SubMethods} methods
+ */
 exports.event = (client, channel, username, months, message, userstate, methods) => {
     const tierList = { 1000: 'Tier 1', 2000: 'Tier 2', 3000: 'Tier 3' };
     let cumulativeMonths = userstate['msg-param-cumulative-months'];

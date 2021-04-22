@@ -1,4 +1,12 @@
 const { WriteStream } = require("fs")
+/**
+ * @listens twitch:message
+ * @param {TwitchClient} client
+ * @param {string} target
+ * @param {ChatUserstate} context
+ * @param {string} msg
+ * @param  {boolean} self
+ */
 exports.event = async (client, target, context, msg, self) => {
     switch (target[0]) {
         case "#":

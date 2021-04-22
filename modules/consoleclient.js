@@ -1,16 +1,22 @@
 const { Collection } = require("discord.js");
 const EventEmitter = require("events");
-const { existsSync, readdir } = require("fs");
+const {loadCommands} = require("./functions")
 const { createInterface } = require("readline");
-const { CustomError } = require("./CustomError");
 
+/**
+ * ConsoleClient Class
+ * @class
+ * @property {Interface} rl readline Instance
+ * @property {Clients} clients Access to the other clients
+ * @property {Collection} commands 
+ */
 exports.ConsoleClient = class ConsoleClient extends EventEmitter {
     rl = createInterface({ input: process.stdin, output: process.stdout, prompt: "" })
     clients;
     commands = new Collection();
     constructor() {
         super()
-        this.loadCommands(this.commands, "commands/console")
+        loadCommands(this.commands, "commands/console")
         this.rl.write("Listening to Console Commands\n")
         this.rl.on("line", (line) => this.online(line))
         this.rl.on("SIGINT", () => this.clients.stop())
@@ -18,7 +24,18 @@ exports.ConsoleClient = class ConsoleClient extends EventEmitter {
         this.rl.on("SIGTSTP", () => this.clients.stop())
         this.rl.on("close", console.log)
     }
-    write = this.rl.write
+    /**
+     * 
+     * @param {string|Buffer} data 
+     * @param {Key} [key] 
+     */
+    write(data, key) {
+        this.rl.write(data, key)
+    }
+    /**
+     * method for parsing a line from readline
+     * @param {string} line 
+     */
     online(line) {
         let args = line.split(" ")
         let commandName = args.shift().toLowerCase();
@@ -29,24 +46,9 @@ exports.ConsoleClient = class ConsoleClient extends EventEmitter {
             console.log("Diese Funktion kenne ich nicht.")
         }
     }
-    loadCommands(commandmap, commanddir, helplist) {
-        var readcommanddir = "./" + commanddir
-        if (existsSync(readcommanddir)) {
-            readdir(`./${readcommanddir}/`, (err, files) => {
-                if (err) return console.error(err);
-                files.forEach(file => {
-                    if (!(file.endsWith(".js") || file.endsWith(".ts"))) return;
-                    let command = file.split(".")[0]
-                    let props = require(`../${commanddir}/${command}`);
-                    console.log(`Attempting to load Command ${command}`)
-                    commandmap.set(command, props)
-                    if (props.help && helplist) helplist.push(command)
-                    if (!props.alias) return
-
-                })
-            })
-        } else throw new CustomError("LoadError", `CommandDirectory ${commanddir} does not exist.`)
-    }
+    /**
+     * stops the console client
+     */
     async stop() {
         return this.rl.close()
     }

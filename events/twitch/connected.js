@@ -1,6 +1,13 @@
 const { flatMap } = require("lodash");
 const fetch = require("node-fetch");
+const {TwitchClient} = require("../../modules/twitchclient")
 
+/**
+ * @listens twitch:connected
+ * @param {TwitchClient} client 
+ * @param {string} addr 
+ * @param {number} port 
+ */
 exports.event = (client, addr, port) => {
     console.log(`* Connected to ${addr}:${port}`);
     if (client.clients.discord) if (client.clients.discord.started) {

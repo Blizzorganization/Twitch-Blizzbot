@@ -1,0 +1,33 @@
+{
+    "tags": {
+        "allowUnknownTags": true,
+        "dictionaries": ["jsdoc"]
+    },
+    "source": {
+        "include": [
+            "bot.js",
+            "modules",
+            "events",
+            "commands",
+            "package.json",
+            "README.md"
+        ],
+        "includePattern": ".js$",
+        "excludePattern": "(node_modules/|zdocs|jsdoc)"
+    },
+    "plugins": [
+        "plugins/markdown",
+        "node_modules/better-docs/category"
+    ],
+    "opts": {
+        "encoding": "utf8",
+        "readme": "./README.md",
+        "destination": "jsdoc/",
+        "recurse": true,
+        "verbose": true,
+        "template": "./node_modules/better-docs",
+        "theme_opts": {
+            "theme": "dark"
+        }
+    }
+}
