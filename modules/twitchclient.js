@@ -84,9 +84,13 @@ exports.TwitchClient = class TwitchClient extends client {
         } else throw new CustomError("LoadError", `EventDirectory ${eventdir} does not exist.`)
     }
     async stop() {
-        this.db.stop()
         clearInterval(this.watchtime)
-        this.disconnect()
-        this.blacklist.close()
+        console.log("stopped watchtime collector")
+        await this.db.stop()
+        console.log("db stopped")
+        await this.disconnect()
+        console.log("disconnected from twitch")
+        await this.blacklist.close()
+        console.log("stopped blacklist")
     }
 }
