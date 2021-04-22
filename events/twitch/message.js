@@ -32,12 +32,12 @@ exports.event = async (client, target, context, msg, self) => {
         console.log(`* Executed ${commandName} command`);
     } else {
         cmd = client.db.getCcmd(`!${commandName}`);
-        if (!cmd) cmd = client.db.getCcmd(client.db.getAlias(commandName))
+        if (!cmd) cmd = client.db.getCcmd(client.db.getAlias(`!${commandName}`))
         if (cmd) {
             client.say(target, cmd);
             console.log(`* Executed ${commandName} Customcommand`)
         } else {
-            cmd = client.db.getCom(`${commandName}`)
+            cmd = client.db.getCom(`!${commandName}`)
             if (cmd) {
                 if (!hasPerm(context)) return
                 client.say(target, cmd);
