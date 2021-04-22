@@ -8,19 +8,19 @@
 
 ```
 !add !(command name) (text)
-    z.B !add !test This is a test
+    e.g. !add !test This is a test
 ```
 #### Changing a saved command.<br>
 
 ```
 !edit !(command name) (text)<br>
-    z.B !edit !test This is a new text
+    e.g. !edit !test This is a new text
 ```     
 #### Removing a saved command.<br>
 
 ```
 !del !(command name)
-    z.B !del !test 
+    e.g. !del !test 
 ```    
 
 ## **Add / delete blacklist**
@@ -29,13 +29,13 @@
 
 ```
 !addbl (word)
-    z.B !addbl test
+    e.g. !addbl test
 ```          
 #### Removing a saved word from the blacklist<br>
 
 ```
 !delbl (word)
-    z.B !delbl test
+    e.g. !delbl test
 ```         
 #### Display the words on the blacklist in the selected DC channel.<br>
 
@@ -48,13 +48,13 @@
 
 ```
 !addalias (new alias) (main command)
-    z.B !addalias !testing !test
+    e.g. !addalias !testing !test
 ```
 #### Removes an alias from the command list.<br>
 
 ```
 !delalias (alias) (main command)
-    z.B !delalias !testing !test
+    e.g. !delalias !testing !test
 ```
 ## **Watchtime function**
 
@@ -62,5 +62,5 @@ Shows the time how long someone is watching. <br>
 
 ```
 !uwtime (name)
-    z.B !uwtime username
+    e.g. !uwtime username
 ```
