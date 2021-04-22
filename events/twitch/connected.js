@@ -3,7 +3,10 @@ const fetch = require("node-fetch");
 
 exports.event = (client, addr, port) => {
     console.log(`* Connected to ${addr}:${port}`);
-    if (client.clients.discord) if (client.clients.discord.started) client.clients.discord.statuschannel.send("Bot wurde gestartet.")
+    if (client.clients.discord) if (client.clients.discord.started) {
+        client.clients.discord.statuschannel.send("Bot wurde gestartet.")
+        client.clients.discord.statuschannel.setTopic("Bot Online")
+    }
     client.started = true
     client.config.channels.forEach((channel) => {
         client.clients.twitch.db.newWatchtimeChannel(channel)

@@ -53,7 +53,8 @@ exports.DiscordClient = class DiscordClient extends Client {
             });
         } else throw new CustomError("LoadError", `EventDirectory ${eventdir} does not exist.`)
     }
-    stop() {
-        this.destroy()
+    async stop() {
+        await Promise.all(this.statuschannel.send("Goodbye"), this.statuschannel.setTopic("Bot Offline"))
+        return this.destroy()
     }
 }

@@ -13,6 +13,9 @@ exports.event = (client) => {
     if (statuschannel instanceof TextChannel) {
         client.statuschannel = statuschannel
     } else throw new CustomError("ChanneltypeError", "The Status Channel ID supplied in the config.json file does not belong to a text channel.")
-    if (client.clients.twitch.started && !client.started) client.statuschannel.send("Bot wurde gestartet.")
+    if (client.clients.twitch.started && !client.started) {
+        client.statuschannel.send("Bot wurde gestartet.")
+        client.statuschannel.setTopic("Bot online")
+    }
     client.started = true
 }
