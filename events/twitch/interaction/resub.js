@@ -16,6 +16,6 @@ exports.event = (client, channel, username, months, message, userstate, methods)
     let resubmessage = (message != null)
     
     //message for Action
-    client.say(channel, `/me Danke ${username} fÃ¼r deinen insgesamt ${cumulativeMonths}. Monat${resubmessage ? " Mit der Nachricht: " + message : ""}.`)
+    client.say(channel, `/me Danke ${username} für deinen insgesamt ${cumulativeMonths}. Monat${resubmessage ? " Mit der Nachricht: " + message : ""}.`)
     console.log(` ${username} resub ${cumulativeMonths}. month`)
 }
