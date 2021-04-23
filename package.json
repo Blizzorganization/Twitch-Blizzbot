@@ -5,11 +5,10 @@
     "enmap": "^5.8.4",
     "node-fetch": "^2.6.1",
     "node-schedule": "^2.0.0",
-    "tmi.js": "^1.7.5"
+    "tmi.js": "^1.8.3"
   },
   "devDependencies": {
     "better-docs": "^2.3.2",
-    "clean-jsdoc-theme": "^3.2.4",
     "jsdoc": "^3.6.6"
   },
   "scripts": {

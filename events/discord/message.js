@@ -20,6 +20,8 @@ exports.event = (client, message) => {
             client.clients.twitch.say(channel, args.join(" "))
             break;
         case client.config.channels.commands:
+            if (!message.content.startsWith(client.config.prefix)) return
+            args = message.content.slice(client.config.prefix.length).split(" ")
             let commandName = args.shift().toLowerCase()
             let cmd = client.commands.get(commandName)
             if (!cmd) return;
