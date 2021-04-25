@@ -23,9 +23,9 @@ exports.event = (client) => {
     if (relaychannel instanceof TextChannel) {
         client.relaychannel = relaychannel
     } else throw new CustomError("ChanneltypeError", "The Command Channel ID supplied in the config.json file does not belong to a text channel.")
-    if (client.clients.twitch.started && !client.started) {
+    client.setTimeout(() => {
         console.log("changing channel topics")
         client.channelTopic()
-    }
+    }, 300000)
     client.started = true
 }

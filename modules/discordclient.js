@@ -8,7 +8,6 @@ const { loadCommands, loadEvents } = require("./functions")
  * @property {Object} channels
  * @property {string} channels.blacklist
  * @property {string} channels.commands
- * @property {string} channels.status
  * @property {string} channels.relay
  */
 
@@ -50,10 +49,10 @@ exports.DiscordClient = class DiscordClient extends Client {
     /**
      * changes the channel topics of the blacklist, relay and status channels
      */
-    channelTopic = () => {
-        this.blchannel.setTopic(":green_circle: Hier wir die Blacklist vom Bot angezeigt")
-        this.relaychannel.setTopic(":green_circle: Nachrichten werden über den Bot ausgegeben.")
-        this.commandchannel.setTopic(":green_circle: Commands für den Twitch-Bot.")
+    async channelTopic () {
+        this.clients.console.write(await (await this.channels.fetch(this.config.channels.blacklist)).setTopic(":green_circle: Hier wir die Blacklist vom Bot angezeigt"))
+        this.clients.console.write(await (await this.channels.fetch(this.config.channels.relay)).setTopic(":green_circle: Nachrichten werden über den Bot ausgegeben."))
+        this.clients.console.write(await (await this.channels.fetch(this.config.channels.commands)).setTopic(":green_circle: Commands für den Twitch-Bot."))
     }
     /**
      * stops the discord Client
