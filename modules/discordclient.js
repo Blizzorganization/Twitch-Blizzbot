@@ -48,6 +48,14 @@ exports.DiscordClient = class DiscordClient extends Client {
         this.login(config.token);
     }
     /**
+     * changes the channel topics of the blacklist, relay and status channels
+     */
+    channelTopic = () => {
+        this.blchannel.setTopic(":green_circle: Hier wir die Blacklist vom Bot angezeigt")
+        this.relaychannel.setTopic(":green_circle: Nachrichten werden über den Bot ausgegeben.")
+        this.commandchannel.setTopic(":green_circle: Commands für den Twitch-Bot.")
+    }
+    /**
      * stops the discord Client
      */
     async stop() {
