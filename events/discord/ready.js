@@ -13,14 +13,19 @@ exports.event = (client) => {
     if (blchannel instanceof TextChannel) {
         client.blchannel = blchannel
     } else throw new CustomError("ChanneltypeError", "The Blacklist channel ID supplied in the config.json file does not belong to a text channel.")
-    var statuschannel = client.channels.resolve(client.config.channels.status)
-    if (!statuschannel) throw new CustomError("UnknownChannelError", "Discord Status Channel Channel ID could not be resolved.")
-    if (statuschannel instanceof TextChannel) {
-        client.statuschannel = statuschannel
-    } else throw new CustomError("ChanneltypeError", "The Status Channel ID supplied in the config.json file does not belong to a text channel.")
+    var commandchannel = client.channels.resolve(client.config.channels.commands)
+    if (!commandchannel) throw new CustomError("UnknownChannelError", "Discord Status Channel Channel ID could not be resolved.")
+    if (commandchannel instanceof TextChannel) {
+        client.commandchannel = commandchannel
+    } else throw new CustomError("ChanneltypeError", "The Command Channel ID supplied in the config.json file does not belong to a text channel.")
+    var relaychannel = client.channels.resolve(client.config.channels.relay)
+    if (!relaychannel) throw new CustomError("UnknownChannelError", "Discord Relay Channel Channel ID could not be resolved.")
+    if (relaychannel instanceof TextChannel) {
+        client.relaychannel = relaychannel
+    } else throw new CustomError("ChanneltypeError", "The Command Channel ID supplied in the config.json file does not belong to a text channel.")
     if (client.clients.twitch.started && !client.started) {
-        client.statuschannel.send("Bot wurde gestartet.")
-        client.statuschannel.setTopic("Bot online")
+        console.log("changing channel topics")
+        client.channelTopic()
     }
     client.started = true
 }

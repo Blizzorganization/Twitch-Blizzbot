@@ -33,7 +33,8 @@ exports.DiscordClient = class DiscordClient extends Client {
     clients;
     started = false;
     blchannel;
-    statuschannel;
+    commandchannel;
+    relaychannel;
     /**
      * 
      * @param {config} config discord part of the config file
@@ -50,11 +51,11 @@ exports.DiscordClient = class DiscordClient extends Client {
      * stops the discord Client
      */
     async stop() {
-        this.statuschannel.setTopic("Bot Offline")
+        this.blchannel.setTopic(":red_circle: Bot Offline")
+        this.commandchannel.setTopic(":red_circle: Bot Offline")
+        this.relaychannel.setTopic(":red_circle: Bot Offline")
         console.log("set status to offline")
-        await this.statuschannel.send("Goodbye")
-        console.log("sent goodbye message")
-        this.destroy()
+        setTimeout(() => this.destroy(), 500)
         console.log("disconnected from discord")
     }
 }
