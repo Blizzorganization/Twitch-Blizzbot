@@ -1,9 +1,15 @@
-module.exports = (client, message) => {
+/**
+ * 
+ * @listens discord:message
+ * @param {DiscordClient} client 
+ * @param {Message} message 
+ */
+exports.event = (client, message) => {
     if (message.author.id == client.user.id) return;
     if (message.author.bot) return;
     let args = message.content.split(" ")
     switch (message.channel.id) {
-        case client.config.relaychannel:
+        case client.config.channels.relay:
             let channel;
             if (client.clients.twitch.config.channels.length == 1) {
                 channel = client.clients.twitch.config.channels[0]
@@ -13,7 +19,9 @@ module.exports = (client, message) => {
             if (!channel.startsWith("#")) return message.channel.send("Es wurde nicht angegeben, wo die Nachricht gesendet werden soll.")
             client.clients.twitch.say(channel, args.join(" "))
             break;
-        case client.config.commandchannel:
+        case client.config.channels.commands:
+            if (!message.content.startsWith(client.config.prefix)) return
+            args = message.content.slice(client.config.prefix.length).split(" ")
             let commandName = args.shift().toLowerCase()
             let cmd = client.commands.get(commandName)
             if (!cmd) return;

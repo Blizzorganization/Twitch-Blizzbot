@@ -1,5 +1,15 @@
-const fetch = require("node-fetch")
+const fetch = require("node-fetch");
+
 exports.help = true
+/**
+ * @name info
+ * @module TwitchCommands
+ * @param {TwitchClient} client
+ * @param {string} target
+ * @param {ChatUserstate} context
+ * @param {string} msg
+ * @param {boolean} self
+ */
 exports.run = async (client, target, context, msg, self) => {
     let viewerrequest = await fetch(`https://decapi.me/twitch/viewercount/${target.slice(1)}`)
     let viewer = await viewerrequest.text()

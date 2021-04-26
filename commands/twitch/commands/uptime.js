@@ -1,7 +1,16 @@
 const fetch = require("node-fetch")
 exports.help = true
+/**
+ * @name uptime
+ * @module TwitchCommands
+ * @param {TwitchClient} client
+ * @param {string} target
+ * @param {ChatUserstate} context
+ * @param {string} msg
+ * @param {boolean} self
+ */
 exports.run = async (client, target, context, msg, self) => {
-    let uptimerequest = await fetch(`https://decapi.me/twitch/uptime/${target.slice(1)}`)
+    let uptimerequest = await fetch(`https://decapi.me/twitch/uptime/${target.slice(1)}`, {})
     let uptime = (await uptimerequest.text())
         .replace("days", "Tagen").replace("day", "Tag")
         .replace("hours", "Stunden").replace("hour", "Stunde")

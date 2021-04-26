@@ -1,5 +1,15 @@
 const fetch = require("node-fetch")
+
 exports.help = true
+/**
+ * @name age
+ * @module TwitchCommands
+ * @param {TwitchClient} client 
+ * @param {string} target 
+ * @param {ChatUserstate} context 
+ * @param {string} msg 
+ * @param {boolean} self 
+ */
 exports.run = async (client, target, context, msg, self) => {
     let resp = await fetch(`https://decapi.me/twitch/accountage/${context["display-name"]}`)
     let age = (await resp.text())

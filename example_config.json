@@ -4,16 +4,23 @@
             "username": "",
             "password": ""
         },
+        "connection": {
+            "reconnect": true,
+            "secure": true
+        },
         "channels": [
             ""
         ],
         "Raidminutes": 0
     },
+    "useDiscord": true,
     "discord": {
         "token": "",
-        "blchannel": "",
-        "relaychannel": "",
-        "statuschannel": "",
-        "commandchannel": ""
+        "prefix": "!",
+        "channels": {
+            "blacklist": "",
+            "commands": "",
+            "relay": ""
+        }
     }
 }
