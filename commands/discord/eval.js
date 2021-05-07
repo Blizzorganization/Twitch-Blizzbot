@@ -13,6 +13,8 @@ const { DiscordClient } = require("../../modules/discordclient")
  */
 exports.adminOnly = true
 exports.run = (client, message, args) => {
+    var permitted = client.config.evalUsers
+    if (!permitted.includes(message.author.id)) return;
     var evaled = eval(args.join(" "))
-    if (evaled) message.channel.send(evaled)
+    if (evaled && evaled!=="") message.channel.send(util.inspect(evaled, {depth:1}), {split:true})
 }
