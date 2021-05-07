@@ -13,7 +13,7 @@ exports.event = (client) => {
     if (blchannel instanceof TextChannel) {
         client.blchannel = blchannel
     } else throw new CustomError("ChanneltypeError", "The Blacklist channel ID supplied in the config.json file does not belong to a text channel.")
-    var commandchannel = client.channels.resolve(client.config.channels.commands)
+    var commandchannel = client.channels.resolve(client.config.channels.adminCommands)
     if (!commandchannel) throw new CustomError("UnknownChannelError", "Discord Status Channel Channel ID could not be resolved.")
     if (commandchannel instanceof TextChannel) {
         client.commandchannel = commandchannel
