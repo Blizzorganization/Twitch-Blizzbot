@@ -17,10 +17,12 @@
     "discord": {
         "token": "",
         "prefix": "!",
+        "watchtimechannel": "",
         "channels": {
             "blacklist": "",
             "commands": "",
-            "relay": ""
+            "relay": "",
+            "adminCommands": ""
         }
     }
 }

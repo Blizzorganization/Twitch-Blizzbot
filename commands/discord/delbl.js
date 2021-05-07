@@ -8,6 +8,7 @@ const { DiscordClient } = require("../../modules/discordclient")
  * @param {Message} message 
  * @param {string[]} args 
  */
+exports.adminOnly = true
 exports.run = (client, message, args) => {
     if (!args || args.lenth == 0) return message.channel.send("Du musst angeben, was du von der Blacklist entfernen willst!")
     let blremove = args.join(" ").toLowerCase()

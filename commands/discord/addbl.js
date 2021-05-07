@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const {DiscordClient} = require("../../modules/discordclient")
+const { DiscordClient } = require("../../modules/discordclient")
 
 /**
  * @name addbl
@@ -8,6 +8,7 @@ const {DiscordClient} = require("../../modules/discordclient")
  * @param {Message} message 
  * @param {string[]} args 
  */
+exports.adminOnly = true
 exports.run = (client, message, args) => {
     if (!args || args.length == 0) return message.channel.send("Du musst angeben, was du blockieren willst!")
     let blword = args.join(" ").toLowerCase()

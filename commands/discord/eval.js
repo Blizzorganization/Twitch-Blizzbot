@@ -11,6 +11,7 @@ const { DiscordClient } = require("../../modules/discordclient")
  * @param {Message} message 
  * @param {string[]} args 
  */
+exports.adminOnly = true
 exports.run = (client, message, args) => {
     var evaled = eval(args.join(" "))
     if (evaled) message.channel.send(evaled)
