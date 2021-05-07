@@ -20,7 +20,7 @@ exports.run = (client, message, args) => {
         }
     }
     if (user == "") return message.channel.send("Du musst angeben, für welchen Account du die Watchtime abfragen möchtest.")
-    var watchtime = client.db.getWatchtime(channel, user)
+    var watchtime = client.clients.twitch.db.getWatchtime(channel, user)
     if (!watchtime) return message.channel.send("Diesen Nutzer kenne ich nicht.")
     message.channel.send(`${user} schaut ${target.slice(1)} schon seit ${calcWatchtime(watchtime)}`)
 }
