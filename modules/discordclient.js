@@ -52,7 +52,7 @@ exports.DiscordClient = class DiscordClient extends Client {
     async channelTopic () {
         this.clients.console.write(await (await this.channels.fetch(this.config.channels.blacklist)).setTopic(":green_circle: Hier wir die Blacklist vom Bot angezeigt"))
         this.clients.console.write(await (await this.channels.fetch(this.config.channels.relay)).setTopic(":green_circle: Nachrichten werden über den Bot ausgegeben."))
-        this.clients.console.write(await (await this.channels.fetch(this.config.channels.commands)).setTopic(":green_circle: Commands für den Twitch-Bot."))
+        this.clients.console.write(await (await this.channels.fetch(this.config.channels.adminCommands)).setTopic(":green_circle: Commands für den Twitch-Bot."))
     }
     /**
      * stops the discord Client
