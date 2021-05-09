@@ -1,29 +1,29 @@
 {
     "twitch": {
         "identity": {
-            "username": "",
-            "password": ""
+            "username": "username",
+            "password": "OAuth-Token"
         },
         "connection": {
             "reconnect": true,
             "secure": true
         },
         "channels": [
-            ""
+            "twitchchannel"
         ],
         "Raidminutes": 0
     },
     "useDiscord": true,
     "discord": {
-        "token": "",
+        "token": "Token",
         "prefix": "!",
-        "watchtimechannel": "",
-        "evalUsers": [""],
+        "watchtimechannel": "twitchchannel",
+        "evalUsers": ["User IDs from the discord should have the rights"],
         "channels": {
-            "blacklist": "",
-            "commands": "",
-            "relay": "",
-            "adminCommands": ""
+            "blacklist": "channel-ID",
+            "commands": "channel-ID",
+            "relay": "channel-ID",
+            "adminCommands": "channel-ID"
         }
     }
 }
