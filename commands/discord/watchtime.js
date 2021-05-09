@@ -24,6 +24,6 @@ exports.run = (client, message, args) => {
     var watchtime = client.clients.twitch.db.getWatchtime(channel, user)
     if (!watchtime) return message.channel.send("Diesen Nutzer kenne ich nicht.")
     
-    var embed = new MessageEmbed().setTitle("Watchtime").addField("Twitchchannel", channel,).addField("Nutzername", user).addField("Watchtime", calcWatchtime(watchtime)).setColor(0xdfb82d).setThumbnail(url="https://blizzor.de/Twitchbot/blizzbot.png")
+    var embed = new MessageEmbed().setTitle("Watchtime").addField("Nutzername", user).addField("Watchtime", calcWatchtime(watchtime)).setColor(0xdfb82d).setThumbnail(url="https://blizzor.de/Twitchbot/blizzbot.png")
     message.channel.send(embed)
 }
