@@ -12,7 +12,7 @@ const { calcWatchtime } = require("../../modules/functions")
 exports.adminOnly = false
 exports.run = (client, message, args) => {
     if (!args[0]) return message.channel.send("Du musst einen Kananl angeben - folgende sind zur Auswahl:\n`" + client.clients.twitch.getChannels().join("`, `") + "`")
-    const channel = args[0]
+    let channel = client.config.watchtimechannel;
     const embed = new MessageEmbed()
         .setTitle("Watchtime")
         .setColor(0xdfb82d)
