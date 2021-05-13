@@ -30,5 +30,5 @@ exports.run = (client, message, args) => {
         .addField("Nutzername", user)
         .addField("Watchtime", calcWatchtime(watchtime))
 
-    await message.channel.send(embed)
+    message.channel.send(embed)
 }
