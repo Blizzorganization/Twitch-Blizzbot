@@ -13,10 +13,10 @@ exports.event = (client, channel, username, months, message, userstate, methods)
     let cumulativeMonths = userstate['msg-param-cumulative-months'];
     let streakMonths = userstate['msg-param-steak-Months'];
     let sharedStreak = userstate['msg-param-should-share-streak'];
-    let tiers = userstate['msg-param-sub-plan-name'];
+    let tiers = userstate['msg-param-sub-plan'];
     let resubmessage = (message != null)
     
     //message for Action
-    client.say(channel, `/me Danke ${username} für deinen insgesamt ${cumulativeMonths}. Monat mit ${tiers} ${resubmessage ? " Mit der Nachricht: " + message : ""}.`)
+    client.say(channel, `/me Danke ${username} für deinen insgesamt ${cumulativeMonths}. Monat${resubmessage ? " Mit der Nachricht: " + message : ""}.`)
     console.log(` ${username} resub ${cumulativeMonths}. month`)
 }
