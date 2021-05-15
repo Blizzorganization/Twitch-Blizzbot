@@ -6,7 +6,7 @@
  * @param {number} viewers
  */
 exports.event = (client, channel, username, viewers) => {
-    
+
     //message for Action
     console.log(` ${username} raid ${viewers} viewer!`)
     if (viewers<10) return;

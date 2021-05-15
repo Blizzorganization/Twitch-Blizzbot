@@ -13,5 +13,6 @@ exports.help = true
 exports.run = async (client, target, context, msg, self) => {
     var watchtime = client.db.getWatchtime(target, context["username"])
     if (!watchtime) watchtime = 1
+
     client.say(target, `${context["display-name"]} schaut ${target.slice(1)} schon seit ${calcWatchtime(watchtime)}`)
 }

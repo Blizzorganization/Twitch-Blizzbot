@@ -22,4 +22,3 @@ exports.run = async (client, target, context, msg, self) => {
         client.say(target, `${target.slice(1)} ist seit ${uptime} live. blizzorLogo `)
     }
 }
-
