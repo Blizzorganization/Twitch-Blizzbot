@@ -7,10 +7,6 @@
     "node-schedule": "^2.0.0",
     "tmi.js": "^1.8.3"
   },
-  "devDependencies": {
-    "better-docs": "^2.3.2",
-    "jsdoc": "^3.6.6"
-  },
   "scripts": {
     "generateDocs": "jsdoc -c ./jsdoc.json",
     "start": "node bot"
