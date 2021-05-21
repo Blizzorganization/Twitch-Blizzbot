@@ -10,5 +10,5 @@
 
 ```
 !watchtime (Name)
-    z.B !uwtime username
+    z.B !watchtime username
 ```

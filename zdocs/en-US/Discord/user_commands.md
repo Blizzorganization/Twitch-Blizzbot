@@ -10,5 +10,5 @@
 
 ```
 !watchtime (name)
-    e.g.!watchtime username
+    e.g. !watchtime username
 ```

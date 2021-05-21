@@ -1,6 +1,7 @@
 const fetch = require("node-fetch");
 
-exports.help = true;
+exports.help = true
+exports.alias = ["titel"]
 /**
  * @name title
  * @module TwitchCommands
