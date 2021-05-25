@@ -1,6 +1,6 @@
 const { Collection } = require("discord.js");
 const enmap = require("enmap");
-const { createWriteStream, existsSync, mkdirSync, readdir } = require("fs");
+const { createWriteStream, existsSync, mkdirSync, readdir, readFileSync } = require("fs");
 const { client } = require("tmi.js");
 const { loadCommands, loadEvents } = require("./functions")
 const { DB } = require("./db");
@@ -27,6 +27,7 @@ const schedule = require("node-schedule")
  * @emits twitch:subscription
  */
 exports.TwitchClient = class TwitchClient extends client {
+    cooldowns = new Map()
     channellogs = [];
     config;
     clients;
@@ -35,6 +36,7 @@ exports.TwitchClient = class TwitchClient extends client {
     blacklist = new enmap({ name: "blacklist" })
     db;
     watchtime;
+    permittedlinks = readFileSync("./links.txt", "utf8").split(/\r\n|\n\r|\n|\r/).filter((link) => link !== "")
     /**
      * 
      * @constructor
@@ -45,7 +47,10 @@ exports.TwitchClient = class TwitchClient extends client {
         super(opts);
         this.config = opts;
         if (!existsSync("./channellogs")) mkdirSync("./channellogs")
-        this.once("connected", () => this.newChannellogs(opts.channels))
+        this.once("connected", () => {
+            this.newChannellogs(opts.channels)
+            for (const c of opts.channels) this.cooldowns.set(c.replace("#", ""), 0)
+        })
         schedule.scheduleJob("newchannellogs", "0 17 * * *", this.newChannellogs)
         this.blacklist.ensure("delmsg", [])
         this.db = new DB()
@@ -77,7 +82,7 @@ exports.TwitchClient = class TwitchClient extends client {
             this.channellogs[channel] = createWriteStream(`./channellogs/${channel}/${dateString}.chatlog.txt`, { flags: "a" })
         }
     }
-    
+
     /**
      * stops the Twitch Client
      */

@@ -11,7 +11,8 @@
         "channels": [
             "twitchchannel"
         ],
-        "Raidminutes": 0
+        "Raidminutes": 0,
+        "Cooldown" : 0
     },
     "useDiscord": true,
     "discord": {

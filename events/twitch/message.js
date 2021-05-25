@@ -1,4 +1,5 @@
 const { WriteStream } = require("fs")
+const linkTest = new RegExp("(^|[ \t\r\n])((sftp|ftp|http|https):(([A-Za-z0-9$_.+!*(),;/?:@&~=-])|%[A-Fa-f0-9]{2}){2,}(#([a-zA-Z0-9][a-zA-Z0-9$_.+!*(),;/?:@&~=%-]*))?([A-Za-z0-9$_+!*();/?:~-]))", "g")
 /**
  * @listens twitch:message
  * @param {TwitchClient} client
@@ -28,8 +29,11 @@ exports.event = async (client, target, context, msg, self) => {
             if (!cmd.silent) client.say(target, "Du hast keine Rechte!")
             return
         }
-        cmd.run(client, target, context, msg, self, args)
-        console.log(`* Executed ${commandName} command`);
+        if ((Date.now() - client.cooldowns.get(target.replace("#", ""))) > 1000 * client.config.Cooldown) {
+            cmd.run(client, target, context, msg, self, args)
+            console.log(`* Executed ${commandName} command`);
+            client.cooldowns.set(target.replace("#", ""), Date.now())
+        }
     } else {
         cmd = client.db.getCcmd(`!${commandName}`);
         if (!cmd) cmd = client.db.getCcmd(client.db.getAlias(`!${commandName}`))
@@ -54,9 +58,16 @@ function checkModAction(client, msg, ctx, target) {
     var checkmsg = ` ${message} `
     if (delbl.some((a) => checkmsg.includes(` ${a} `))) return client.deletemessage(target, ctx.id)
     if (ctx["message-type"] == "action") return client.deletemessage(target, ctx.id)
+    var urls = message.match(linkTest)
+    if (!urls) return
+    if (urls.length == 0) return
+    if (urls.some((url) => !permittedlink(client, url))) return client.deletemessage(target, ctx.id)
 }
 function hasPerm(ctx) {
     if (ctx.mod) return true
     if (ctx.badges) if (ctx.badges["broadcaster"]) return true
     return false
+}
+function permittedlink(client, url) {
+    return client.permittedlinks.some((purl) => url.includes(purl))
 }
