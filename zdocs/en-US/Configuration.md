@@ -54,7 +54,7 @@ watchtimechannel -> Here you have to enter the name from the Twitch part where t
 evalUsers -> Here you have to specify the user ID which Discord user should have all rights to the bot
     e.g. ["523963492408229888", "523963492408229888"]
 ```
-**So you can run remote code and you have to be careful who has access, <br>
+**So you can run remote code and you should be careful who has access <br>
 because you have access to all data from the bot and the host system**
 
 ### Channel
