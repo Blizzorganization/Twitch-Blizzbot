@@ -22,33 +22,35 @@ exports.event = async (client, target, context, msg, self) => {
     if (self) return; // Ignore messages from the bot
     let args = msg.trim().split(" ");
     checkModAction(client, msg, context, target)
-    const commandName = args.shift().toLowerCase().slice(1);
-    let cmd = client.commands.get(commandName)
-    if (cmd) {
-        if (cmd.perm && (hasPerm(context) == false)) {
-            if (!cmd.silent) client.say(target, "Du hast keine Rechte!")
-            return
-        }
-        if ((Date.now() - client.cooldowns.get(target.replace("#", ""))) > 1000 * client.config.Cooldown) {
-            cmd.run(client, target, context, msg, self, args)
-            console.log(`* Executed ${commandName} command`);
-            client.cooldowns.set(target.replace("#", ""), Date.now())
-        }
-    } else {
-        cmd = client.db.getCcmd(`!${commandName}`);
-        if (!cmd) cmd = client.db.getCcmd(client.db.getAlias(`!${commandName}`))
+    if (msg.startsWith("!")) {
+        const commandName = args.shift().toLowerCase().slice(1);
+        let cmd = client.commands.get(commandName)
         if (cmd) {
-            client.say(target, cmd);
-            console.log(`* Executed ${commandName} Customcommand`)
+            if (cmd.perm && (hasPerm(context) == false)) {
+                if (!cmd.silent) client.say(target, "Du hast keine Rechte!")
+                return
+            }
+            if ((Date.now() - client.cooldowns.get(target.replace("#", ""))) > 1000 * client.config.Cooldown) {
+                cmd.run(client, target, context, msg, self, args)
+                console.log(`* Executed ${commandName} command`);
+                client.cooldowns.set(target.replace("#", ""), Date.now())
+            }
         } else {
-            cmd = client.db.getCom(`!${commandName}`)
+            cmd = client.db.getCcmd(`!${commandName}`);
+            if (!cmd) cmd = client.db.getCcmd(client.db.getAlias(`!${commandName}`))
             if (cmd) {
-                if (!hasPerm(context)) return
                 client.say(target, cmd);
                 console.log(`* Executed ${commandName} Customcommand`)
+            } else {
+                cmd = client.db.getCom(`!${commandName}`)
+                if (cmd) {
+                    if (!hasPerm(context)) return
+                    client.say(target, cmd);
+                    console.log(`* Executed ${commandName} Customcommand`)
+                }
             }
-        }
 
+        }
     }
 }
 function checkModAction(client, msg, ctx, target) {
