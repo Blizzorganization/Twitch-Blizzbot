@@ -11,7 +11,7 @@ const { MessageEmbed } = require("discord.js")
 exports.run = (client, message, args) => {
     let user = "";
     if (!args || args.length == 0) {
-        var dbuser = client.db.getDiscordConnection(message.author)
+        var dbuser = client.clients.twitch.db.getDiscordConnection(message.author)
         if (dbuser) {
             user = dbuser
         } else {
