@@ -272,7 +272,7 @@ exports.DB = class DB {
      * @param {string} twitchname twitch username
      */
     newDiscordConnection(user, twitchname) {
-        this.statements.get("newDiscordConnection").run({ discordid: user.id, twitchname })
+        this.statements.get("newDiscordConnection").run({ id: user.id, twitchname })
     }
     /**
      * backup all databases
