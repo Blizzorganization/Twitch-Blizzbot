@@ -23,19 +23,30 @@ exports.DB = class DB {
     monthlyWatchtime;
     statements = new Map();
     watchtimechannels = [];
+    userLink
     constructor() {
         if (!(existsSync("./data"))) mkdirSync("./data");
         if (!(existsSync("./data/watchtime"))) mkdirSync("./data/watchtime");
         this.customcommands = new Database("data/customcommands.sqlite");
-        this.watchtimedb = new Database("data/watchtime.sqlite")
-        var date = new Date()
+        this.watchtimedb = new Database("data/watchtime.sqlite");
+        this.userLink = new Database("data/userLink.sqlite");
+        this.customcommands.pragma("synchronous = 1")
+        this.watchtimedb.pragma("synchronous = 1")
+        this.userLink.pragma("synchronous = 1")
+        this.customcommands.pragma("journal_mode = wal")
+        this.watchtimedb.pragma("journal_mode = wal")
+        this.userLink.pragma("journal_mode = wal")
+        var date = new Date();
         var month = '' + (date.getMonth() + 1);
         var year = date.getFullYear();
         if (month.length < 2) month = '0' + month;
         this.monthlyWatchtime = new Database(`data/watchtime/${year}.${month}.sqlite`)
+        this.monthlyWatchtime.pragma("synchronous = 1")
+        this.monthlyWatchtime.pragma("journal_mode = wal")
         this.customcommands.prepare("CREATE TABLE IF NOT EXISTS aliases (name text PRIMARY KEY, command text);").run()
         this.customcommands.prepare("CREATE TABLE IF NOT EXISTS ccmds (commandname text PRIMARY KEY, response text);").run()
         this.customcommands.prepare("CREATE TABLE IF NOT EXISTS coms (commandname text PRIMARY KEY, response text);").run()
+        this.userLink.prepare("CREATE TABLE IF NOT EXISTS users (discordid text PRIMARY KEY, twitchname text)").run()
         this.statements.set("newAlias", this.customcommands.prepare("INSERT OR IGNORE INTO aliases VALUES (@name, @command)"))
         this.statements.set("getAlias", this.customcommands.prepare("SELECT command FROM aliases WHERE name = @name;"))
         this.statements.set("getAliases", this.customcommands.prepare("SELECT name FROM aliases"))
@@ -51,9 +62,13 @@ exports.DB = class DB {
         this.statements.set("editCom", this.customcommands.prepare("UPDATE coms SET response = @response WHERE commandname = @commandname"))
         this.statements.set("delCcmd", this.customcommands.prepare("DELETE FROM ccmds WHERE commandname = @commandname"))
         this.statements.set("delCom", this.customcommands.prepare("DELETE FROM coms WHERE commandname = @commandname"))
+        this.statements.set("newDiscordConnection", this.userLink.prepare("INSERT OR REPLACE INTO users VALUES (id @id, twitchname @twitchname)"))
+        this.statements.set("getDiscordConnection", this.userLink.prepare("SELECT twitchname FROM users WHERE discordid = @id"))
         schedule.scheduleJob("newMonthlyWatchtime", "0 0 1 * *", async () => {
             await this.monthlyWatchtime.close()
             this.monthlyWatchtime = new Database(`data/watchtime/${year}.${month}.sqlite`)
+            this.monthlyWatchtime.pragma("synchronous = 1")
+            this.monthlyWatchtime.pragma("journal_mode = wal")
             for (const channel of this.watchtimechannels) {
                 this.mWatchtimeSetup(channel)
             }
@@ -242,6 +257,23 @@ exports.DB = class DB {
      * @param {string} name 
      */
     delAlias(name) { this.statements.get("delAlias").run({ name }) }
+    /**
+     * get linked twitch account if exists, otherwise returns null
+     * @param {User} user discord user
+     * @returns {string | null} twitch username
+     */
+    getDiscordConnection(user) {
+        var data = this.statements.get("getDiscordConnection").get({ id: user.id })
+        return data ? data.twitchname : null
+    }
+    /**
+     * Set a twitch user to your discord user
+     * @param {User} user discord user 
+     * @param {string} twitchname twitch username
+     */
+    newDiscordConnection(user, twitchname) {
+        this.statements.get("newDiscordConnection").run({ discordid: user.id, twitchname })
+    }
     /**
      * backup all databases
      */
