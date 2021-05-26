@@ -62,7 +62,7 @@ exports.DB = class DB {
         this.statements.set("editCom", this.customcommands.prepare("UPDATE coms SET response = @response WHERE commandname = @commandname"))
         this.statements.set("delCcmd", this.customcommands.prepare("DELETE FROM ccmds WHERE commandname = @commandname"))
         this.statements.set("delCom", this.customcommands.prepare("DELETE FROM coms WHERE commandname = @commandname"))
-        this.statements.set("newDiscordConnection", this.userLink.prepare("INSERT OR REPLACE INTO users VALUES (id @id, twitchname @twitchname)"))
+        this.statements.set("newDiscordConnection", this.userLink.prepare("INSERT OR REPLACE INTO users VALUES (@id, @twitchname)"))
         this.statements.set("getDiscordConnection", this.userLink.prepare("SELECT twitchname FROM users WHERE discordid = @id"))
         schedule.scheduleJob("newMonthlyWatchtime", "0 0 1 * *", async () => {
             await this.monthlyWatchtime.close()
