@@ -60,6 +60,7 @@ function checkModAction(client, msg, ctx, target) {
     var checkmsg = ` ${message} `
     if (delbl.some((a) => checkmsg.includes(` ${a} `))) return client.deletemessage(target, ctx.id)
     if (ctx["message-type"] == "action") return client.deletemessage(target, ctx.id)
+    if (ctx.badges) if (ctx.badges["vip"]) return
     var urls = message.match(linkTest)
     if (!urls) return
     if (urls.length == 0) return
