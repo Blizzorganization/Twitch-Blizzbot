@@ -36,6 +36,7 @@ exports.TwitchClient = class TwitchClient extends client {
     blacklist = new enmap({ name: "blacklist" })
     db;
     watchtime;
+    helplist = [];
     permittedlinks = readFileSync("./links.txt", "utf8").split(/\r\n|\n\r|\n|\r/).filter((link) => link !== "")
     /**
      * 
@@ -54,8 +55,8 @@ exports.TwitchClient = class TwitchClient extends client {
         schedule.scheduleJob("newchannellogs", "0 17 * * *", this.newChannellogs)
         this.blacklist.ensure("delmsg", [])
         this.db = new DB()
-        loadCommands(this.commands, "commands/twitch/commands")
-        loadCommands(this.commands, "commands/twitch/functions")
+        loadCommands(this.commands, "commands/twitch/commands", this.helplist)
+        loadCommands(this.commands, "commands/twitch/functions", this.helplist)
         loadEvents("events/twitch", this)
         loadEvents("events/twitch/interaction", this)
         this.connect()
