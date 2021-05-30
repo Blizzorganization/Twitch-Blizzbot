@@ -27,9 +27,9 @@ exports.run = (client, message, args) => {
 
     var embed = new MessageEmbed()
         .setColor(0xdfb82d).setThumbnail(url = "https://blizzor.de/Twitchbot/blizzbot.png")
-        .setTitle("Watchtime")
+        .setTitle("Montly Watchtime")
         .addField("Nutzername", user)
-        .addField("Montly Watchtime", calcWatchtime(mwatchtime))
+        .addField("Watchtime", calcWatchtime(mwatchtime))
 
     message.channel.send(embed)
 }
