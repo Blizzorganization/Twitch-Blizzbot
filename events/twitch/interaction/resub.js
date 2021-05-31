@@ -18,6 +18,6 @@ exports.event = (client, channel, username, months, message, userstate, methods)
     let ave = tierlist[tiers]
 
     //message for Action
-    console.log(` ${username} resub ${cumulativeMonths}. month`)
+    console.log(`${username} resub ${cumulativeMonths}. month`)
     client.say(channel, `/me Danke ${username} für deinen ${ave} Sub im insgesamt ${cumulativeMonths}. Monat${resubmessage ? " Mit der Nachricht: " + message : ""}.`)
 }
