@@ -9,7 +9,7 @@
  * @param {SubMethods} methods
  */
 exports.event = (client, channel, username, months, message, userstate, methods) => {
-    const tierlist = { 1000: 'Tier 1', 2000: 'Tier 2', 3000: 'Tier 3', Prime: 'Prime' };
+    const tierlist = { 1000: 'Tier 1', 2000: 'Tier 2', 3000: 'Tier 3', Prime: 'Twitch Prime' };
     let cumulativeMonths = userstate['msg-param-cumulative-months'];
     let streakMonths = userstate['msg-param-steak-Months'];
     let sharedStreak = userstate['msg-param-should-share-streak'];
