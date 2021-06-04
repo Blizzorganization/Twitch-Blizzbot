@@ -8,7 +8,6 @@
     "tmi.js": "^1.8.3"
   },
   "scripts": {
-    "generateDocs": "jsdoc -c ./jsdoc.json",
     "start": "node bot"
   }
 }
