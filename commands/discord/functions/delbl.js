@@ -1,5 +1,5 @@
 const { Message } = require("discord.js")
-const { DiscordClient } = require("../../modules/discordclient")
+const { DiscordClient } = require("../../../modules/discordclient")
 
 /**
  * @name delbl

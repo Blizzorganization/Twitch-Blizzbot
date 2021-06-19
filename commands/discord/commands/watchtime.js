@@ -1,4 +1,4 @@
-const { calcWatchtime } = require("../../modules/functions")
+const { calcWatchtime } = require("../../../modules/functions")
 const { MessageEmbed } = require("discord.js")
 
 /**

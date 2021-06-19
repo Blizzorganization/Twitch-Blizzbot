@@ -2,7 +2,7 @@ const { Message } = require("discord.js")
 const fs = require("fs")
 const os = require("os")
 const util = require("util")
-const { DiscordClient } = require("../../modules/discordclient")
+const { DiscordClient } = require("../../../modules/discordclient")
 
 exports.adminOnly = false
 exports.run = (client, message, args) => {
