@@ -1,4 +1,4 @@
-const { Message } = require("discord.js")
+const { MessageEmbed } = require("discord.js")
 const fs = require("fs")
 const os = require("os")
 const util = require("util")
@@ -6,5 +6,12 @@ const { DiscordClient } = require("../../../modules/discordclient")
 
 exports.adminOnly = false
 exports.run = (client, message, args) => {
-    message.channel.send("**__Der Bot kann folgende Befehle__**\n```!top10 Zeigt die Aktuelle Top10 der Watchtime an.\n!watchtime (Twitchname) Zeigt die Watchtime von diesem Nutzer an.```")
+
+    var embed = new MessageEmbed()
+        .setColor(0xdfb82d)
+        .setTitle("**__Der Bot kann folgende Befehle__**")
+        .addField("!top10", value="Gibt die aktuellen Top10 der Watchtime liste wieder", inline=false)
+        .addField("!watchtime [Twitch-Name]", value="Gibt die aktuelle watchtime des angegebenen Nutzers wieder", inline=true)
+
+    message.channel.send(embed)
 }
