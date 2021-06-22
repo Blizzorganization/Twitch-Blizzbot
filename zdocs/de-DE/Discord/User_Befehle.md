@@ -5,10 +5,14 @@
 ```
 !top10
 ```
-
 #### Zeigt die Aktuelle Watchtime an 
 
 ```
 !watchtime (Name)
     z.B !watchtime username
+```
+#### Zeigt die Befehlslist vom Bot an 
+
+```
+!help
 ```

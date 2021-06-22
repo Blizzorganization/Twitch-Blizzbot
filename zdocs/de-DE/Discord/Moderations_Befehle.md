@@ -19,8 +19,12 @@
 ```
 !blacklist
 ```
+#### Displays the monthly watchtime. <br>
 
-#### Anzeigen der Monatlichen Watchtime.<br>
+```
+!mwtime
+```
+#### Displays the current monthly top 10
 
 ```
 !mwatchtime
