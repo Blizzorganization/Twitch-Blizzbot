@@ -13,5 +13,6 @@ exports.event = (client, channel, username, streakMonths, recipient, methods, us
 
     //message for Action
     console.log(`${username} gifted ${recipient} a subscription.`)
-    client.say(channel, `/me Danke ${username} hat bereits ${senderCount} Subs verschenkt.`)
+    /*client.say(channel, `/me Danke ${username} hat bereits ${senderCount} Subs verschenkt.`)
+    */
 }

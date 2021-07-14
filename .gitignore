@@ -2,7 +2,6 @@ node_modules
 logs
 data
 config.json
-start.sh
 channellogs/
-jsdoc
+jsdoc.json
 links.txt
