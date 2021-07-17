@@ -1,6 +1,7 @@
 const fetch = require("node-fetch")
 
 exports.help = true
+exports.alias = ["alter"]
 /**
  * @name age
  * @module TwitchCommands
@@ -10,8 +11,10 @@ exports.help = true
  * @param {string} msg 
  * @param {boolean} self 
  */
-exports.run = async (client, target, context, msg, self) => {
-    let resp = await fetch(`https://decapi.me/twitch/accountage/${context["display-name"]}`)
+exports.run = async (client, target, context, msg, self, args) => {
+    let user = args[0]
+    if (!user || user=="") user=context["display-name"]
+    let resp = await fetch(`https://decapi.me/twitch/accountage/${user}`)
     let age = (await resp.text())
         .replace("years", "Jahren").replace("year", "Jahr")
         .replace("months", "Monaten").replace("month", "Monat")
