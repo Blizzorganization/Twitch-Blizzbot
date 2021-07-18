@@ -21,7 +21,7 @@ exports.event = async (client, target, context, msg, self) => {
     }
     if (self) return; // Ignore messages from the bot
     let args = msg.trim().split(" ");
-    checkModAction(client, msg, context, target)
+    checkModAction(client, msg, context, target, args)
     if (msg.startsWith("!")) {
         const commandName = args.shift().toLowerCase().slice(1);
         let cmd = client.commands.get(commandName)
@@ -53,12 +53,17 @@ exports.event = async (client, target, context, msg, self) => {
         }
     }
 }
-function checkModAction(client, msg, ctx, target) {
+function checkModAction(client, msg, ctx, target, args) {
     if (hasPerm(ctx)) return
     var message = msg.toLowerCase()
     var delbl = client.blacklist.get("delmsg")
     var checkmsg = ` ${message} `
     if (delbl.some((a) => checkmsg.includes(` ${a} `))) return client.deletemessage(target, ctx.id)
+    if (checkmsg.includes(" www.")) {
+        var links = args.filter((a)=> a.toLowerCase().includes("www"))
+        var forbiddenlinks = links.filter((l)=> !(client.permittedlinks.some((purl) => l.toLowerCase().includes(purl))))
+        if(forbiddenlinks.length>0) return client.deletemessage(target, ctx.id)
+    }
     if (ctx["message-type"] == "action") return client.deletemessage(target, ctx.id)
     if (ctx.badges) if (ctx.badges["vip"]) return
     var urls = message.match(linkTest)
