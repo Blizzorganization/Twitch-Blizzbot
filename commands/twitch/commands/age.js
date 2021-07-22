@@ -24,5 +24,5 @@ exports.run = async (client, target, context, msg, self, args) => {
         .replace("minutes", "Minuten").replace("minute", "Minute")
         .replace("seconds", "Sekunden").replace("second", "Sekunde")
 
-    client.say(target, `${user} dein Account wurde vor ${age} erstellt.`)
+    client.say(target, `Der Account ${user} wurde vor ${age} erstellt.`)
 }
