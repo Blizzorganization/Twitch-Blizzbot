@@ -8,12 +8,18 @@ const { MessageEmbed } = require("discord.js")
  * @param {Message} message
  * @param {string[]} args
  */
+exports.adminOnly = false
 exports.run = (client, message, args) => {
-    if (!args || args.length == 0) {
-        message.channel.send("Du musst einen Nutzer angeben.")
-        return
-    }
     let user = "";
+    if (!args || args.length == 0) {
+        var dbuser = client.clients.twitch.db.getDiscordConnection(message.author)
+        if (dbuser) {
+            user = dbuser
+        } else {
+            message.channel.send("Du musst einen Nutzer angeben.")
+            return
+        }
+    }
     let channel = client.config.watchtimechannel;
     while (args.length > 0 && user == "") {
         if (user == "") {
