@@ -19,7 +19,7 @@ channels -> Here you specify on which Twitchchanel the bot should work
 Here you can find the number of minutes for how long the raid mode should be active
 it means how much time between activating and deactivating passes
 ```
-#### Cool down
+#### Cooldown
 
 ```
 Here you can specify how much time in seconds must pass for the bot to open again

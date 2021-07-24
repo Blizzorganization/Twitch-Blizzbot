@@ -80,7 +80,7 @@ exports.DB = class DB {
      */
     mWatchtimeSetup(channel) {
         this.monthlyWatchtime.prepare(`CREATE TABLE IF NOT EXISTS ${channel} (user text PRIMARY KEY, watchtime number);`).run()
-        this.statements.set(`getMWachtimeFor${channel}`, this.monthlyWatchtime.prepare(`SELECT watchtime FROM ${channel} WHERE user = @user`))
+        this.statements.set(`getMWatchtimeFor${channel}`, this.monthlyWatchtime.prepare(`SELECT watchtime FROM ${channel} WHERE user = @user`))
         this.statements.set(`mwatchtimeNewFor${channel}`, this.monthlyWatchtime.prepare(`INSERT OR IGNORE INTO ${channel} VALUES (@user, 0);`))
         this.statements.set(`mwatchtimeIncFor${channel}`, this.monthlyWatchtime.prepare(`UPDATE ${channel} SET watchtime = watchtime + 1 WHERE user = @user`))
         this.statements.set(`mwatchtimeListFor${channel}`, this.monthlyWatchtime.prepare("SELECT user, watchtime FROM <channel> ORDER BY watchtime DESC LIMIT @max".replace("<channel>", channel)))

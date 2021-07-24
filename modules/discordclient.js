@@ -41,7 +41,8 @@ exports.DiscordClient = class DiscordClient extends Client {
     constructor(config) {
         super();
         this.config = config;
-        loadCommands(this.commands, "commands/discord")
+        loadCommands(this.commands, "commands/discord/commands")
+        loadCommands(this.commands, "commands/discord/functions")
         loadEvents("events/discord", this)
         console.log("logging in")
         this.login(config.token);
