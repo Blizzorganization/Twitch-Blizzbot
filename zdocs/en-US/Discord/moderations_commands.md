@@ -22,7 +22,7 @@
 #### Displays the monthly watchtime. <br>
 
 ```
-!mwtime
+!mtime
 ```
 #### Displays the current monthly top 10
 

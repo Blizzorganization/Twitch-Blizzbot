@@ -11,8 +11,17 @@
 !watchtime (Name)
     z.B !watchtime username
 ```
+#### Linkfunktion zwischen Discord und Twitch 
+
+```
+!link (Twitch-Name) 
+```
+> _Hiermit kann man seinen Twitchaccount mit Discord verbinden so das man nur  noch !watchtime eingeben <br>
+muss um seine Watchtime zu sehen_ 
+
 #### Zeigt die Befehlslist vom Bot an 
 
 ```
 !help
+
 ```
