@@ -1,3 +1,17 @@
+const { Message } = require("discord.js")
+const fs = require("fs")
+const os = require("os")
+const util = require("util")
+const { DiscordClient } = require("../../../modules/discordclient")
+
+/**
+ * @name eval
+ * @module DiscordCommands
+ * @param {DiscordClient} client 
+ * @param {Message} message 
+ * @param {string[]} args 
+ */
+exports.adminOnly = false
 exports.run = async (client, message, args) => {
     if (!args || !args[0]) {
         var msg = await message.channel.send("Du musst deinen Twitch Nutzernamen angeben.")
@@ -8,8 +22,9 @@ exports.run = async (client, message, args) => {
             
             handle(client, m, m.content.split(" "))
         })
-    }
-    handle(client, message, args)
+    } else {
+    console.log("mammutistschmutz")
+    handle(client, message, args)}
 }
 function handle(client, message, args) {
     if (!(/^[a-zA-Z0-9][\w]{2,24}$/.test(args[0]))) return message.channel.send("Dies ist kein valider Twitch Nutzername.");
