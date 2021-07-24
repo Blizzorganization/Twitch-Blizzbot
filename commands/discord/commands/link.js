@@ -23,7 +23,6 @@ exports.run = async (client, message, args) => {
             handle(client, m, m.content.split(" "))
         })
     } else {
-    console.log("mammutistschmutz")
     handle(client, message, args)}
 }
 function handle(client, message, args) {
