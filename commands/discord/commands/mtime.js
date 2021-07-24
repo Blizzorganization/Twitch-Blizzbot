@@ -8,7 +8,7 @@ const { MessageEmbed } = require("discord.js")
  * @param {Message} message
  * @param {string[]} args
  */
-exports.adminOnly = false
+exports.adminOnly = true
 exports.run = (client, message, args) => {
     let user = "";
     if (!args || args.length == 0) {
