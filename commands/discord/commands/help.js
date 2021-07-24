@@ -12,7 +12,7 @@ exports.run = (client, message, args) => {
         .setTitle("**__Der Bot kann folgende Befehle__**")
         .addField("!top10", value="Gibt die aktuellen Top10 der Watchtime liste wieder")
         .addField("!watchtime [Twitch-Name]", value="Gibt die aktuelle watchtime des angegebenen Nutzers wieder")
-        .addField("!link [Twitch-Name]", value=" Um deinen Twitchaccount mit Discord verbinden so das man nur  noch !watchtime eingeben muss")
+        .addField("!link [Twitch-Name]", value=" Um deinen Twitchaccount mit Discord zu verbinden so das man nur noch !watchtime eingeben muss")
 
     message.channel.send(embed)
 }
