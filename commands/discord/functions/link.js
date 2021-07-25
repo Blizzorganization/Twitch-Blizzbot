@@ -28,5 +28,5 @@ exports.run = async (client, message, args) => {
 function handle(client, message, args) {
     if (!(/^[a-zA-Z0-9][\w]{2,24}$/.test(args[0]))) return message.channel.send("Dies ist kein valider Twitch Nutzername.");
     client.clients.twitch.db.newDiscordConnection(message.author, args[0].toLowerCase());
-    message.channel.send("Dein Name wurde erfolgreich eingetragen.")
+    message.channel.send("Der Name (Name) wurde erfolgreich eingetragen".replace("(Name)", args[0].toLowerCase()))
 }
