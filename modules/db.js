@@ -302,6 +302,7 @@ exports.DB = class DB {
         stopping.push(this.customcommands.close());
         stopping.push(this.watchtimedb.close());
         stopping.push(this.monthlyWatchtime.close());
+        stopping.push(this.userLink.close());
         return Promise.all(stopping);
     }
 };
