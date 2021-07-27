@@ -52,7 +52,7 @@ exports.TwitchClient = class TwitchClient extends client {
             this.newChannellogs(opts.channels)
             for (const c of opts.channels) this.cooldowns.set(c.replace("#", ""), 0)
         })
-        schedule.scheduleJob("newchannellogs", "0 17 * * *", this.newChannellogs)
+        schedule.scheduleJob("newchannellogs", "0 1 * * *", this.newChannellogs)
         this.blacklist.ensure("delmsg", [])
         this.db = new DB()
         loadCommands(this.commands, "commands/twitch/commands", this.helplist)

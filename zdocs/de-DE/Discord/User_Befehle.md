@@ -14,6 +14,10 @@
 #### Linkfunktion zwischen Discord und Twitch 
 
 ```
+!twitchname 
+```
+
+```
 !link (Twitch-Name) 
 ```
 > _Hiermit kann man seinen Twitchaccount mit Discord verbinden so das man nur  noch !watchtime eingeben <br>
