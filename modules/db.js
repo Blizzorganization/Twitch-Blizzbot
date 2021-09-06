@@ -1,308 +1,664 @@
-const Database = require("better-sqlite3");
-const { existsSync, mkdirSync } = require("fs");
-const schedule = require("node-schedule");
-
-/**
- * @typedef {Object} watchtimeuser
- * @property {string} user
+const { Pool } = require("pg");
+const { permissions } = require("./constants");
+const { currentMonth } = require("./functions");
+const { EOL } = require("os");
+/** 
+ * @typedef watchtimeuser 
+ * @property {string} viewer
  * @property {number} watchtime
+*/
+/**
+ * @typedef resolvedAlias
+ * @property {string} alias
+ * @property {string} command
+ * @property {string} response
+ * @property {number} permissions
+ */
+/** 
+ * @typedef cmdData
+ * @property {string} commandname
+ * @property {string} response
+ * @property {number} permissions
  */
 
-/**
- * Database Class
- * @class
- * @property {Database} customcommands
- * @property {Database} watchtimedb
- * @property {Database} monthlyWatchtime
- * @property {Object<string, Statement>} statements
- * @property {string[]} watchtimechannels
- */
-exports.DB = class DB {
-    customcommands;
-    watchtimedb;
-    monthlyWatchtime;
-    statements = new Object({});
-    watchtimechannels = [];
-    userLink;
-    constructor() {
-        if (!(existsSync("./data"))) mkdirSync("./data");
-        if (!(existsSync("./data/watchtime"))) mkdirSync("./data/watchtime");
-        this.customcommands = new Database("data/customcommands.sqlite");
-        this.watchtimedb = new Database("data/watchtime.sqlite");
-        this.userLink = new Database("data/userLink.sqlite");
-        this.customcommands.pragma("synchronous = 1");
-        this.watchtimedb.pragma("synchronous = 1");
-        this.userLink.pragma("synchronous = 1");
-        this.customcommands.pragma("journal_mode = wal");
-        this.watchtimedb.pragma("journal_mode = wal");
-        this.userLink.pragma("journal_mode = wal");
-        var date = new Date();
-        var month = '' + (date.getMonth() + 1);
-        var year = date.getFullYear();
-        if (month.length < 2) month = '0' + month;
-        this.monthlyWatchtime = new Database(`data/watchtime/${year}.${month}.sqlite`);
-        this.monthlyWatchtime.pragma("synchronous = 1");
-        this.monthlyWatchtime.pragma("journal_mode = wal");
-        this.customcommands.prepare("CREATE TABLE IF NOT EXISTS aliases (name text PRIMARY KEY, command text);").run();
-        this.customcommands.prepare("CREATE TABLE IF NOT EXISTS ccmds (commandname text PRIMARY KEY, response text);").run();
-        this.customcommands.prepare("CREATE TABLE IF NOT EXISTS coms (commandname text PRIMARY KEY, response text);").run();
-        this.userLink.prepare("CREATE TABLE IF NOT EXISTS users (discordid text PRIMARY KEY, twitchname text)").run();
-        this.statements["newAlias"] = this.customcommands.prepare("INSERT OR IGNORE INTO aliases VALUES (@name, @command)");
-        this.statements["getAlias"] = this.customcommands.prepare("SELECT command FROM aliases WHERE name = @name;");
-        this.statements["getAliases"] = this.customcommands.prepare("SELECT name FROM aliases");
-        this.statements["delAlias"] = this.customcommands.prepare("DELETE FROM aliases WHERE name = @name");
-        this.statements["delAliases"] = this.customcommands.prepare("DELETE FROM aliases WHERE command = @command");
-        this.statements["getCcmd"] = this.customcommands.prepare("SELECT response FROM ccmds WHERE commandname = @commandname");
-        this.statements["getCom"] = this.customcommands.prepare("SELECT response FROM coms WHERE commandname = @commandname");
-        this.statements["allCcmds"] = this.customcommands.prepare("SELECT commandname FROM ccmds");
-        this.statements["allComs"] = this.customcommands.prepare("SELECT commandname FROM coms");
-        this.statements["newCcmd"] = this.customcommands.prepare("INSERT INTO ccmds VALUES (@commandname, @response)");
-        this.statements["newCom"] = this.customcommands.prepare("INSERT INTO coms VALUES (@commandname, @response)");
-        this.statements["editCcmd"] = this.customcommands.prepare("UPDATE ccmds SET response = @response WHERE commandname = @commandname");
-        this.statements["editCom"] = this.customcommands.prepare("UPDATE coms SET response = @response WHERE commandname = @commandname");
-        this.statements["delCcmd"] = this.customcommands.prepare("DELETE FROM ccmds WHERE commandname = @commandname");
-        this.statements["delCom"] = this.customcommands.prepare("DELETE FROM coms WHERE commandname = @commandname");
-        this.statements["newDiscordConnection"] = this.userLink.prepare("INSERT OR REPLACE INTO users VALUES (@id, @twitchname)");
-        this.statements["getDiscordConnection"] = this.userLink.prepare("SELECT twitchname FROM users WHERE discordid = @id");
-        schedule.scheduleJob("newMonthlyWatchtime", "0 0 1 * *", async () => {
-            await this.monthlyWatchtime.close();
-            this.monthlyWatchtime = new Database(`data/watchtime/${year}.${month}.sqlite`);
-            this.monthlyWatchtime.pragma("synchronous = 1");
-            this.monthlyWatchtime.pragma("journal_mode = wal");
-            for (const channel of this.watchtimechannels) {
-                this.mWatchtimeSetup(channel);
-            }
-        });
+class DB {
+    #statements; /*eslint-ignore*/
+    /**
+     * @class DB
+     * Database class - currently based on postgres
+     * @property {import("./statements").statements} #statements
+     * @property {config} #config
+     */
+    constructor(config) {
+        this.#statements = require("./statements.json");
+        this.doingWatchtime = false;
+        this.db = new Pool(config);
+        this.dbname = config.database;
+        /** @type {import("./clients").Clients}*/
+        this.clients = undefined;
+        this.#ensureTables();
+    }
+
+    /**
+     * @param {string} sql
+     * @param {any[]} data
+     */
+    async query(sql, ...data) {
+        let client = await this.db.connect();
+        try {
+            let res = await client.query(sql, data).catch(e => { throw e; });
+            return res;
+        } catch (e) {
+            this.clients.logger.error(e?.toString());
+        } finally {
+            client.release();
+        }
     }
     /**
-     * setup monthly watchtime Table and prepare statements
-     * @param {string} channel Twitch Channel Name
+     * initializes the Database
      */
-    mWatchtimeSetup(channel) {
-        this.monthlyWatchtime.prepare(`CREATE TABLE IF NOT EXISTS ${channel} (user text PRIMARY KEY, watchtime number);`).run();
-        this.statements[`getMWatchtimeFor${channel}`] = this.monthlyWatchtime.prepare(`SELECT watchtime FROM ${channel} WHERE user = @user`);
-        this.statements[`mwatchtimeNewFor${channel}`] = this.monthlyWatchtime.prepare(`INSERT OR IGNORE INTO ${channel} VALUES (@user, 0);`);
-        this.statements[`mwatchtimeIncFor${channel}`] = this.monthlyWatchtime.prepare(`UPDATE ${channel} SET watchtime = watchtime + 1 WHERE user = @user`);
-        this.statements[`mwatchtimeListFor${channel}`] = this.monthlyWatchtime.prepare("SELECT user, watchtime FROM <channel> ORDER BY watchtime DESC LIMIT @max".replace("<channel>", channel));
+    async #ensureTables() {
+        let client = await this.db.connect();
+        try {
+            let tables = (await client.query("SELECT * FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema';")).rows;
+            this.clients.logger.log("debug", "Existing databases: " + tables.map(t => t.tablename).join(", "));
+            let todoTables = [
+                ["streamer", "CREATE TABLE streamer (name VARCHAR(25) PRIMARY KEY, automessage BOOLEAN DEFAULT TRUE);"],
+                ["watchtime", `CREATE TABLE watchtime
+                (channel VARCHAR(25) NOT NULL REFERENCES streamer(name) ON UPDATE CASCADE ON DELETE CASCADE,
+                viewer VARCHAR(25) NOT NULL,
+                watchtime INTEGER DEFAULT 0,
+                month VARCHAR(7) NOT NULL,
+                PRIMARY KEY(channel, viewer, month));`],
+                ["customcommands", `CREATE TABLE customcommands
+                (channel VARCHAR(25) NOT NULL references streamer(name),
+                command TEXT NOT NULL,
+                response TEXT,
+                permissions INTEGER,
+                PRIMARY KEY(channel, command));`],
+                ["aliases", `CREATE TABLE aliases
+                (alias TEXT,
+                command TEXT NOT NULL,
+                channel VARCHAR(25) NOT NULL,
+                PRIMARY KEY(channel, alias),
+                FOREIGN KEY(channel, command) REFERENCES customcommands(channel, command) ON UPDATE CASCADE ON DELETE CASCADE);`],
+                ["counters", `CREATE TABLE counters
+                (channel VARCHAR(25) NOT NULL references streamer(name) ON UPDATE CASCADE ON DELETE CASCADE,
+                name TEXT,
+                cur INTEGER DEFAULT 0,
+                inc INTEGER DEFAULT 1,
+                PRIMARY KEY(channel, name));`],
+                ["userlink", `CREATE TABLE userlink
+                (discordid VARCHAR(30) PRIMARY KEY,
+                twitchname VARCHAR(25) NOT NULL);`],
+                ["blacklist", `create table blacklist  
+                (channel VARCHAR(25) REFERENCES streamer(name) ON DELETE CASCADE ON UPDATE CASCADE,
+                blwords TEXT [],
+                UNIQUE(channel));`]
+            ];
+            if (tables && tables.length > 0) {
+                /** @type {string[]}*/
+                let tablenames = tables.map(t => t.tablename);
+                todoTables = todoTables.filter((val) => tablenames.indexOf(val[0]) == -1);
+            }
+            for (const stmt of todoTables) {
+                this.clients.logger.log("debug", "creating table " + stmt[0]);
+                client.query(stmt[1]);
+            }
+        } catch (e) {
+            this.clients.logger.error(e);
+            throw e;
+        } finally {
+            client.release();
+        }
+
     }
+    /**
+     * stops the database
+     */
+    stop() {
+        return this.db.end();
+    }
+    /**
+     * add a new channel to the database
+     * @param {string} channel
+     */
+    async newChannel(channel) {
+        const client = await this.db.connect();
+        try {
+            channel = channel.replace(/#+/g, "");
+            await client.query(this.#statements.newChannel, [channel, true]).catch((e) => { throw e; });
+            await client.query(this.#statements.newBlacklist, [channel]).catch((e) => { throw e; });
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
+    }
+    /**
+     * add a new channel to the database
+     * @param {string} channel
+     */
+    async getChannel(channel) {
+        const client = await this.db.connect();
+        try {
+            channel = channel.replace(/#+/g, "");
+            let data = await client.query(this.#statements.getChannel, [channel]).catch((e) => { throw e; });
+            return data.rows.length == 0 ? null : data.rows[0];
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
+    }
+    //#region Aliases
     /**
      * adds an Alias to a custom command
+     * @param {string} channel Channel where to add the Alias
      * @param {string} name name of the Alias
      * @param {string} command Command the alias refers to
      */
-    newAlias(name, command) { this.statements["newAlias"].run({ name, command }); }
+    async newAlias(channel, name, command) {
+        const client = await this.db.connect();
+        try {
+            channel = channel.replace(/#+/g, "");
+            await client.query(this.#statements.newAlias, [channel, name, command]).catch((e) => { throw e; });
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
+    }
     /**
-     * resolve an alias
-     * @param {string} name 
-     * @returns {string|undefined} the command the alias refers to if the alias exists
+     * @param {string} channel
+     * @param {string} name
+     * @returns {Promise<resolvedAlias?>} command data
      */
-    getAlias(name) {
-        let data = this.statements["getAlias"].get({ name });
-        return data ? data.command : undefined;
+    async resolveAlias(channel, name) {
+        const client = await this.db.connect();
+        try {
+            channel = channel.replace(/#+/g, "");
+            let data = await client.query(this.#statements.resolveAlias, [name, channel]).catch((e) => { throw e; });
+            return data.rows.length == 0 ? null : data.rows[0];
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
     }
     /**
      * delete an alias
      * @param {string} name Name of the Alias to delete
+     * @param {string} channel
      */
-    deleteAlias(name) { this.statements["deleteAlias"].run({ name }); }
+    async deleteAlias(channel, name) {
+        const client = await this.db.connect();
+        try {
+            channel = channel.replace(/#+/g, "");
+            await client.query(this.#statements.delAlias, [channel, name]).catch((e) => { throw e; });
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
+    }
     /**
      * Get all existing aliases
-     * @returns {string[]} List of all Aliases
+     * @param {string} channel
+     * @returns {Promise<string[]>} List of all Aliases
      */
-    getAliases() { return this.statements["getAliases"].all().map((row) => row.name); }
+    async getAliases(channel) {
+        const client = await this.db.connect();
+        try {
+            channel = channel.replace(/#+/g, "");
+            return (await client.query(this.#statements.getAliases, [channel]).catch((e) => { throw e; }))?.rows?.map((row) => row.alias);
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
+    }
+    //#endregion aliasses
+
+    //#region counters
     /**
-     * Generate Watchtime Table and prepare statements
-     * @param {string} channel Twitch Channel Name
+     * creates a new counter
+     * @param  {string} channel channel to create the counter for
+     * @param  {string} name counter name
+     * @param  {number} inc=1 the automatic increase
+     * @param  {number} defaultVal=0 the starting value
      */
-    newWatchtimeChannel(channel) {
-        if (channel.includes("#")) channel = channel.replace("#", "");
-        this.watchtimedb.prepare(`CREATE TABLE IF NOT EXISTS ${channel} (user text PRIMARY KEY, watchtime number);`).run();
-        this.statements[`getWatchtimeFor${channel}`] = this.watchtimedb.prepare(`SELECT watchtime FROM ${channel} WHERE user = @user`);
-        this.statements[`watchtimeNewFor${channel}`] = this.watchtimedb.prepare(`INSERT OR IGNORE INTO ${channel} VALUES (@user, 0);`);
-        this.statements[`watchtimeIncFor${channel}`] = this.watchtimedb.prepare(`UPDATE ${channel} SET watchtime = watchtime + 1 WHERE user = @user`);
-        this.statements[`watchtimeListFor${channel}`] = this.watchtimedb.prepare("SELECT user, watchtime FROM <channel> ORDER BY watchtime DESC LIMIT @max".replace("<channel>", channel));
-        this.mWatchtimeSetup(channel);
-        this.watchtimechannels.push(channel);
+    async newCounter(channel, name, inc = 1, defaultVal = 0) {
+        const client = await this.db.connect();
+        try {
+            channel = channel.replace(/#+/g, "");
+            await client.query(this.#statements.newCounter, [channel, name, defaultVal, inc]).catch((e) => { throw e; });
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
     }
     /**
-     * get a top list of watchtime
-     * @param {string} channel Twitch Channel Name
-     * @param {number} max Amount of Viewers to fetch
-     * @returns {watchtimeuser[]} Sorted Watchtime List
+     * read only, does NOT modify the value
+     * @param {string} channel
+     * @param {string} name
+     * @returns {Promise<number?>} value if exists
      */
-    watchtimeList(channel, max) {
-        if (!("number" == typeof max)) throw new TypeError("You have to select how many entries you need as a number.");
-        return this.statements[`watchtimeListFor${channel}`].all({ max });
+    async readCounter(channel, name) {
+        const client = await this.db.connect();
+        try {
+            channel = channel.replace(/#+/g, "");
+            let data = await client.query(this.#statements.getCounter, [name, channel]).catch((e) => { throw e; });
+            if (data.rows.length == 0) return;
+            return data.rows[0].cur;
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
     }
     /**
-     * get a top list of watchtime
-     * @param {string} channel Twitch Channel Name
-     * @param {number} max Amount of Viewers to fetch
-     * @returns {watchtimeuser[]} Sorted Watchtime List
+     * @param  {string} channel
+     * @param  {string} name
+     * @returns {Promise<number?>}
      */
-    mwatchtimeList(channel, max) {
-        if (!("number" == typeof max)) throw new TypeError("You have to select how many entries you need as a number.");
-        return this.statements[`mwatchtimeListFor${channel}`].all({ max });
+    async getCounter(channel, name) {
+        const client = await this.db.connect();
+        try {
+            channel = channel.replace(/#+/g, "");
+            let data = await client.query(this.#statements.getCounter, [name, channel]).catch((e) => { throw e; });
+            if (data.rows.length == 0) return;
+            await client.query(this.#statements.incCounter, [name, channel]).catch((e) => { throw e; });
+            return data.rows[0]?.cur;
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
     }
+    /**
+     * @param  {string} channel
+     * @param  {string} name
+     * @param  {number} val
+     */
+    async setCounter(channel, name, val) {
+        const client = await this.db.connect();
+        try {
+            channel = channel.replace(/#+/g, "");
+            await client.query(this.#statements.setCounter, [val, name, channel]).catch((e) => { throw e; });
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
+    }
+    /**
+     * @param  {string} channel
+     * @param  {string} name
+     */
+    async delCounter(channel, name) {
+        const client = await this.db.connect();
+        try {
+            channel = channel.replace(/#+/g, "");
+            await client.query(this.#statements.delCounter, [channel, name]).catch((e) => { throw e; });
+        } catch (e) {
+            this.clients.logger.error(e.message);
+        } finally {
+            client.release();
+        }
+    }
+
+    async allCounters(channel) {
+        const client = await this.db.connect();
+        try {
+            channel = channel.replace(/#+/g, "");
+            let data = await client.query(this.#statements.allCounters, [channel]).catch((e) => { throw e; });
+            return data.rows;
+        } catch (e) {
+            this.clients.logger.error(e.message);
+        } finally {
+            client.release();
+        }
+    }
+    //#endregion counters
+
+    //#region Customcommands
+    /**
+     * get all customcommands
+     * @returns {Promise<string[]>} list of customcommands
+     * @param {string} channel
+     * @param {number} permission
+     */
+    async allCcmds(channel, permission = permissions.user) {
+        const client = await this.db.connect();
+        try {
+            channel = channel.replace(/#+/g, "");
+            return (await client.query(this.#statements.getAllCommands, [channel, permission]).catch((e) => { throw e; }))?.rows?.map((row) => row.command);
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
+    }
+
+    /**
+     * get response of customcommand
+     * @param {string} commandname
+     * @param {string} channel
+     * @returns {Promise<?cmdData>} response
+     */
+    async getCcmd(channel, commandname) {
+        const client = await this.db.connect();
+        try {
+            channel = channel.replace(/#+/g, "");
+            let data = await client.query(this.#statements.getCommand, [commandname, channel]).catch((e) => { throw e; });
+            return data.rows.length > 0 ? data.rows[0] : undefined;
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
+    }
+
+    /**
+     * Create new Customcommand/change its response
+     * @param {string} channel
+     * @param {string} commandname
+     * @param {string} response
+     * @param {number} permissions
+     */
+    async newCcmd(channel, commandname, response, permissions) {
+        const client = await this.db.connect();
+        try {
+            channel = channel.replace(/#+/g, "");
+            await client.query(this.#statements.newCommand, [commandname, response, channel, permissions]).catch((e) => { throw e; });
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
+    }
+    
+    /**
+     * @param  {cmdData[]} cmdData
+     * @param  {string} channel
+     * @param  {"user"|"mod"} cmdType
+     */
+    async migrateCustomcommands(cmdData, channel, cmdType) {
+        const client = await this.db.connect();
+        try {
+            channel = channel.replace(/#+/, "");
+            var transaction = async (/** @type {cmdData[]} */ cmds) => {
+                await client.query("BEGIN");
+                for (const cmd of cmds) {
+                    await client.query(this.#statements.newCommand, [cmd.commandname, cmd.response, channel, permissions[cmdType]]).catch((e) => { throw e; });
+                }
+                return await client.query("COMMIT").catch((e) => { throw e; });
+            };
+            transaction(cmdData);
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
+    }
+    /**
+    * Edit a Customcommand/change its response
+    * @param {string} channel
+    * @param {string} commandname
+    * @param {string} response
+    * @param {keyof permissions}
+    */
+    async editCcmd(channel, commandname, response) {
+        const client = await this.db.connect();
+        try {
+            channel = channel.replace(/#+/g, "");
+            await client.query(this.#statements.updateCommand, [response, commandname, channel]).catch((e) => { throw e; });
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
+    }
+    /**
+     * delete a Customcommand
+     * @param {string} channel
+     * @param {string} commandname
+     */
+    async delCcmd(channel, commandname) {
+        const client = await this.db.connect();
+        try {
+            channel = channel.replace(/#+/g, "");
+            await client.query(this.#statements.deleteCommand, [commandname, channel]).catch((e) => { throw e; });
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
+    }
+
+    /**
+     * transfers a customcommande to another permission level
+     * @param  {string} channel
+     * @param  {string} commandname
+     */
+    async transferCmd(channel, commandname) {
+        const client = await this.db.connect();
+        try {
+            channel = channel.replace(/#+/g, "");
+            let cmd = await client.query(this.#statements.getCommandPermission, [commandname, channel]).catch((e) => { throw e; });
+            if (cmd?.rows?.length == 0) {
+                return "no_such_command";
+            }
+            let newPerm = cmd.rows[0].permissions == permissions.user ? permissions.mod : permissions.user;
+            await client.query(this.#statements.changeCommandPermissions, [newPerm, commandname, channel]).catch((e) => { throw e; });
+            return "ok";
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
+    }
+    //#endregion Customcommands
+
+    //#region watchtime
     /**
      * Default Watchtime Increase (and creation for new users)
      * @param {string} channel Channel where to add Watchtime
      * @param {string[]} chatters List of Users to add Watchtime to
      */
-    watchtime(channel, chatters) {
-        if (channel.includes("#")) channel = channel.replace("#", "");
-        var watchtimenewstatement = this.statements[`watchtimeNewFor${channel}`];
-        var watchtimeincstatement = this.statements[`watchtimeIncFor${channel}`];
-        var mwatchtimenewstatement = this.statements[`mwatchtimeNewFor${channel}`];
-        var mwatchtimeincstatement = this.statements[`mwatchtimeIncFor${channel}`];
-        var transaction = this.watchtimedb.transaction((users) => {
-            for (const user of users) {
-                watchtimenewstatement.run({ channel, user });
-                watchtimeincstatement.run({ channel, user });
-                mwatchtimenewstatement.run({ channel, user });
-                mwatchtimeincstatement.run({ channel, user });
-            }
-        });
-        transaction(chatters);
+    async watchtime(channel, chatters) {
+        if (this.doingWatchtime) {
+            return this.clients.logger.error("watchtime already in progress at " + (new Date).toLocaleTimeString());
+        }
+        this.doingWatchtime = true;
+        const client = await this.db.connect();
+        try {
+            let started = new Date;
+            this.clients.logger.log("info", "starting watchtime at " + started.toLocaleTimeString());
+            channel = channel.replace(/#+/, "");
+            let month = currentMonth();
+            var transaction = async (/** @type {string[]} */ users) => {
+                await client.query("BEGIN");
+                await client.query(this.#statements.watchtimeNew, [channel, users, month]).catch((e) => {
+                    this.clients.logger.error("insert month" + e?.toString());
+                    client.query("ROLLBACK");
+                });
+                await client.query(this.#statements.watchtimeNew, [channel, users, "alltime"]).catch((e) => {
+                    this.clients.logger.error("insert alltime" + e?.toString());
+                    client.query("ROLLBACK");
+                });
+                await client.query(this.#statements.watchtimeInc, [users, channel, month]).catch((e) => {
+                    this.clients.logger.error("inc month" + e?.toString());
+                    client.query("ROLLBACK");
+                });
+                await client.query(this.#statements.watchtimeInc, [users, channel, "alltime"]).catch((e) => {
+                    this.clients.logger.error("inc alltime" + e?.toString());
+                    client.query("ROLLBACK");
+                });
+                client.query("COMMIT").catch((e) => { throw e; });
+            };
+            await transaction(chatters);
+            let endtime = new Date;
+            this.clients.logger.log("info", "finished watchtime at " + endtime.toLocaleTimeString() + EOL + "Took " + (endtime.getTime() - started.getTime()) + "ms.");
+        } catch (e) {
+            this.clients.logger.error(e?.toString());
+        } finally {
+            client.release();
+            this.doingWatchtime = false;
+        }
+    }
+    /** @typedef old_watchtime
+     * @property {number} watchtime
+     * @property {string} user
+    */
+    /**
+     * Watchtime migration method (and creation for new users)
+     * @param {string} channel Channel where to add Watchtime
+     * @param {old_watchtime[]} chatters List of Users to add Watchtime to
+     * @param {string} month The month to add the watchtime at
+     */
+    async migrateWatchtime(channel, chatters, month) {
+        const client = await this.db.connect();
+        try {
+            channel = channel.replace(/#+/, "");
+            var transaction = async (/** @type {old_watchtime[]} */ users) => {
+                await client.query("BEGIN");
+                for (const user of users) {
+                    await client.query(this.#statements.watchtimeNew, [channel, user.user, month]).catch((e) => { throw e; });
+                    await client.query(this.#statements.watchtimeIncBy, [user.user, channel, month, user.watchtime]).catch((e) => { throw e; });
+                }
+                return await client.query("COMMIT").catch((e) => { throw e; });
+            };
+            transaction(chatters);
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
+    }
+    /**
+     * get a top list of watchtime
+     * @param {string} channel Twitch Channel Name
+     * @param {number} max Amount of Viewers to fetch
+     * @param {number} page
+     * @returns {Promise<watchtimeuser[]>} Sorted Watchtime List
+     * @param {string | number} month
+     */
+    async watchtimeList(channel, month, max, page = 1) {
+        const client = await this.db.connect();
+        try {
+            channel = channel.replace(/#+/g, "");
+            if (!("number" == typeof max)) throw new TypeError("You have to select how many entries you need as a number.");
+            if (!("number" == typeof page)) throw new TypeError("You need to supply a number as page");
+            return (await client.query(this.#statements.watchtimeList, [month, channel, max, (page - 1) * max]).catch((e) => { throw e; }))?.rows;
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
     }
     /**
      * get Watchtime for User on Channel
-     * @param {string} channel 
-     * @param {string} user 
-     * @returns {number|undefined} watchtime of the user
+     * @param {string} channel
+     * @param {string} user
+     * @returns {Promise<?number>} watchtime of the user
+     * @param {string} [month]
      */
-    getWatchtime(channel, user) {
-        if (channel.includes("#")) channel = channel.replace("#", "");
-        let data = this.statements[`getWatchtimeFor${channel}`].get({ user });
-        return data ? data.watchtime : undefined;
+    async getWatchtime(channel, user, month = "alltime") {
+        const client = await this.db.connect();
+        try {
+            channel = channel.replace("#", "");
+            let data = await client.query(this.#statements.getWatchtime, [user, channel, month]).catch((e) => { throw e; });
+            return data.rows.length > 0 ? data.rows[0].watchtime : undefined;
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
     }
-    /**
-     * get monthly Watchtime for User on Channel
-     * @param {string} channel 
-     * @param {string} user 
-     * @returns {number|undefined} watchtime of the user
-     */
-    getMWatchtime(channel, user) {
-        if (channel.includes("#")) channel = channel.replace("#", "")
-        let data = this.statements[`getMWatchtimeFor${channel}`].get({ user })
-        return data ? data.watchtime : undefined;
-    }
-    /**
-     * get all customcommands
-     * @returns {string[]} list of customcommands
-     */
-    allCcmds() { return this.statements["allCcmds"].all().map((row) => row.commandname); }
-    /**
-     * get all mod customcommands
-     * @returns {string[]} list of mod customcommands
-     */
-    allComs() { return this.statements["allComs"].all().map((row) => row.commandname); }
-    /**
-     * get response of customcommand
-     * @param {string} commandname 
-     * @returns {string|undefined} response
-     */
-    getCcmd(commandname) {
-        let data = this.statements["getCcmd"].get({ commandname });
-        return data ? data.response : undefined;
-    }
-    /**
-     * get mod customcommand response
-     * @param {string} commandname 
-     * @returns {string|undefined} response
-     */
-    getCom(commandname) {
-        let data = this.statements["getCom"].get({ commandname });
-        return data ? data.response : undefined;
-    }
-    /**
-     * Create new Customcommand/change its response
-     * @param {string} commandname 
-     * @param {string} response 
-     */
-    newCcmd(commandname, response) { this.statements["newCcmd"].run({ commandname, response }); }
-    /**
-     * Create new mod Customcommand/change its response
-     * @param {string} commandname 
-     * @param {string} response 
-     */
-    newCom(commandname, response) { this.statements["newCom"].run({ commandname, response }); }
-    /**
-    * Edit a Customcommand/change its response
-    * @param {string} commandname 
-    * @param {string} response 
-    */
-    editCcmd(commandname, response) { this.statements["editCcmd"].run({ commandname, response }); }
-    /**
-     * Edit a mod Customcommand/change its response
-     * @param {string} commandname 
-     * @param {string} response 
-     */
-    editCom(commandname, response) { this.statements["editCom"].run({ commandname, response }); }
-    /**
-     * delete a mod Customcommand
-     * @param {string} commandname 
-     */
-    delCom(commandname) { this.statements["delCom"].run({ commandname }); }
-    /**
-     * delete a Customcommand
-     * @param {string} commandname 
-     */
-    delCcmd(commandname) {
-        this.statements["delCcmd"].run({ commandname });
-        this.statements["delAliases"].run({ command: commandname });
-    }
-    /**
-     * delete an Alias
-     * @param {string} name 
-     */
-    delAlias(name) { this.statements["delAlias"].run({ name }); }
+    //#endregion watchtime
+
     /**
      * get linked twitch account if exists, otherwise returns null
-     * @param {User} user discord user
-     * @returns {string | null} twitch username
+     * @param {import("discord.js").User} user discord user
+     * @returns {Promise<string | null>} twitch username
      */
-    getDiscordConnection(user) {
-        var data = this.statements["getDiscordConnection"].get({ id: user.id });
-        return data ? data.twitchname : null;
+    async getDiscordConnection(user) {
+        const client = await this.db.connect();
+        try {
+            var data = await client.query(this.#statements.getDiscordConnection, [user.id]).catch((e) => { throw e; });
+            return data?.rows?.length > 0 ? data.rows[0].twitchname : null;
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
     }
     /**
      * Set a twitch user to your discord user
-     * @param {User} user discord user 
+     * @param {import("discord.js").User} user discord user
      * @param {string} twitchname twitch username
      */
-    newDiscordConnection(user, twitchname) {
-        this.statements["newDiscordConnection"].run({ id: user.id, twitchname });
+    async newDiscordConnection(user, twitchname) {
+        const client = await this.db.connect();
+        try {
+            await client.query(this.#statements.newDiscordConnection, [user.id, twitchname]).catch((e) => { throw e; });
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
     }
-    /**
-     * backup all databases
-     */
-    async backup() {
-        var date = new Date();
-        var month = '' + (date.getMonth() + 1);
-        var day = '' + date.getDate();
-        var year = date.getFullYear();
 
-        if (month.length < 2) month = '0' + month;
-        if (day.length < 2) day = '0' + day;
-
-        var dateString = [year, month, day].join('-') + date.toLocaleTimeString("de-DE", { hour12: false });
-        console.log("backing up watchtime");
-        await this.watchtimedb.backup(`backup/${dateString}.watchtime.sqlite`);
-        console.log("backed up watchtime");
-        console.log("backing up customcommands");
-        await this.customcommands.backup(`backup/${dateString}.customcommands.sqlite`);
-        console.log("backed up customcommands");
-    }
     /**
-     * stop all Databases 
+     * @param  {import("discord.js").User} user
      */
-    stop() {
-        var stopping = [];
-        stopping.push(this.customcommands.close());
-        stopping.push(this.watchtimedb.close());
-        stopping.push(this.monthlyWatchtime.close());
-        stopping.push(this.userLink.close());
-        return Promise.all(stopping);
+    async deleteDiscordConnection(user) {
+        const client = await this.db.connect();
+        try {
+            await client.query(this.#statements.deleteDiscordConnection, [user.id]).catch((e) => { throw e; });
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
     }
-};
+    //#region blacklist
+    async saveBlacklist() {
+        const channels = this.clients.twitch.channels;
+        const client = await this.db.connect();
+        try {
+            var transaction = async (/** @type {string[]} */ channels) => {
+                await client.query("BEGIN");
+                for (let channel of channels) {
+                    channel = channel.replace(/#+/, "");
+                    let blacklist = this.clients.twitch.blacklist[channel];
+                    await client.query(this.#statements.saveBlacklist, [channel, blacklist]).catch((e) => { throw e; });
+                }
+                return await client.query("COMMIT").catch((e) => { throw e; });
+            };
+            transaction(channels);
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
+    }
+    async loadBlacklist() {
+        const client = await this.db.connect();
+        try {
+            let data = (await client.query(this.#statements.loadBlacklist).catch((e) => { throw e; }))?.rows;
+            data.forEach((b) => {
+                this.clients.twitch.blacklist[b.channel] = b.blwords;
+            });
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
+    }
+    //#endregion
+}
+exports.DB = DB;

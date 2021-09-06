@@ -12,19 +12,34 @@
             "twitchchannel"
         ],
         "Raidminutes": 0,
-        "Cooldown" : 0
+        "Cooldown": 0,
+        "automessagedelay": 0,
+        "clientId": "API token from https://dev.twitch.tv/console/apps/create",
+        "devs": [
+            "blackdemonfire4",
+            "speed_r"
+        ]
     },
     "useDiscord": true,
     "discord": {
-        "token": "Token",
+        "token": "get your discord token from https://discord.com/developers/applications",
         "prefix": "!",
         "watchtimechannel": "twitchchannel",
-        "evalUsers": ["User IDs from the discord should have the rights"],
+        "evalUsers": [
+            "Discord User IDs of people who should have full permissions over the bot"
+        ],
         "channels": {
-            "blacklist": "channel-ID",
-            "commands": "channel-ID",
-            "relay": "channel-ID",
-            "adminCommands": "channel-ID"
+            "blacklist": "ID of the channel where the blacklist is posted",
+            "commands": "ID of the channel where users can execute commands",
+            "relay": "ID of the channel where messages are sent to the twitch chat",
+            "adminCommands": "ID of the channel where admins can execute commands"
         }
+    },
+    "db": {
+        "host": "localhost",
+        "database": "twitchbot",
+        "keepAlive": true,
+        "user": "twitchbot",
+        "password": "super_secret_password"
     }
 }

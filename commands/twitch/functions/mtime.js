@@ -1,23 +1,24 @@
-const { calcWatchtime } = require("../../../modules/functions")
+const { calcWatchtime } = require("../../../modules/functions");
+const { currentMonth } = require("../../../modules/functions");
 
-exports.help = false
-exports.perm = true
+exports.help = false;
+exports.perm = true;
 /**
- * @name uwtime
- * @module TwitchCommands
- * @param {TwitchClient} client
+ * @name mtime
+ * @namespace TwitchCommands
+ * @param {import("../../../modules/twitchclient").TwitchClient} client
  * @param {string} target
- * @param {ChatUserstate} context
+ * @param {import("tmi.js").ChatUserstate} context
  * @param {string} msg
  * @param {boolean} self
  */
-exports.run = (client, target, context, msg, self, args) => {
+exports.run = async (client, target, context, msg, self, args) => {
     if (!args || args.length == 0) {
-        client.say(target, "Du musst einen Nutzer angeben.")
-        return
+        client.say(target, "Du musst einen Nutzer angeben.");
+        return;
     }
-    let user = args[0].toLowerCase()
-    var watchtime = client.db.getMWatchtime(target, user)
-    if (!watchtime) return client.say(target, "Diesen Nutzer kenne ich nicht.")
-    client.say(target, `${user} schaut ${target.slice(1)} schon diesen Monat seit ${calcWatchtime(watchtime)}`)
-}
+    let user = args[0].toLowerCase();
+    var watchtime = await client.clients.db.getWatchtime(target, user, currentMonth());
+    if (!watchtime) return client.say(target, "Diesen Nutzer kenne ich nicht.");
+    client.say(target, `${user} schaut ${target.slice(1)} schon diesen Monat seit ${calcWatchtime(watchtime)}`);
+};

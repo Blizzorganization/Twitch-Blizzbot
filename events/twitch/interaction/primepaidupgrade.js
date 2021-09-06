@@ -1,14 +1,12 @@
 /**
  * @listens primepaidupgrade
- * @param {TwitchClient} client
+ * @param {import("../../../modules/twitchclient").TwitchClient} client
  * @param {string} channel
  * @param {string} username
- * @param {string} sender
- * @param {SubUserstate} userstate
  */
-exports.event = (client, channel, username, sender, userstate) => {
+exports.event = (client, channel, username) => {
 
-   //message for Action
-   console.log(`${username} extended subcription`)
-   client.say(channel, `/me ${username} hat seinen geschenkten Sub verlängert!`)
-}
+    //message for Action
+    client.clients.logger.log("info", `${username} extended subcription`);
+    client.say(channel, `/me ${username} hat seinen geschenkten Sub verlängert!`);
+};

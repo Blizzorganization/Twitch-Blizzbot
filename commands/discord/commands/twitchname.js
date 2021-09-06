@@ -1,24 +1,22 @@
-const { MessageEmbed } = require("discord.js")
+const { MessageEmbed } = require("discord.js");
 
+exports.adminOnly = false;
 /**
  * @name tname
- * @module DiscordCommands
- * @param {DiscordClient} client
- * @param {Message} message
- * @param {string[]} args
+ * @namespace DiscordCommands
+ * @param {import("../../../modules/discordclient").DiscordClient} client
+ * @param {import("discord.js").Message} message
  */
-exports.adminOnly = false
-exports.run = (client, message, args) => {
-
-    var dbuser = client.clients.twitch.db.getDiscordConnection(message.author)
-    if (!dbuser) dbuser = "Du hast keinen Namen hinterlegt"
-
+exports.run = async (client, message) => {
+    let dcuser = message.mentions.users.first() || message.author;
+    var dbuser = await client.clients.db.getDiscordConnection(dcuser);
+    if (!dbuser) dbuser = "Du hast keinen Namen hinterlegt";
     var embed = new MessageEmbed()
         .setColor(0xdfb82d)
-        .setThumbnail(url = message.author.avatarURL())
+        .setThumbnail(dcuser.avatarURL())
         .setTitle("**__Linkinginfo__**")
-        .addField("Discord-name", message.author.username)
-        .addField("Twitch-name", dbuser)
+        .addField("Discord-name", dcuser.username)
+        .addField("Twitch-name", dbuser);
 
-    message.channel.send(embed)
-}
+    message.channel.send({ embeds: [embed] });
+};

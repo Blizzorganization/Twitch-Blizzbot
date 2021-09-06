@@ -1,18 +1,15 @@
-exports.help = false
-exports.alias = ["befehl", "command", "commands", "cmd"]
+exports.help = false;
+exports.perm = false;
+exports.alias = ["befehl", "command", "commands", "cmd"];
 /**
  * @name help
- * @module TwitchCommands
- * @param {TwitchClient} client
+ * @namespace TwitchCommands
+ * @param {import("../../../modules/twitchclient").TwitchClient} client
  * @param {string} target
- * @param {ChatUserstate} context
- * @param {string} msg
- * @param {boolean} self
  */
-exports.run = (client, target, context, msg, self) => {
-    let appHelp = "!" + client.helplist.join(", !")
-    var ccmds = client.db.allCcmds()
-    if (ccmds.length > 0) appHelp += `, ${ccmds.join(", ")}`
-
-    client.say(target, `Der Bot kann folgende Commands: ${appHelp}`)
-}
+exports.run = async (client, target) => {
+    let appHelp = "!" + client.helplist.join(", !");
+    var ccmds = await client.clients.db.allCcmds(target);
+    if (ccmds.length > 0) appHelp += `, ${ccmds.join(", ")}`;
+    client.say(target, `Der Bot kann folgende Commands: ${appHelp}`);
+};

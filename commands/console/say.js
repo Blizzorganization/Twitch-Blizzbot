@@ -1,10 +1,7 @@
-const {Clients} = require("../../modules/clients")
-
+/* eslint-disable no-sparse-arrays */
 /**
- * @title say
- * @name say
- * @module ConsoleCommands
- * @param {Clients} clients 
+ * @namespace ConsoleCommands
+ * @param {import("../../modules/clients").Clients} clients 
  * @param {string[]} args 
  */
 exports.run = (clients, args) => {
@@ -13,7 +10,24 @@ exports.run = (clients, args) => {
         channel = clients.twitch.config.channels[0];
     } else {
         channel = args.shift();
-        if (!channel.startsWith("#")) return console.error("No channel supplied, message will not be sent.");
+        if (!channel.startsWith("#")) return clients.logger.error("No channel supplied, message will not be sent.");
     }
     clients.twitch.say(channel, args.join(" "));
-}
+};
+/**
+ * @param  {import("../../modules/clients").Clients} clients
+ * @param  {string} line
+ */
+exports.completer = (clients, line) => {
+    if (clients.twitch.config.channels.length == 1) return [, line];
+    let args = line.split(" ");
+    if (args.length > 2) return [, line];
+    let cmd = args.shift();
+    let completions = clients.twitch.config.channels;
+    let fline = args.join(" ");
+    let hits = completions.filter((c) => c.startsWith(fline));
+    hits.forEach((val, key) => {
+        hits[key] = `${cmd} ${val}`;
+    });
+    return [hits.length ? hits : completions, line];
+};

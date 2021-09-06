@@ -1,33 +1,26 @@
 {
     "tags": {
         "allowUnknownTags": true,
-        "dictionaries": [
-            "jsdoc"
-        ]
+        "dictionaries": ["jsdoc","closure"]
     },
     "source": {
-        "include": [
-            "bot.js",
-            "modules",
-            "events",
-            "commands",
-            "package.json",
-            "README.md"
-        ],
-        "includePattern": ".js$",
-        "excludePattern": "(node_modules/|zdocs|jsdoc)"
+        "include": ["bot.js", "modules", "events", "commands"],
+        "includePattern": ".+\\.js(doc|x)?$",
+        "excludePattern": "(^|\\/|\\\\)_"
     },
     "plugins": [
-        "plugins/markdown",
-        "node_modules/better-docs/category"
+        "plugins/markdown"
     ],
+    "templates": {
+        "cleverLinks": true,
+        "monospaceLinks": true
+    },
     "opts": {
+        "destination": "docs",
         "encoding": "utf8",
-        "readme": "./README.md",
-        "destination": "jsdoc/",
         "recurse": true,
-        "verbose": true,
-        "template": "./node_modules/better-docs",
+        "readme": "README.md",
+        "template": "node_modules/clean-jsdoc-theme",
         "theme_opts": {
             "theme": "dark"
         }

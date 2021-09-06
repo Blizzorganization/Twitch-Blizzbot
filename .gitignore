@@ -1,7 +1,11 @@
-node_modules
-logs
-data
-config.json
+backup/
 channellogs/
-jsdoc.json
+data/
+node_modules/
+automessages.json
+config.json
 links.txt
+TODO.todo
+logs
+docs/
+zdocs/
