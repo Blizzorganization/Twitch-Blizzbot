@@ -211,7 +211,6 @@ let createConfig = async () => {
         }
         return response;
     }
-    let confirm = false;
     existingconfig.twitch.connection = {
         reconnect: true,
         secure: true
@@ -223,6 +222,7 @@ let createConfig = async () => {
     existingconfig.twitch.channels = (await request("twitchchannels", existingconfig.twitch.channels?.join(" "))).split(/ +/g);
     existingconfig.twitch.Raidminutes = parseFloat(await request("raidduration", existingconfig.twitch.Raidminutes));
     existingconfig.twitch.Cooldown = parseInt(await request("twitchcooldown", existingconfig.twitch.Cooldown));
+    existingconfig.twitch.automessagedelay = parseInt(await request("automessagedelay"));
     existingconfig.twitch.clientId = await request("twitchclientId", existingconfig.twitch.clientId);
     existingconfig.useDiscord = parseBoolean(await request("useDiscord", typeof existingconfig.useDiscord === "boolean" ? (existingconfig.useDiscord ? initStrings[language].yes : initStrings[language].no) : undefined));
     if (existingconfig.useDiscord || parseBoolean(await request("setupDiscord", undefined))) {
@@ -260,6 +260,10 @@ if (process.argv[1].endsWith("setup.js") || process.argv[1].endsWith("setup")) {
     process.on("exit", writeData);
     createConfig();
 }
-
-
+(() => {
+    if (!fs.existsSync("automessages.json")) {
+        fs.writeFileSync("automessages.json", "{\"channelname\": [\"message\"]}");
+        return console.log("You should fill in the automessages.json");
+    }
+})();
 exports.createConfig = createConfig;
