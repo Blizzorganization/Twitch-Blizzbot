@@ -12,5 +12,5 @@ exports.run = async (client, target) => {
     let resp = await fetch(`https://decapi.me/twitch/game/${target.slice(1)}`);
     let game = await resp.text();
 
-    client.say(target, `Er spielt gerade: ${game}`);
+    client.say(target, `${target.slice(1)} spielt gerade: ${game}`);
 };
