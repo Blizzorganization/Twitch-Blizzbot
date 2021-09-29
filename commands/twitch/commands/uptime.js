@@ -17,6 +17,6 @@ exports.run = async (client, target) => {
     if (uptime == `${target.slice(1)} is offline`) {
         client.say(target, `${target.slice(1)} ist offline.`);
     } else {
-        client.say(target, `${target.slice(1)} ist seit ${uptime} live. blizzorLogo `);
+        client.say(target, `${target.slice(1)} ist seit ${uptime} live. blizzorLogo`);
     }
 };
