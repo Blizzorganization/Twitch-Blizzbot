@@ -1,6 +1,6 @@
 const fetch = require("node-fetch");
 exports.help = true
-exports.alias = ["folgezeit"]
+exports.alias = ["folgezeit", "followage"]
 /**
  * @name followage
  * @module TwitchCommands
