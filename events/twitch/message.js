@@ -115,10 +115,8 @@ function hasPerm(client, ctx) {
     if (ctx.badges) if (ctx.badges["broadcaster"]) return permissions.streamer;
     if (ctx.mod) return permissions.mod;
     if (ctx.subscriber) return permissions.sub;
-    if (ctx.badges.vip == "1") return permissions.vip;
     return permissions.user;
 }
-
 /**
  * @param {{ permittedlinks: string[]; }} client
  * @param {string[]} url

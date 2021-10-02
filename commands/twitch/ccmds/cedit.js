@@ -18,7 +18,6 @@ exports.run = async (client, target, context, msg, self, args) => {
         let cmd = await client.clients.db.getCcmd(target, args[0]);
         if (!cmd) return client.say(target, `Ich kenne keinen Befehl ${args[0]}.`);
         if (cmd.permissions !== permissions.mod) return client.say(target, `${args[0]} ist kein Mod Only Customcommand.`);
-
         let newcmd = args.shift().toLowerCase();
         let res = args.join(" ");
         await client.clients.db.editCcmd(target.replace(/#+/g, ""), newcmd, res);

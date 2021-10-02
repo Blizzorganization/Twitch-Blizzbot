@@ -14,7 +14,6 @@ exports.perm = true;
 exports.run = async (client, target, context, msg, self, args) => {
     if (!args) return client.say(target, "Welchen Befehl möchtest du bearbeiten?");
     if (args.length > 1) {
-
         let cmd = await client.clients.db.getCcmd(target, args[0]);
         if (!cmd) return client.say(target, `Ich kenne keinen Befehl ${args[0]}.`);
         if (cmd.permissions !== permissions.user) return client.say(target, `${args[0]} ist kein Nutzer Customcommand.`);

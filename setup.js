@@ -108,10 +108,7 @@ const initStrings = {
         dbuser: "the database username"
     }
 };
-
 const supportedLanguages = Object.keys(initStrings);
-
-
 
 /** @type {import("./typings/config").config} existingconfig*/
 let existingconfig = {
@@ -184,7 +181,7 @@ let createConfig = async () => {
         language = (await question(`Which language do you want to use?${EOL}Following languages are supported:${EOL}en\t\tEnglish${EOL}de\t\tDeutsch`)).toLowerCase();
     }
     console.log(initStrings[language].welcome);
-
+    
     /**
      * @param  {keyof translations} which which question to ask
      * @param  {(string | number | boolean)?} pre previous value if exists
@@ -244,7 +241,6 @@ let createConfig = async () => {
     console.log(initStrings[language].success);
 };
 const writeData = () => fs.writeFileSync("./config.json", JSON.stringify(existingconfig, undefined, 4), "utf8");
-
 
 /**
  * @param {string} response
