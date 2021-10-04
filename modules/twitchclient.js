@@ -58,7 +58,7 @@ exports.TwitchClient = class TwitchClient extends Client {
         loadCommands(this.commands, "commands/twitch/ccmds", this.helplist);
         loadCommands(this.commands, "commands/twitch/functions", this.helplist);
         loadEvents("events/twitch", this);
-        /* loadEvents("events/twitch/interaction", this);*/
+        loadEvents("events/twitch/interaction", this);
         this.messages = require("../automessages.json");
         this.connect();
     }
