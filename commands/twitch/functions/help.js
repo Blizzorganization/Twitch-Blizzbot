@@ -8,8 +8,8 @@ exports.alias = ["befehl", "befehle", "command", "commands", "cmd"];
  * @param {string} target
  */
 exports.run = async (client, target) => {
-    let appHelp = "!" + client.helplist.join(", !");
-    const ccmds = await client.clients.db.allCcmds(target);
+    let appHelp = "!" + client.helplist.sort().join(", !");
+    const ccmds = (await client.clients.db.allCcmds(target)).sort();
     if (ccmds.length > 0) appHelp += `, ${ccmds.join(", ")}`;
     client.say(target, `Der Bot kann folgende Commands: ${appHelp}`);
 };

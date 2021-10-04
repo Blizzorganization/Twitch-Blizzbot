@@ -22,7 +22,7 @@ exports.loadCommands = (commandmap, commanddir, helplist = []) => {
                 const props = require(`../${commanddir}/${command}`);
                 Logger.log("command", `Attempting to load Command ${command}`);
                 commandmap.set(command, props);
-                if (props.help && helplist) helplist.push(command);
+                if (props.help) helplist.push(command);
                 if (!props.alias) return;
                 for (const alias of props.alias) {
                     commandmap.set(alias, props);
