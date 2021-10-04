@@ -15,8 +15,8 @@ exports.alias = ["alter"];
 exports.run = async (client, target, context, msg, self, args) => {
     let user = args[0];
     if (!user || user == "") user = context["display-name"];
-    let resp = await fetch(`https://decapi.me/twitch/accountage/${user}`);
-    let age = (await resp.text())
+    const resp = await fetch(`https://decapi.me/twitch/accountage/${user}`);
+    const age = (await resp.text())
         .replace("years", "Jahren").replace("year", "Jahr")
         .replace("months", "Monaten").replace("month", "Monat")
         .replace("weeks", "Wochen").replace("week", "Woche")

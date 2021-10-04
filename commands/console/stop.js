@@ -1,9 +1,9 @@
 /**
  * @name stop
  * @namespace ConsoleCommands
- * @param {import("../../modules/clients").Clients} clients 
+ * @param {import("../../modules/clients").Clients} clients
  */
-exports.run = async (clients,) => {
+exports.run = async (clients) => {
     await clients.stop();
     process.exit(0);
 };

@@ -2,13 +2,13 @@ exports.adminOnly = true;
 /**
  * @name delbl
  * @namespace DiscordCommands
- * @param {import("../../../modules/discordclient").DiscordClient} client 
- * @param {import("discord.js").Message} message 
- * @param {string[]} args 
+ * @param {import("../../../modules/discordclient").DiscordClient} client
+ * @param {import("discord.js").Message} message
+ * @param {string[]} args
  */
 exports.run = async (client, message, args) => {
     if (!args || args.length == 0) return message.channel.send("Du musst angeben, was du von der Blacklist entfernen willst!");
-    let blremove = args.join(" ").toLowerCase();
+    const blremove = args.join(" ").toLowerCase();
     if (!client.clients.twitch.blacklist[client.config.watchtimechannel].includes(blremove)) return message.channel.send(`"${blremove}" wird nicht gelöscht, kann also auch nicht aus der Blacklist entfernt werden.`);
     client.clients.twitch.blacklist[client.config.watchtimechannel] = client.clients.twitch.blacklist[client.config.watchtimechannel].filter((w) => w !== blremove);
     await client.clients.db.saveBlacklist();

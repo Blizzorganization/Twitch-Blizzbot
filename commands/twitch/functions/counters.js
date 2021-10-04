@@ -4,12 +4,12 @@ exports.alias = ["counter"];
 /**
  * @name counters
  * @namespace TwitchCommands
- * @param {import("../../../modules/twitchclient").TwitchClient} client 
+ * @param {import("../../../modules/twitchclient").TwitchClient} client
  * @param {string} target
  */
 exports.run = async (client, target) => {
     let appHelp = "";
-    var counters = await client.clients.db.allCounters(target);
+    let counters = await client.clients.db.allCounters(target);
     if (counters && counters.length > 0) {
         counters = counters.map(c => c.name);
         appHelp = `Es sind folgende Zähler hinterlegt: ${counters.join(", ")}`;

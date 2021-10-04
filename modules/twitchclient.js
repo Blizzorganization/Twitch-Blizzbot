@@ -11,7 +11,7 @@ const schedule = require("node-schedule");
  * @property {string[]} devs
  * @property {number} Raidminutes
  * @property {string} clientId
- * 
+ *
  * @typedef {configExtension~import("tmi.js").Options} config
  */
 
@@ -44,7 +44,7 @@ exports.TwitchClient = class TwitchClient extends Client {
         /** @type {import("./clients").Clients}*/
         this.clients = undefined;
         /** @type {import("../typings/blacklist").bltype}*/
-        //@ts-ignore
+        // @ts-ignore
         this.blacklist = [];
         if (!existsSync("./channellogs")) mkdirSync("./channellogs");
         this.once("connected", () => {
@@ -58,7 +58,7 @@ exports.TwitchClient = class TwitchClient extends Client {
         loadCommands(this.commands, "commands/twitch/ccmds", this.helplist);
         loadCommands(this.commands, "commands/twitch/functions", this.helplist);
         loadEvents("events/twitch", this);
-        /*loadEvents("events/twitch/interaction", this);*/
+        /* loadEvents("events/twitch/interaction", this);*/
         this.messages = require("../automessages.json");
         this.connect();
     }
@@ -67,15 +67,13 @@ exports.TwitchClient = class TwitchClient extends Client {
      * @param {string[]} channels Channels to create channel logs for
      */
     newChannellogs(channels = this.channels) {
-        var date = new Date();
-        var month = "" + (date.getMonth() + 1);
-        var day = "" + date.getDate();
-        var year = date.getFullYear();
-        if (month.length < 2)
-            month = "0" + month;
-        if (day.length < 2)
-            day = "0" + day;
-        var dateString = [year, month, day].join("-");
+        const date = new Date();
+        let month = "" + (date.getMonth() + 1);
+        let day = "" + date.getDate();
+        const year = date.getFullYear();
+        if (month.length < 2) {month = "0" + month;}
+        if (day.length < 2) {day = "0" + day;}
+        const dateString = [year, month, day].join("-");
         for (let channel of channels) {
             channel = channel.replace("#", "");
             if (!existsSync(`./channellogs/${channel}`)) mkdirSync(`./channellogs/${channel}`);

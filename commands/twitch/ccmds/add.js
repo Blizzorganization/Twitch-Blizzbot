@@ -13,8 +13,8 @@ exports.perm = true;
  */
 exports.run = async (client, target, context, msg, self, args) => {
     if (args.length > 1) {
-        let newcmd = args.shift().toLowerCase();
-        let res = args.join(" ");
+        const newcmd = args.shift().toLowerCase();
+        const res = args.join(" ");
         if (!res || res == "") return client.say(target, "Du musst angeben, was die Antwort sein soll.");
         await client.clients.db.newCcmd(target.replace(/#+/g, ""), newcmd, res, permissions.user);
         client.say(target, `Befehl ${newcmd} wurde hinzugefügt.`);

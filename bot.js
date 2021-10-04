@@ -9,10 +9,11 @@ const { createConfig } = require("./setup");
     if (process.argv0.length >= 18) process.title = "Twitch-Blizzbot@" + require("./package.json").version;
     if (!existsSync("./config.json")) await createConfig();
     const config = JSON.parse(readFileSync("./config.json").toString());
-    appendFileSync("links.txt", ""); //making sure a links.txt exists
+    // making sure a links.txt exists
+    appendFileSync("links.txt", "");
     require("./modules/logger").debug("starting bot");
-    var clients = new Clients(config);
-    var discordClient;
+    const clients = new Clients(config);
+    let discordClient;
     const twitchClient = new TwitchClient(config.twitch);
     clients.twitch = twitchClient;
     twitchClient.clients = clients;
@@ -27,8 +28,8 @@ const { createConfig } = require("./setup");
         discordClient = new DiscordClient(config.discord);
         clients.discord = discordClient;
         discordClient.clients = clients;
-        let dcReady = new Promise((resolve) => discordClient.once("ready", () => resolve()));
-        let twReady = new Promise((resolve) => twitchClient.once("connected", () => resolve()));
+        const dcReady = new Promise((resolve) => discordClient.once("ready", () => resolve()));
+        const twReady = new Promise((resolve) => twitchClient.once("connected", () => resolve()));
         Promise.all([dcReady, twReady]).then(() => {
             setTimeout(() => {
                 clients.logger.log("debug", "changing channel topics");

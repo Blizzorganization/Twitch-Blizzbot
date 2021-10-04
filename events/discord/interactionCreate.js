@@ -1,11 +1,11 @@
 /**
- * 
- * @param {import("../../modules/discordclient").DiscordClient} client 
- * @param {import("discord.js").Interaction} interaction 
+ *
+ * @param {import("../../modules/discordclient").DiscordClient} client
+ * @param {import("discord.js").Interaction} interaction
  */
 exports.event = (client, interaction) => {
     if (!interaction.isCommand()) return;
-    let commands = client.slashcommands;
+    const commands = client.slashcommands;
     if (!commands.has(interaction.commandName)) return;
     try {
         commands.get(interaction.commandName).execute(interaction);

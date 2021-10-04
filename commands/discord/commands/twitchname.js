@@ -8,10 +8,10 @@ exports.adminOnly = false;
  * @param {import("discord.js").Message} message
  */
 exports.run = async (client, message) => {
-    let dcuser = message.mentions.users.first() || message.author;
-    var dbuser = await client.clients.db.getDiscordConnection(dcuser);
+    const dcuser = message.mentions.users.first() || message.author;
+    let dbuser = await client.clients.db.getDiscordConnection(dcuser);
     if (!dbuser) dbuser = "Du hast keinen Namen hinterlegt";
-    var embed = new MessageEmbed()
+    const embed = new MessageEmbed()
         .setColor(0xdfb82d)
         .setThumbnail(dcuser.avatarURL())
         .setTitle("**__Linkinginfo__**")

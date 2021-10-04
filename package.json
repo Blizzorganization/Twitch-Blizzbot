@@ -27,7 +27,7 @@
     "winston-daily-rotate-file": "^4.5.5"
   },
   "devDependencies": {
-    "babel-eslint": "^10.1.0",
+    "@babel/eslint-parser": "^7.15.7",
     "clean-jsdoc-theme": "^3.2.8",
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
@@ -49,5 +49,6 @@
     "modules/*.js",
     "events/**/*.js",
     "commands/**/*.js"
-  ]
+  ],
+  "babel": {}
 }

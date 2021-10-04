@@ -1,8 +1,8 @@
 /* eslint-disable no-sparse-arrays */
 /**
  * @namespace ConsoleCommands
- * @param {import("../../modules/clients").Clients} clients 
- * @param {string[]} args 
+ * @param {import("../../modules/clients").Clients} clients
+ * @param {string[]} args
  */
 exports.run = (clients, args) => {
     let channel;
@@ -20,12 +20,12 @@ exports.run = (clients, args) => {
  */
 exports.completer = (clients, line) => {
     if (clients.twitch.config.channels.length == 1) return [, line];
-    let args = line.split(" ");
+    const args = line.split(" ");
     if (args.length > 2) return [, line];
-    let cmd = args.shift();
-    let completions = clients.twitch.config.channels;
-    let fline = args.join(" ");
-    let hits = completions.filter((c) => c.startsWith(fline));
+    const cmd = args.shift();
+    const completions = clients.twitch.config.channels;
+    const fline = args.join(" ");
+    const hits = completions.filter((c) => c.startsWith(fline));
     hits.forEach((val, key) => {
         hits[key] = `${cmd} ${val}`;
     });

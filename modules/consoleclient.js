@@ -8,7 +8,7 @@ const { createInterface } = require("readline");
  * @class
  * @property {Interface} rl readline Instance
  * @property {Clients} clients Access to the other clients
- * @property {Collection} commands 
+ * @property {Collection} commands
  */
 exports.ConsoleClient = class ConsoleClient extends EventEmitter {
     #processStats;
@@ -20,11 +20,11 @@ exports.ConsoleClient = class ConsoleClient extends EventEmitter {
         this.commands = new Collection;
         this.#processStats = undefined;
         loadCommands(this.commands, "commands/console");
-        let commands = this.commands;
-        let cc = this;
+        const commands = this.commands;
+        const cc = this;
         function completer(line) {
-            let completions = commands.map((val, key) => key);
-            let hits = completions.filter((c) => c.startsWith(line) || line.startsWith(c));
+            const completions = commands.map((val, key) => key);
+            const hits = completions.filter((c) => c.startsWith(line) || line.startsWith(c));
             if (line.startsWith(`${hits[0]} `)) {
                 return commands.get(hits[0]).completer(cc.clients, line);
             }
@@ -40,7 +40,7 @@ exports.ConsoleClient = class ConsoleClient extends EventEmitter {
         this.rl.on("close", () => this.stopping ? null : this.clients.stop());
 
         try {
-            let pidu = require("pidusage");
+            const pidu = require("pidusage");
             this.#processStats = setInterval(() => pidu(process.pid, (err, data) => require("./logger").log("verbose", `cpu: ${Math.round(data.cpu * 100) / 100}%; memory: ${Math.round(data.memory / 1024 / 1024 * 100) / 100}MB`)), 10000);
             pidu(process.pid, (err, data) => require("./logger").log("verbose", `cpu: ${Math.round(data.cpu * 100) / 100}%; memory: ${Math.round(data.memory / 1024 / 1024 * 100) / 100}MB`));
         } catch (e) {
@@ -48,22 +48,22 @@ exports.ConsoleClient = class ConsoleClient extends EventEmitter {
         }
     }
     /**
-     * 
-     * @param {string|Buffer} data 
-     * @param [key] 
+     *
+     * @param {string|Buffer} data
+     * @param [key]
      */
     write(data, key) {
         this.rl.write(data, key);
     }
     /**
      * method for parsing a line from readline
-     * @param {string} line 
+     * @param {string} line
      */
     online(line) {
         this.clients.logger.log("stdin", line);
-        let args = line.split(" ");
-        let commandName = args.shift().toLowerCase();
-        let cmd = this.commands.get(commandName);
+        const args = line.split(" ");
+        const commandName = args.shift().toLowerCase();
+        const cmd = this.commands.get(commandName);
         if (cmd) {
             cmd.run(this.clients, args);
         } else {

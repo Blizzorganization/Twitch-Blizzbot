@@ -3,8 +3,8 @@ const { getTable } = require("../../modules/functions");
 global.util = require("util");
 global.fs = require("fs");
 /**
- * @param {import("../../modules/clients").Clients} clients 
- * @param {string[]} args 
+ * @param {import("../../modules/clients").Clients} clients
+ * @param {string[]} args
  */
 exports.run = async (clients) => {
     const query_size = `SELECT
@@ -24,8 +24,8 @@ exports.run = async (clients) => {
     SELECT 'userlink', count(*) from userlink union
     SELECT 'blacklist', count(*) from blacklist;`;
     const size = (await clients.db.query(query_size)).rows[0];
-    let lines = [];
-    let lines_data = (await clients.db.query(query_lines)).rows;
+    const lines = [];
+    const lines_data = (await clients.db.query(query_lines)).rows;
     lines_data.forEach(line => { lines[line["?column?"]] = line.count; });
     lines["total"] = `${lines_data.reduce((a, b) => parseInt(a) + parseInt(b.count), 0)}`;
     clients.logger.log("info", "\n" + getTable({ size, lines }));

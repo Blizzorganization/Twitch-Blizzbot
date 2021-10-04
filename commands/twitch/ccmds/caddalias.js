@@ -11,8 +11,8 @@ exports.perm = true;
  */
 exports.run = async (client, target, context, msg, self, args) => {
     if (args.length > 1) {
-        let newcmd = args.shift().toLowerCase();
-        let res = args.join(" ");
+        const newcmd = args.shift().toLowerCase();
+        const res = args.join(" ");
         if (!res || res == "") return client.say(target, "Du musst angeben, worauf der Alias verknüpft sein soll.");
         if (!await client.clients.db.getCcmd(target, res)) return client.say(target, "Diesen Befehl kenne ich nicht.");
         await client.clients.db.newAlias(target.replace(/#+/g, ""), newcmd, res);

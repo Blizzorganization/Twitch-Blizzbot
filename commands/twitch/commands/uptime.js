@@ -8,8 +8,8 @@ exports.perm = false;
  * @param {string} target
  */
 exports.run = async (client, target) => {
-    let uptimerequest = await fetch(`https://decapi.me/twitch/uptime/${target.slice(1)}`, {});
-    let uptime = (await uptimerequest.text())
+    const uptimerequest = await fetch(`https://decapi.me/twitch/uptime/${target.slice(1)}`, {});
+    const uptime = (await uptimerequest.text())
         .replace("days", "Tagen").replace("day", "Tag")
         .replace("hours", "Stunden").replace("hour", "Stunde")
         .replace("minutes", "Minuten").replace("minute", "Minute")

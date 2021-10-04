@@ -1,6 +1,6 @@
 const { EOL } = require("os");
-/** 
- * @typedef watchtimeuser 
+/**
+ * @typedef watchtimeuser
  * @property {string} viewer
  * @property {number} watchtime
 */
@@ -28,7 +28,7 @@ const { EOL } = require("os");
  * @property {string} user
 */
 
-/** 
+/**
  * @class DB
  */
 class ProtoDB {
@@ -56,7 +56,7 @@ class ProtoDB {
     /**
      * @description add a new channel to the database
      * @param {string} channel
-     * 
+     *
      */
     async newChannel() {
     }
@@ -67,7 +67,7 @@ class ProtoDB {
      */
     async getChannel() {
     }
-    //#region Aliases
+    // #region Aliases
     /**
      * @description adds an Alias to a custom command
      * @param {string} channel Channel where to add the Alias
@@ -98,9 +98,9 @@ class ProtoDB {
      */
     async getAliases() {
     }
-    //#endregion aliasses
+    // #endregion aliasses
 
-    //#region counters
+    // #region counters
     /**
      * @description creates a new counter
      * @param  {string} channel channel to create the counter for
@@ -141,9 +141,9 @@ class ProtoDB {
      */
     async delCounter() {
     }
-    //#endregion counters
+    // #endregion counters
 
-    //#region Customcommands
+    // #region Customcommands
     /**
      * @description get all customcommands
      * @param {string} channel
@@ -202,19 +202,19 @@ class ProtoDB {
      */
     async transferCmd() {
     }
-    //#endregion Customcommands
+    // #endregion Customcommands
 
-    //#region watchtime
+    // #region watchtime
     /**
      * @description Default Watchtime Increase (and creation for new users)
      * @param {string} channel Channel where to add Watchtime
      * @param {string[]} chatters List of Users to add Watchtime to
      */
     async watchtime() {
-        let started = new Date;
+        const started = new Date;
         this.clients.logger.log("info", "starting watchtime at " + started.toLocaleTimeString());
-        //do_stuff_here
-        let endtime = new Date;
+        // do_stuff_here
+        const endtime = new Date;
         this.clients.logger.log("info", "finished watchtime at " + endtime.toLocaleTimeString() + EOL + "Took " + (endtime.getTime() - started.getTime()) + "ms.");
     }
     /**
@@ -239,12 +239,12 @@ class ProtoDB {
      * @description get Watchtime for User on Channel
      * @param {string} channel the channel the watchtime is being collected for
      * @param {string} user the viewer the watchtime is being collected for
-     * @param {string} [month] the month the watchtime is recorded at 
+     * @param {string} [month] the month the watchtime is recorded at
      * @returns {Promise<number?>} watchtime of the user
      */
     async getWatchtime() {
     }
-    //#endregion watchtime
+    // #endregion watchtime
 
     /**
      * @description get linked twitch account if exists, otherwise returns null
@@ -266,17 +266,17 @@ class ProtoDB {
      */
     async deleteDiscordConnection() {
     }
-    //#region blacklist
-    /** 
+    // #region blacklist
+    /**
      * @description saves the blacklist stored in `this.clients.twitch.blacklist` as {channel(string): blacklistwords(Array<string>)}
      */
     async saveBlacklist() {
     }
-    /** 
+    /**
      * @description load the blacklist into `this.clients.twitch.blacklist`
      */
     async loadBlacklist() {
     }
-    //#endregion
+    // #endregion
 }
 exports.DB = ProtoDB;

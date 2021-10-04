@@ -7,10 +7,10 @@ if (!fs.existsSync("./logs")) fs.mkdirSync("./logs");
 const Logger = winston.createLogger({
     level: "silly",
     format: winston.format.prettyPrint({
-        colorize: true
+        colorize: true,
     }),
     transports: [
-        
+
         new DailyRotateFile({
             createSymlink: true,
             dirname: "logs/",
@@ -21,7 +21,7 @@ const Logger = winston.createLogger({
             filename: "%DATE%.log",
             level: "unused",
             format: winston.format.combine(winston.format.uncolorize(), winston.format.simple()),
-            maxFiles: "14d"
+            maxFiles: "14d",
         }),
         new winston.transports.Console({
             level: "info",
@@ -32,12 +32,12 @@ const Logger = winston.createLogger({
                     colors: {
                         info: "green",
                         warn: "yellow",
-                        error: "red"
-                    }
+                        error: "red",
+                    },
                 }),
-                winston.format.cli()
-            )
-        })
+                winston.format.cli(),
+            ),
+        }),
     ],
     levels: {
         error: 0,
@@ -48,7 +48,7 @@ const Logger = winston.createLogger({
         debug: 5,
         silly: 6,
         stdin: 7,
-        unused: 8
-    }
+        unused: 8,
+    },
 });
 module.exports = Logger;

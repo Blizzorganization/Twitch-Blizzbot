@@ -10,8 +10,8 @@ exports.alias = ["titel"];
  * @param {string} target
  */
 exports.run = async (client, target) => {
-    let resp = await fetch(`https://decapi.me/twitch/title/${target.slice(1)}`);
-    let title = await resp.text();
+    const resp = await fetch(`https://decapi.me/twitch/title/${target.slice(1)}`);
+    const title = await resp.text();
 
     client.say(target, `Der Titel des Streams lautet: ${title}`);
 };

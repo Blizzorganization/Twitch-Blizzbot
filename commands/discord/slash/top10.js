@@ -4,9 +4,9 @@ const { calcWatchtime } = require("../../../modules/functions");
 /**
  * @name watchtimelb
  * @namespace DiscordCommands
- * @param {import("../../../modules/discordclient").DiscordClient} client 
- * @param {import("discord.js").Message} message 
- * @param {string[]} args 
+ * @param {import("../../../modules/discordclient").DiscordClient} client
+ * @param {import("discord.js").Message} message
+ * @param {string[]} args
  * @returns {Message|undefined}
  */
 module.exports = {
@@ -14,12 +14,12 @@ module.exports = {
         name: "top10",
         description: "Watchtime Ranking",
         type: 1,
-        options: []
+        options: [],
     },
     execute: async (interaction) => {
         /** @type {import("../../../modules/discordclient").DiscordClient}*/
-        let client = interaction.client;
-        let channel = client.config.watchtimechannel;
+        const client = interaction.client;
+        const channel = client.config.watchtimechannel;
         let page = 1;
         const embed = new MessageEmbed()
             .setTitle("Watchtime")
@@ -40,7 +40,7 @@ module.exports = {
                 new MessageButton()
                     .setCustomId("+")
                     .setLabel("Nächste Seite")
-                    .setStyle("PRIMARY")
+                    .setStyle("PRIMARY"),
             );
         await interaction.reply({ embeds: [embed], components: [row] });
         const coll = interaction.channel.createMessageComponentCollector();
@@ -55,7 +55,7 @@ module.exports = {
                 default:
                     break;
             }
-            const row = new MessageActionRow()
+            const updateRow = new MessageActionRow()
                 .addComponents(
                     new MessageButton()
                         .setCustomId("-")
@@ -65,21 +65,21 @@ module.exports = {
                     new MessageButton()
                         .setCustomId("+")
                         .setLabel("Nächste Seite")
-                        .setStyle("PRIMARY")
+                        .setStyle("PRIMARY"),
                 );
             const editEmbed = new MessageEmbed()
                 .setTitle("Watchtime")
                 .setColor(0xdfb82d)
                 .setFooter("Seite" + page)
                 .setDescription(channel);
-            const watchtime = await client.clients.db.watchtimeList(channel, "alltime", 10, page);
-            for (const viewer in watchtime) {
-                editEmbed.addField(watchtime[viewer].viewer, calcWatchtime(watchtime[viewer].watchtime), false);
+            const updateWatchtime = await client.clients.db.watchtimeList(channel, "alltime", 10, page);
+            for (const viewer in updateWatchtime) {
+                editEmbed.addField(updateWatchtime[viewer].viewer, calcWatchtime(updateWatchtime[viewer].watchtime), false);
             }
-            await i.reply({ embeds: [editEmbed], components: [row] });
+            await i.reply({ embeds: [editEmbed], components: [updateRow] });
         });
         coll.on("end", async () => {
             interaction.editReply("Die Zeit ist abgelaufen.", await (interaction.fetchReply()).embed);
         });
-    }
+    },
 };

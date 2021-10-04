@@ -5,7 +5,7 @@ const linkTest = new RegExp("(^|[ \t\r\n])((sftp|ftp|http|https):(([A-Za-z0-9$_.
 const counterTest = new RegExp(/\{(.*?)\}/g);
 
 /**
- * 
+ *
  * @param {import("../../modules/twitchclient").TwitchClient} client
  * @param {string} target
  * @param {import("tmi.js").ChatUserstate} context
@@ -15,21 +15,24 @@ const counterTest = new RegExp(/\{(.*?)\}/g);
 exports.event = async (client, target, context, msg, self) => {
     switch (target[0]) {
         case "#":
-            var channellog = client.channellogs[target.replace("#", "")];
-            if (!channellog || !(channellog instanceof WriteStream)) {
-                client.clients.logger.error("channellogs for channel " + target.slice(1) + " is not available!");
-            } else {
-                channellog.write(`[${(new Date()).toLocaleTimeString()}]${context["display-name"]}: ${msg}\n`);
+            {
+                const channellog = client.channellogs[target.replace("#", "")];
+                if (!channellog || !(channellog instanceof WriteStream)) {
+                    client.clients.logger.error("channellogs for channel " + target.slice(1) + " is not available!");
+                } else {
+                    channellog.write(`[${(new Date()).toLocaleTimeString()}]${context["display-name"]}: ${msg}\n`);
+                }
             }
             break;
     }
-    if (self) return; // Ignore messages from the bot
-    let args = msg.trim().split(" ");
+    // Ignore messages from the bot
+    if (self) return;
+    const args = msg.trim().split(" ");
     const userpermission = hasPerm(client, context);
     checkModAction(client, msg, context, target, args);
     if (msg.startsWith("!")) {
         const commandName = args.shift().toLowerCase().slice(1);
-        let cmd = client.commands.get(commandName);
+        const cmd = client.commands.get(commandName);
         if (cmd) {
             if (cmd.perm && (hasPerm(client, context) < cmd.perm)) {
                 if (!cmd.silent) client.say(target, "Du hast keine Rechte");
@@ -41,7 +44,7 @@ exports.event = async (client, target, context, msg, self) => {
                 client.cooldowns.set(target.replace("#", ""), Date.now());
             }
         } else {
-            let ccmd = await client.clients.db.getCcmd(target, `!${commandName}`);
+            const ccmd = await client.clients.db.getCcmd(target, `!${commandName}`);
             let response;
             if (ccmd) {
                 if (ccmd.permissions > userpermission) return client.say(target, "Es bleibt alles so wie es ist, ob du hier bist und nicht. [Du hast keine Rechte]");
@@ -49,7 +52,7 @@ exports.event = async (client, target, context, msg, self) => {
                 client.say(target, response);
                 client.clients.logger.log("command", `* Executed ${commandName} Customcommand`);
             } else {
-                let alias = await client.clients.db.resolveAlias(target, `!${commandName}`);
+                const alias = await client.clients.db.resolveAlias(target, `!${commandName}`);
                 if (alias) {
                     if (alias.permissions > userpermission) return client.say(target, "Du denkst doch nicht wirklich das du das darfst");
                     response = await counters(client, alias.response, target);
@@ -69,12 +72,12 @@ exports.event = async (client, target, context, msg, self) => {
  * @returns {Promise<string>}
  */
 async function counters(client, response, target) {
-    let possibleCounters = response.match(counterTest);
+    const possibleCounters = response.match(counterTest);
     if (possibleCounters && possibleCounters.length > 0) {
         for (const pc of possibleCounters) {
             if (!pc.startsWith("{counter:")) return;
-            let counter = pc.replace("{counter:", "").replace("}", "");
-            let cdata = await client.clients.db.getCounter(target, counter);
+            const counter = pc.replace("{counter:", "").replace("}", "");
+            const cdata = await client.clients.db.getCounter(target, counter);
             if (cdata) response = response.replace(pc, cdata.toString());
         }
     }
@@ -85,25 +88,25 @@ async function counters(client, response, target) {
  * @param {string} msg
  * @param {import("tmi.js").ChatUserstate} ctx
  * @param {string} target
- * @param {any[]} args
+ * @param {string[]} args
  */
 function checkModAction(client, msg, ctx, target, args) {
     if (hasPerm(client, ctx)) return;
-    var message = msg.toLowerCase();
-    var delbl = client.blacklist[target.replace(/#+/g, "")];
-    var checkmsg = ` ${message} `;
-    if (delbl.some((/** @type {string} */ a) => checkmsg.includes(` ${a} `))) return client.deletemessage(target, ctx.id);
+    const message = msg.toLowerCase();
+    const delbl = client.blacklist[target.replace(/#+/g, "")];
+    const checkmsg = ` ${message} `;
+    if (delbl.some((a) => checkmsg.includes(` ${a} `))) return client.deletemessage(target, ctx.id);
     if (checkmsg.includes(" www.")) {
-        var links = args.filter((/** @type {string} */ a) => a.toLowerCase().includes("www"));
-        var forbiddenlinks = links.filter((/** @type {string} */ l) => !(client.permittedlinks.some((/** @type {any} */ purl) => l.toLowerCase().includes(purl))));
+        const links = args.filter((a) => a.toLowerCase().includes("www"));
+        const forbiddenlinks = links.filter((l) => !(client.permittedlinks.some((purl) => l.toLowerCase().includes(purl))));
         if (forbiddenlinks.length > 0) return client.deletemessage(target, ctx.id);
     }
     if (ctx["message-type"] == "action") return client.deletemessage(target, ctx.id);
     if (ctx.badges) if (ctx.badges["vip"]) return;
-    var urls = message.match(linkTest);
+    const urls = message.match(linkTest);
     if (!urls) return;
     if (urls.length == 0) return;
-    if (urls.some((/** @type {any} */ url) => !permittedlink(client, url))) return client.deletemessage(target, ctx.id);
+    if (urls.some((url) => !permittedlink(client, url))) return client.deletemessage(target, ctx.id);
 }
 /**
  * @param {import("../../modules/twitchclient").TwitchClient} client
@@ -122,5 +125,5 @@ function hasPerm(client, ctx) {
  * @param {string[]} url
  */
 function permittedlink(client, url) {
-    return client.permittedlinks.some((/** @type {string} */ purl) => url.includes(purl));
+    return client.permittedlinks.some((purl) => url.includes(purl));
 }

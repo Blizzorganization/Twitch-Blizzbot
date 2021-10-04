@@ -9,8 +9,8 @@ exports.alias = ["spiel"];
  * @param {string} target
  */
 exports.run = async (client, target) => {
-    let resp = await fetch(`https://decapi.me/twitch/game/${target.slice(1)}`);
-    let game = await resp.text();
+    const resp = await fetch(`https://decapi.me/twitch/game/${target.slice(1)}`);
+    const game = await resp.text();
 
     client.say(target, `${target.slice(1)} spielt gerade: ${game}`);
 };

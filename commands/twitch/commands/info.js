@@ -9,12 +9,12 @@ exports.perm = false;
  * @param {string} target
  */
 exports.run = async (client, target) => {
-    let viewerrequest = await fetch(`https://decapi.me/twitch/viewercount/${target.slice(1)}`);
+    const viewerrequest = await fetch(`https://decapi.me/twitch/viewercount/${target.slice(1)}`);
     let viewer = await viewerrequest.text();
-    let followrequest = await fetch(`https://decapi.me/twitch/followcount/${target.slice(1)}`);
-    let follow = await followrequest.text();
-    let subrequest = await fetch(`https://decapi.me/twitch/subcount/${target.slice(1)}`);
-    let sub = await subrequest.text();
+    const followrequest = await fetch(`https://decapi.me/twitch/followcount/${target.slice(1)}`);
+    const follow = await followrequest.text();
+    const subrequest = await fetch(`https://decapi.me/twitch/subcount/${target.slice(1)}`);
+    const sub = await subrequest.text();
     if (viewer == `${target.slice(1)} is offline`) {
         viewer = "0";
     }

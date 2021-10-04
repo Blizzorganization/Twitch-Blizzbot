@@ -9,10 +9,10 @@
  */
 exports.event = (client, channel, username, method, message, userstate) => {
     const tierlist = { 1000: "Tier 1", 2000: "Tier 2", 3000: "Tier 3", Prime: "Twitch Prime" };
-    let tiers = userstate["msg-param-sub-plan"];
-    let ave = tierlist[tiers];
+    const tiers = userstate["msg-param-sub-plan"];
+    const ave = tierlist[tiers];
 
-    //message for Action
+    // message for Action
     client.clients.logger.log("info", `${username} subscription`);
     client.say(channel, `/me Haaaaaallloooooo und Willkommen ${username} bei den Subscrizzors mit deinem ${ave} Sub`);
 };

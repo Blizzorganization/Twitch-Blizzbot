@@ -7,7 +7,7 @@ exports.perm = true;
  * @param {string} target
  */
 exports.run = (client, target) => {
-    let minutes = client.config.Raidminutes;
+    const minutes = client.config.Raidminutes;
     setTimeout(ende, 60000 * minutes);
 
     client.say(target, `/me Der Follower Modus wurde für die nächsten ${minutes} Minuten deaktiviert.`);

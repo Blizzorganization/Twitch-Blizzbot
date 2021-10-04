@@ -12,7 +12,7 @@ exports.perm = true;
  */
 exports.run = async (client, target, context, msg, self, args) => {
     if (args.length == 0) return;
-    let cmd = await client.clients.db.getCcmd(target, args[0]);
+    const cmd = await client.clients.db.getCcmd(target, args[0]);
     if (!cmd) return client.say(target, `Ich kenne keinen Befehl ${args[0]}.`);
     if (cmd.permissions !== permissions.user) return client.say(target, `${args[0]} ist kein Nutzer Customcommand.`);
     await client.clients.db.delCcmd(target.replace(/#+/g, ""), args[0]);

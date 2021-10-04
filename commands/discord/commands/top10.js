@@ -5,12 +5,12 @@ exports.adminOnly = false;
 /**
  * @name watchtimelb
  * @namespace DiscordCommands
- * @param {import("../../../modules/discordclient").DiscordClient} client 
- * @param {import("discord.js").Message} message 
- * @param {string[]} args 
+ * @param {import("../../../modules/discordclient").DiscordClient} client
+ * @param {import("discord.js").Message} message
+ * @param {string[]} args
  */
 exports.run = async (client, message, args) => {
-    let channel = client.config.watchtimechannel;
+    const channel = client.config.watchtimechannel;
     let page = 1;
     if (args && args.length > 0) {
         if (args[0] && !isNaN(parseInt(args[0]))) page = parseInt(args[0]);
@@ -24,12 +24,12 @@ exports.run = async (client, message, args) => {
     for (const viewer in watchtime) {
         embed.addField(watchtime[viewer].viewer, calcWatchtime(watchtime[viewer].watchtime), false);
     }
-    var outmsg = await message.channel.send({ embeds: [embed] });
+    let outmsg = await message.channel.send({ embeds: [embed] });
     await outmsg.react("⬅️");
     await outmsg.react("➡️");
-    var coll = outmsg.createReactionCollector({
+    const coll = outmsg.createReactionCollector({
         filter: (reaction, user) => user !== client.user && ["⬅️", "➡️"].includes(reaction.emoji.name),
-        idle: 30000
+        idle: 30000,
     });
     coll.on("collect", async (reaction, user) => {
         if (user.id == client.user.id) return;

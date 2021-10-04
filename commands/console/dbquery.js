@@ -1,11 +1,11 @@
 const util = require("util");
 const functions = require("../../modules/functions");
 /**
- * @param {import("../../modules/clients").Clients} clients 
- * @param {string[]} args 
+ * @param {import("../../modules/clients").Clients} clients
+ * @param {string[]} args
  */
 exports.run = async (clients, args) => {
-    let data = await clients.db.query(args.join(" ")).catch(e => {
+    const data = await clients.db.query(args.join(" ")).catch(e => {
         if (e !== undefined) clients.logger.error(e);
     });
     if (!data) return clients.logger.error("Your query produced an error.");

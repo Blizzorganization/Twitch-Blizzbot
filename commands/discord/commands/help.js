@@ -9,7 +9,7 @@ exports.adminOnly = false;
  * @param  {import("discord.js").Message} message
  */
 exports.run = (client, message) => {
-    var embed = new MessageEmbed()
+    const embed = new MessageEmbed()
         .setColor(0xdfb82d)
         .setTitle("**__Der Bot kann folgende Befehle__**")
         .addField("!twitchname", "Zeigt den Twitchnamen an der eingespeichert wurde")

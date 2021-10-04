@@ -17,8 +17,8 @@ exports.run = async (client, target, context, msg, self, args) => {
         client.say(target, "Du musst einen Nutzer angeben.");
         return;
     }
-    let user = args[0].toLowerCase();
-    var watchtime = await client.clients.db.getWatchtime(target, user, currentMonth());
+    const user = args[0].toLowerCase();
+    const watchtime = await client.clients.db.getWatchtime(target, user, currentMonth());
     if (!watchtime) return client.say(target, "Diesen Nutzer kenne ich nicht.");
     client.say(target, `${user} schaut ${target.slice(1)} schon diesen Monat seit ${calcWatchtime(watchtime)}`);
 };

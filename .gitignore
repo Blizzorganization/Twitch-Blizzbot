@@ -1,11 +1,18 @@
-backup/
-channellogs/
-data/
+#don't commit the dependencies
 node_modules/
+TODO.todo
+
+#don't commit json files and txt
 automessages.json
 config.json
 links.txt
-TODO.todo
-logs
+
+#don't commit documentation
 docs/
 zdocs/
+
+#don't commit developer storage file
+backup/
+channellogs/
+data/
+logs

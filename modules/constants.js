@@ -4,5 +4,5 @@ exports.permissions = {
     sub: 2,
     mod: 3,
     streamer: 5,
-    dev: 10
+    dev: 10,
 };

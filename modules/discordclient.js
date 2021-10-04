@@ -44,8 +44,8 @@ exports.DiscordClient = class DiscordClient extends Client {
                 Intents.FLAGS.GUILDS,
                 Intents.FLAGS.GUILD_MESSAGES,
                 Intents.FLAGS.GUILD_MEMBERS,
-                Intents.FLAGS.GUILD_MESSAGE_REACTIONS
-            ]
+                Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+            ],
         });
         this.config = config;
         loadCommands(this.commands, "commands/discord/commands");
@@ -59,19 +59,19 @@ exports.DiscordClient = class DiscordClient extends Client {
      * changes the channel topics of the blacklist, relay and status channels
      */
     async channelTopic() {
-        let blchannel = await this.channels.fetch(this.config.channels.blacklist);
+        const blchannel = await this.channels.fetch(this.config.channels.blacklist);
         if (blchannel instanceof TextChannel) {
             await blchannel.setTopic(":green_circle: Hier wir die Blacklist vom Bot angezeigt");
         } else {
             this.clients.logger.error("blchannel is not a Guild Text Channel.");
         }
-        let relaychannel = await this.channels.fetch(this.config.channels.relay);
+        const relaychannel = await this.channels.fetch(this.config.channels.relay);
         if (relaychannel instanceof TextChannel) {
             await relaychannel.setTopic(":green_circle: Nachrichten werden über den Bot ausgegeben.");
         } else {
             this.clients.logger.error("Relay channel is not a Guild Text Channel.");
         }
-        let adminchannel = await this.channels.fetch(this.config.channels.adminCommands);
+        const adminchannel = await this.channels.fetch(this.config.channels.adminCommands);
         if (adminchannel instanceof TextChannel) {
             await adminchannel.setTopic(":green_circle: Commands für den Twitch-Bot.");
         } else {

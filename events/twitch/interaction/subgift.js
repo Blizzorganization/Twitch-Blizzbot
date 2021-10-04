@@ -9,9 +9,9 @@
  * @param  {import("tmi.js").SubUserstate} userstate
  */
 exports.event = (client, channel, username, streakMonths, recipient, methods, userstate) => {
-    let giftcount = ~~userstate["msg-param-promo-gift-total"];
+    const giftcount = ~~userstate["msg-param-promo-gift-total"];
 
-    //message for Action
+    // message for Action
     client.clients.logger.log("info", `${username} gifted ${recipient} a subscription.`);
     client.say(channel, `/me Danke ${username} hat bereits ${giftcount} Subs verschenkt.`);
 };

@@ -16,11 +16,11 @@ exports.run = async (client, target, context, msg, self, args) => {
         client.say(target, "Du musst den Namen angeben.");
         return;
     }
-    let user = args[0];
-    let resp = await fetch(`https://decapi.me/twitch/title/${user}`);
-    let title = await resp.text();
-    let res = await fetch(`https://decapi.me/twitch/game/${user}`);
-    let game = await res.text();
+    const user = args[0];
+    const resp = await fetch(`https://decapi.me/twitch/title/${user}`);
+    const title = await resp.text();
+    const res = await fetch(`https://decapi.me/twitch/game/${user}`);
+    const game = await res.text();
 
     client.say(target, `Kleines Shoutout an ${user} er streamte ${game} mit dem Titel: ${title}`);
 };

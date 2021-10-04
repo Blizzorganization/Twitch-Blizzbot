@@ -74,7 +74,7 @@ const initStrings = {
         dbhost: "Die IP zum Server auf dem die Datenbank läuft:",
         dbname: "Der Name der Datenbank:",
         dbpass: "Das Passwort für die Datenbank:",
-        dbuser: "Der Datenbanknutzer:"
+        dbuser: "Der Datenbanknutzer:",
     },
     en: {
         welcome: "You chose to do the configuration in English. If you didn't intend to choose English, you can stop the script with ctrl+c and restart it",
@@ -105,8 +105,8 @@ const initStrings = {
         dbhost: "the ip address of the database server",
         dbname: "the name of the database",
         dbpass: "the password for the database user",
-        dbuser: "the database username"
-    }
+        dbuser: "the database username",
+    },
 };
 const supportedLanguages = Object.keys(initStrings);
 
@@ -115,7 +115,7 @@ let existingconfig = {
     twitch: {
         identity: {
             password: undefined,
-            username: undefined
+            username: undefined,
         },
         Cooldown: undefined,
         Raidminutes: undefined,
@@ -124,16 +124,16 @@ let existingconfig = {
         clientId: undefined,
         connection: {
             reconnect: undefined,
-            secure: undefined
+            secure: undefined,
         },
-        devs: undefined
+        devs: undefined,
     },
     db: {
         database: undefined,
         host: undefined,
         keepAlive: undefined,
         password: undefined,
-        user: undefined
+        user: undefined,
     },
     useDiscord: undefined,
     discord: {
@@ -141,25 +141,25 @@ let existingconfig = {
             adminCommands: undefined,
             blacklist: undefined,
             commands: undefined,
-            relay: undefined
+            relay: undefined,
         },
         evalUsers: undefined,
         prefix: undefined,
         token: undefined,
-        watchtimechannel: undefined
-    }
+        watchtimechannel: undefined,
+    },
 };
 if (fs.existsSync("./config.json")) {
-    let file = fs.readFileSync("./config.json", "utf8");
-    let jsondata = JSON.parse(file);
+    const file = fs.readFileSync("./config.json", "utf8");
+    const jsondata = JSON.parse(file);
     if (jsondata) existingconfig = _.merge(existingconfig, jsondata);
 }
-let createConfig = async () => {
-    var rl = readline.createInterface({
+const createConfig = async () => {
+    const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
         prompt: "> ",
-        terminal: true
+        terminal: true,
     });
 
     /**
@@ -174,14 +174,14 @@ let createConfig = async () => {
     const question = (q) => protoQuestion(`${q}${EOL}`);
     console.log("Welcome to the Twitch Blizzbot configuration guide");
     /** @type {keyof initStrings}*/
-    var language;
+    let language;
     while (!supportedLanguages.includes(language)) {
         if (language) console.log(`${language} is not a supported language.`);
-        //@ts-ignore
+        // @ts-ignore
         language = (await question(`Which language do you want to use?${EOL}Following languages are supported:${EOL}en\t\tEnglish${EOL}de\t\tDeutsch`)).toLowerCase();
     }
     console.log(initStrings[language].welcome);
-    
+
     /**
      * @param  {keyof translations} which which question to ask
      * @param  {(string | number | boolean)?} pre previous value if exists
@@ -210,7 +210,7 @@ let createConfig = async () => {
     }
     existingconfig.twitch.connection = {
         reconnect: true,
-        secure: true
+        secure: true,
     };
     existingconfig.twitch.devs = ["blackdemonfire4", "speed_r"];
     existingconfig.db.keepAlive = true;

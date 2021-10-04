@@ -13,16 +13,18 @@ exports.alias = ["tf"];
  */
 exports.run = async (client, target, context, msg, self, args) => {
     if (!args || !(args.length == 0)) {
-        let cmd = args.shift().toLowerCase();
-        let dbres = await client.clients.db.transferCmd(target, cmd);
+        const cmd = args.shift().toLowerCase();
+        const dbres = await client.clients.db.transferCmd(target, cmd);
         switch (dbres) {
             case "no_such_command":
-                var alias = await client.clients.db.resolveAlias(target, cmd);
+            {
+                const alias = await client.clients.db.resolveAlias(target, cmd);
                 if (alias) {
                     client.clients.logger.log("warn", `${cmd} is an alias so it's permissions didn't get changed.`);
                     return client.say(target, `'${cmd}' ist ein Alias, wenn du wechseln möchtest nutze bitte den Befehl ${alias.command}.`);
                 }
                 return client.say(target, `Der Befehl ${cmd} ist nicht vorhanden.`);
+            }
             case "ok":
                 client.say(target, `Die Befehlsberechtigungen von ${cmd} wurden aktualisiert.`);
                 client.clients.logger.log("info", `* Changed Customcommand ${cmd}'s permissions `);

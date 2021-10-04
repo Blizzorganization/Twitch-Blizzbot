@@ -7,7 +7,7 @@
  */
 exports.event = (client, channel, username, viewers) => {
 
-    //message for Action
+    // message for Action
     client.clients.logger.log("info", `${username} raid ${viewers} viewer!`);
     if (viewers < 10) return;
     client.say(channel, `/me ${username} Raidet mit ${viewers} Zuschauer!`);

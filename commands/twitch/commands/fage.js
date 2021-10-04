@@ -14,8 +14,8 @@ exports.alias = ["folgezeit", "followage"];
 exports.run = async (client, target, context, msg, self, args) => {
     let user = args[0];
     if (!user || user == "") user = context["display-name"];
-    let resp = await fetch(`https://2g.be/twitch/following.php?user=${user}&channel=${target.slice(1)}&format=mwdhms`);
-    let followage = (await resp.text())
+    const resp = await fetch(`https://2g.be/twitch/following.php?user=${user}&channel=${target.slice(1)}&format=mwdhms`);
+    const followage = (await resp.text())
         .replace("years", "Jahren").replace("year", "Jahr")
         .replace("months", "Monaten").replace("month", "Monat")
         .replace("weeks", "Wochen").replace("week", "Woche")

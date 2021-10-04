@@ -9,7 +9,7 @@ exports.alias = ["befehl", "befehle", "command", "commands", "cmd"];
  */
 exports.run = async (client, target) => {
     let appHelp = "!" + client.helplist.join(", !");
-    var ccmds = await client.clients.db.allCcmds(target);
+    const ccmds = await client.clients.db.allCcmds(target);
     if (ccmds.length > 0) appHelp += `, ${ccmds.join(", ")}`;
     client.say(target, `Der Bot kann folgende Commands: ${appHelp}`);
 };

@@ -1,7 +1,7 @@
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
 
-module.exports = async function (client, guildid) {
+module.exports = async function(client, guildid) {
     const commands = client.slashcommands.map(({ data }) => data);
 
     const rest = new REST({ version: "9" }).setToken(client.token);
