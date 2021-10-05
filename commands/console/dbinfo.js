@@ -4,7 +4,6 @@ global.util = require("util");
 global.fs = require("fs");
 /**
  * @param {import("../../modules/clients").Clients} clients
- * @param {string[]} args
  */
 exports.run = async (clients) => {
     const query_size = `SELECT

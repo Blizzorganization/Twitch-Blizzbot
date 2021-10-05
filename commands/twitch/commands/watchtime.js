@@ -11,6 +11,7 @@ exports.alias = ["wt"];
  * @param {import("tmi.js").ChatUserstate} context
  * @param {string} msg
  * @param {boolean} self
+ * @param {string[]} args
  */
 exports.run = async (client, target, context, msg, self, args) => {
     let user, watchtime;

@@ -522,7 +522,8 @@ class DB {
             channel = channel.replace(/#+/, "");
             (async (users) => {
                 await client.query("BEGIN");
-                await client.query(this.#statements.watchtimeNew, [channel, users, month]).catch((e) => { throw e; });
+                const usernames = users.map((u) => u.user);
+                await client.query(this.#statements.watchtimeNew, [channel, usernames, month]).catch((e) => { throw e; });
                 for (const user of users) {
                     await client.query(this.#statements.watchtimeIncBy, [user.user, channel, month, user.watchtime]).catch((e) => { throw e; });
                 }

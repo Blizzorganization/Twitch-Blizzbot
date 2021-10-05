@@ -4,7 +4,6 @@ exports.adminOnly = false;
  * @namespace DiscordCommands
  * @param {import("../../../modules/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
- * @param {string[]} args
  */
 exports.run = async (client, message) => {
     const name = await client.clients.db.getDiscordConnection(message.author);

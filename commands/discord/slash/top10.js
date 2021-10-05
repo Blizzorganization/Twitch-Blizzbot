@@ -1,6 +1,7 @@
 const { MessageEmbed, MessageActionRow, MessageButton } = require("discord.js");
 const { calcWatchtime } = require("../../../modules/functions");
 
+
 /**
  * @name watchtimelb
  * @namespace DiscordCommands
@@ -20,7 +21,7 @@ module.exports = {
         /** @type {import("../../../modules/discordclient").DiscordClient}*/
         const client = interaction.client;
         const channel = client.config.watchtimechannel;
-        let page = 1;
+        const page = 1;
         const embed = new MessageEmbed()
             .setTitle("Watchtime")
             .setColor(0xdfb82d)
@@ -43,43 +44,5 @@ module.exports = {
                     .setStyle("PRIMARY"),
             );
         await interaction.reply({ embeds: [embed], components: [row] });
-        const coll = interaction.channel.createMessageComponentCollector();
-        coll.on("collect", async (i) => {
-            switch (i.customId) {
-                case "-":
-                    page--;
-                    break;
-                case "+":
-                    page++;
-                    break;
-                default:
-                    break;
-            }
-            const updateRow = new MessageActionRow()
-                .addComponents(
-                    new MessageButton()
-                        .setCustomId("-")
-                        .setLabel("Vorherige Seite")
-                        .setStyle("PRIMARY")
-                        .setDisabled(page == 1),
-                    new MessageButton()
-                        .setCustomId("+")
-                        .setLabel("Nächste Seite")
-                        .setStyle("PRIMARY"),
-                );
-            const editEmbed = new MessageEmbed()
-                .setTitle("Watchtime")
-                .setColor(0xdfb82d)
-                .setFooter("Seite" + page)
-                .setDescription(channel);
-            const updateWatchtime = await client.clients.db.watchtimeList(channel, "alltime", 10, page);
-            for (const viewer in updateWatchtime) {
-                editEmbed.addField(updateWatchtime[viewer].viewer, calcWatchtime(updateWatchtime[viewer].watchtime), false);
-            }
-            await i.reply({ embeds: [editEmbed], components: [updateRow] });
-        });
-        coll.on("end", async () => {
-            interaction.editReply("Die Zeit ist abgelaufen.", await (interaction.fetchReply()).embed);
-        });
     },
 };

@@ -33,7 +33,7 @@ exports.run = async (clients, args) => {
             case "watchtime":
                 {
                     const month = args[3]?.toLowerCase();
-                    if (!/((\d)[2]-(\d){4}|(alltime))/.test(month)) return clients.logger.error("Dies ist kein valider Monat.");
+                    if (!/((\d){2}-(\d){4}|(alltime))/.test(month)) return clients.logger.error("Dies ist kein valider Monat.");
                     const watchtimeData = db.prepare("SELECT * FROM " + channel + ";").all();
                     await clients.db.migrateWatchtime(channel, watchtimeData, month);
                     clients.logger.log("info", "Watchtime Migration erfolgreich.");

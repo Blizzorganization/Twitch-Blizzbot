@@ -12,23 +12,24 @@ const schedule = require("node-schedule");
  * @property {number} Raidminutes
  * @property {string} clientId
  *
- * @typedef {configExtension~import("tmi.js").Options} config
+ * @typedef {configExtension & import("tmi.js").Options} config
  */
-
+/**
+ * TwitchClient
+ * @class TwitchClient
+ * @extends {Client}
+ * @property {import("fs").WriteStream[]} channellogs
+ * @property {import("./clients").Clients} clients
+ * @property {boolean} started
+ * @property {Collection} commands
+ * @property {Enmap} blacklist
+ * @property {any} watchtime
+ * @property {any} automessage
+ * @property {string[]} channels
+ */
 exports.TwitchClient = class TwitchClient extends Client {
     /**
-     * TwitchClient
-     * @class TwitchClient
-     * @extends {Client}
-     * @param {config} opts
-     * @property {import("fs").WriteStream[]} channellogs
-     * @property {import("./clients").Clients} clients
-     * @property {boolean} started
-     * @property {Collection} commands
-     * @property {Enmap} blacklist
-     * @property {any} watchtime
-     * @property {any} automessage
-     * @property {string[]} channels
+     * @param  {config} opts
      */
     constructor(opts) {
         super(opts);
@@ -71,8 +72,8 @@ exports.TwitchClient = class TwitchClient extends Client {
         let month = "" + (date.getMonth() + 1);
         let day = "" + date.getDate();
         const year = date.getFullYear();
-        if (month.length < 2) {month = "0" + month;}
-        if (day.length < 2) {day = "0" + day;}
+        if (month.length < 2) { month = "0" + month; }
+        if (day.length < 2) { day = "0" + day; }
         const dateString = [year, month, day].join("-");
         for (let channel of channels) {
             channel = channel.replace("#", "");

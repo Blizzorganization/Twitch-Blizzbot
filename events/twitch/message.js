@@ -122,7 +122,7 @@ function hasPerm(client, ctx) {
 }
 /**
  * @param {{ permittedlinks: string[]; }} client
- * @param {string[]} url
+ * @param {string} url
  */
 function permittedlink(client, url) {
     return client.permittedlinks.some((purl) => url.includes(purl));
