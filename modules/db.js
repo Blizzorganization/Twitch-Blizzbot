@@ -366,7 +366,7 @@ class DB {
      * @param {string} channel
      * @param {string} commandname
      * @param {string} response
-     * @param {number} permissions
+     * @param {number} perms
      */
     async newCcmd(channel, commandname, response, perms) {
         const client = await this.db.connect();
@@ -407,7 +407,6 @@ class DB {
     * @param {string} channel
     * @param {string} commandname
     * @param {string} response
-    * @param {keyof permissions}
     */
     async editCcmd(channel, commandname, response) {
         const client = await this.db.connect();
@@ -523,8 +522,8 @@ class DB {
             channel = channel.replace(/#+/, "");
             (async (users) => {
                 await client.query("BEGIN");
+                await client.query(this.#statements.watchtimeNew, [channel, users, month]).catch((e) => { throw e; });
                 for (const user of users) {
-                    await client.query(this.#statements.watchtimeNew, [channel, user.user, month]).catch((e) => { throw e; });
                     await client.query(this.#statements.watchtimeIncBy, [user.user, channel, month, user.watchtime]).catch((e) => { throw e; });
                 }
                 return await client.query("COMMIT").catch((e) => { throw e; });
