@@ -29,7 +29,7 @@ exports.run = async (client, message, args) => {
     await outmsg.react("➡️");
     const coll = outmsg.createReactionCollector({
         filter: (reaction, user) => user !== client.user && ["⬅️", "➡️"].includes(reaction.emoji.name),
-        idle: 30000,
+        idle: 60000,
     });
     coll.on("collect", async (reaction, user) => {
         if (user.id == client.user.id) return;
