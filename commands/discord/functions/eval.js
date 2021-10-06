@@ -1,3 +1,4 @@
+exports.adminOnly = true;
 /**
  * @name eval
  * @namespace DiscordCommands
@@ -5,7 +6,6 @@
  * @param {import("discord.js").Message} message
  * @param {string[]} args
  */
-exports.adminOnly = true;
 exports.run = (client, message, args) => {
     const permitted = client.config.evalUsers;
     if (!permitted.includes(message.author.id)) return;

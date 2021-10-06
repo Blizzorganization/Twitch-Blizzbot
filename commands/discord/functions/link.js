@@ -1,3 +1,4 @@
+exports.adminOnly = false;
 /**
  * @name link
  * @namespace DiscordCommands
@@ -5,7 +6,6 @@
  * @param {import("discord.js").Message} message
  * @param {string[]} args
  */
-exports.adminOnly = false;
 exports.run = async (client, message, args) => {
     if (!args || !args[0]) {
         const msg = await message.channel.send("Du musst deinen Twitch Nutzernamen angeben.");
