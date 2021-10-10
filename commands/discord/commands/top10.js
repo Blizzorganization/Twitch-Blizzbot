@@ -17,7 +17,7 @@ exports.run = async (client, message, args) => {
     }
     const embed = new MessageEmbed()
         .setTitle("Watchtime")
-        .setColor(0xdfb82d)
+        .setColor(0xedbc5d)
         .setDescription(channel)
         .setFooter("Seite " + page);
     const watchtime = await client.clients.db.watchtimeList(channel, "alltime", 10, page);
@@ -40,7 +40,7 @@ exports.run = async (client, message, args) => {
         }
         const editEmbed = new MessageEmbed()
             .setTitle("Watchtime")
-            .setColor(0xdfb82d)
+            .setColor(0xedbc5d)
             .setFooter("Seite " + page)
             .setDescription(channel);
         const newwatchtime = await client.clients.db.watchtimeList(channel, "alltime", 10, page);

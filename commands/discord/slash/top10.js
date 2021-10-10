@@ -24,7 +24,7 @@ module.exports = {
         const page = 1;
         const embed = new MessageEmbed()
             .setTitle("Watchtime")
-            .setColor(0xdfb82d)
+            .setColor(0xedbc5d)
             .setDescription(channel)
             .setFooter("Seite " + page);
         const watchtime = await client.clients.db.watchtimeList(channel, "alltime", 10, page);

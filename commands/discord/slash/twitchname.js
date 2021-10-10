@@ -20,7 +20,7 @@ module.exports = {
         const twuser = await client.clients.db.getDiscordConnection(dcuser);
         if (!twuser) return interaction.reply(`Der Nutzer ${dcuser.tag} hat keinen Namen hinterlegt.`);
         const embed = new MessageEmbed()
-            .setColor(0xdfb82d)
+            .setColor(0xedbc5d)
             .setThumbnail(dcuser.avatarURL())
             .setTitle("**__Linkinginfo__**")
             .addField("Discord-name", dcuser.username)

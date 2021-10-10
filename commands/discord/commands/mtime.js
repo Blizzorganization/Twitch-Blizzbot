@@ -29,7 +29,7 @@ exports.run = async (client, message, args) => {
     const watchtime = await client.clients.db.getWatchtime(channel, user, currentMonth());
     if (!watchtime) return message.channel.send("Diesen Nutzer kenne ich nicht.");
     const embed = new MessageEmbed()
-        .setColor(0xdfb82d)
+        .setColor(0xedbc5d)
         .setThumbnail(client.user.avatarURL({ format: "png" }))
         .setTitle("Monthly Watchtime")
         .addField("Nutzername", user)

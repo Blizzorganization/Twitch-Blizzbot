@@ -18,7 +18,7 @@ exports.run = async (client, message, args) => {
     }
     const embed = new MessageEmbed()
         .setTitle("Monthly Watchtime")
-        .setColor(0xdfb82d)
+        .setColor(0xedbc5d)
         .setDescription(channel)
         .setFooter(`Seite ${page}`);
     const watchtime = await client.clients.db.watchtimeList(channel, currentMonth(), 10, page);
@@ -40,7 +40,7 @@ exports.run = async (client, message, args) => {
         }
         const editEmbed = new MessageEmbed()
             .setTitle("Monthly Watchtime")
-            .setColor(0xdfb82d)
+            .setColor(0xedbc5d)
             .setDescription(channel)
             .setFooter(`Seite ${page}`);
         const newwatchtime = await client.clients.db.watchtimeList(channel, currentMonth(), 10, page);

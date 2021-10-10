@@ -30,7 +30,7 @@ module.exports = {
         }
         const watchtime = await client.clients.db.getWatchtime(channel, twuser, "alltime");
         const embed = new MessageEmbed()
-            .setColor(0xdfb82d)
+            .setColor(0xedbc5d)
             .setThumbnail(client.user.avatarURL({ format: "png" }))
             .setTitle("Watchtime")
             .addField("Nutzername", twuser)
