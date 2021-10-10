@@ -13,7 +13,7 @@ exports.run = async (client, message) => {
     let dbuser = await client.clients.db.getDiscordConnection(dcuser);
     if (!dbuser) dbuser = "Du hast keinen Namen hinterlegt";
     const embed = new MessageEmbed()
-        .setColor(0xdfb82d)
+        .setColor(0xedbc5d)
         .setThumbnail(dcuser.avatarURL())
         .setTitle("**__Linkinginfo__**")
         .addField("Discord-name", dcuser.username)
