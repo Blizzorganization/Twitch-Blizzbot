@@ -13,5 +13,4 @@ exports.event = (client, channel, username, streakMonths, recipient, methods, us
 
     // message for Action
     client.clients.logger.log("info", `${username} gifted ${recipient} a subscription.`);
-    client.say(channel, `/me Danke ${username} hat bereits ${giftcount} Subs verschenkt.`);
 };
