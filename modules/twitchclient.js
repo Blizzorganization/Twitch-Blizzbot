@@ -3,7 +3,6 @@ const { createWriteStream, existsSync, mkdirSync, readFileSync } = require("fs")
 const { Client } = require("tmi.js");
 const { loadCommands, loadEvents } = require("./functions");
 const schedule = require("node-schedule");
-
 /**
  * @typedef configExtension
  * @property {number} Cooldown

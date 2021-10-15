@@ -1,7 +1,7 @@
 exports.help = false;
 exports.perm = true;
 /**
- * @name addalias
+ * @name caddalias
  * @namespace TwitchCommands
  * @param {import("../../../modules/twitchclient").TwitchClient} client
  * @param {string} target

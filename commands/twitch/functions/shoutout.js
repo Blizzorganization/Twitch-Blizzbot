@@ -3,7 +3,7 @@ exports.help = false;
 exports.perm = true;
 exports.alias = ["so"];
 /**
- * @name followage
+ * @name Shoutout
  * @namespace TwitchCommands
  * @param {import("../../../modules/twitchclient").TwitchClient} client
  * @param {string} target

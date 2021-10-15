@@ -2,7 +2,7 @@ const { permissions } = require("../../../modules/constants");
 exports.help = false;
 exports.perm = true;
 /**
- * @name uptime
+ * @name Del
  * @namespace TwitchCommands
  * @param {import("../../../modules/twitchclient").TwitchClient} client
  * @param {string} target

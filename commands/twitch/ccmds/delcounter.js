@@ -1,7 +1,7 @@
 exports.help = false;
 exports.perm = true;
 /**
- * @name addcounter
+ * @name delcounter
  * @namespace TwitchCommands
  * @param {import("../../../modules/twitchclient").TwitchClient} client
  * @param {string} target

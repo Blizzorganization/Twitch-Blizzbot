@@ -2,7 +2,6 @@ const { Collection } = require("discord.js");
 const EventEmitter = require("events");
 const { loadCommands } = require("./functions");
 const { createInterface } = require("readline");
-
 /**
  * ConsoleClient Class
  * @class

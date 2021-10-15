@@ -13,7 +13,6 @@ exports.run = async (client, message, args) => {
         coll.on("collect", (m) => {
             coll.stop();
             if (m.content.startsWith(`${client.config.prefix}`)) return;
-
             handle(client, m, m.content.split(" "));
         });
     } else {

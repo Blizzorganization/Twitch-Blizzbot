@@ -2,7 +2,7 @@ exports.help = false;
 exports.perm = true;
 exports.alias = ["tf"];
 /**
- * @name add
+ * @name transferCmd
  * @namespace TwitchCommands
  * @param {import("../../../modules/twitchclient").TwitchClient} client
  * @param {string} target

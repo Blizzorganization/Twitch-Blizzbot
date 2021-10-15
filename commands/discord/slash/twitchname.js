@@ -12,7 +12,6 @@ module.exports = {
             required: false,
         }],
     },
-
     execute: async (interaction) => {
         /** @type {import("../../../modules/discordclient").DiscordClient}*/
         const client = interaction.client;

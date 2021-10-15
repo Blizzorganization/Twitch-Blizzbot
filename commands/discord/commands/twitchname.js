@@ -1,6 +1,6 @@
 const { MessageEmbed } = require("discord.js");
 
-exports.alias = ["twitch"];
+exports.alias = ["twitchnamen"];
 exports.adminOnly = false;
 /**
  * @name tname
