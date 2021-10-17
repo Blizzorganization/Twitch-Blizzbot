@@ -1,13 +1,12 @@
 /**
  * @listens cheer
- * @param {TwitchClient} client
+ * @param {import("../../../modules/twitchclient").TwitchClient} client
  * @param {string} channel
- * @param {ChatUserstate} userstate
- * @param {string} message
+ * @param {import("tmi.js").ChatUserstate} userstate
  */
-exports.event = (client, channel, userstate, message) => {
+exports.event = (client, channel, userstate) => {
 
-    //message for Action
-    console.log(`${userstate.username} cheered ${userstate.bits} bits`)
-    client.say(channel, `/me Danke ${userstate.username} für die ${userstate.bits} bits!`)
-}
+    // message for Action
+    client.clients.logger.log("info", `${userstate.username} cheered ${userstate.bits} bits`);
+    client.say(channel, `/me Danke ${userstate.username} für die ${userstate.bits} bits!`);
+};

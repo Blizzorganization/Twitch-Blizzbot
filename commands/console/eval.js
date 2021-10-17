@@ -1,13 +1,27 @@
-const util = require("util");
-const fs = require("fs");
-const {Clients} = require("../../modules/clients")
-
+global.util = require("util");
+global.fs = require("fs");
 /**
- * @name eval
- * @module ConsoleCommands
- * @param {Clients} clients 
- * @param {string[]} args 
+ * @param {import("../../modules/clients").Clients} clients
+ * @param {string[]} args
  */
 exports.run = (clients, args) => {
-    console.log(eval(args.join(" ")))
-}
+    const evaled = eval(args.join(" "));
+    clients.logger.log("info", global.util.inspect(evaled));
+};
+/**
+ * @param  {import("../../modules/clients").Clients} clients
+ * @param  {string} line
+ */
+exports.completer = (clients, line) => {
+    const completions = Object.keys(global).filter(i => !i.startsWith("_"));
+    const args = line.split(" ");
+    // eslint-disable-next-line no-sparse-arrays
+    if (args.length > 2) return [, line];
+    const cmd = args.shift();
+    const fline = args.join(" ");
+    const hits = completions.filter((c) => c.startsWith(fline));
+    hits.forEach((val, key) => {
+        hits[key] = `${cmd} ${val}`;
+    });
+    return [hits, line];
+};

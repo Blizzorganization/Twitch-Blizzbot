@@ -1,19 +1,16 @@
-const fetch = require("node-fetch");
-exports.help = true
-exports.alias = ["spiel"]
-
+const fetch = require("node-fetch").default;
+exports.help = true;
+exports.perm = false;
+exports.alias = ["spiel"];
 /**
  * @name game
- * @module TwitchCommands
- * @param {TwitchClient} client
+ * @namespace TwitchCommands
+ * @param {import("../../../modules/twitchclient").TwitchClient} client
  * @param {string} target
- * @param {ChatUserstate} context
- * @param {string} msg
- * @param {boolean} self
  */
-exports.run = async (client, target, context, msg, self) => {
-    let resp = await fetch(`https://decapi.me/twitch/game/${target.slice(1)}`)
-    let game = await resp.text()
+exports.run = async (client, target) => {
+    const resp = await fetch(`https://decapi.me/twitch/game/${target.slice(1)}`);
+    const game = await resp.text();
 
-    client.say(target, `Er spielt gerade: ${game}`)
-}
+    client.say(target, `${target.slice(1)} spielt gerade: ${game}`);
+};

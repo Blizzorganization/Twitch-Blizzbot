@@ -1,13 +1,55 @@
 {
+  "name": "twitch-blizzbot",
+  "version": "8.0.1",
+  "homepage": "https://github.com/blizzor/Twitch-Blizzbot#readme",
+  "bugs": {
+    "url": "https://github.com/blizzor/Twitch-Blizzbot/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/blizzor/Twitch-blizzbot.git"
+  },
   "dependencies": {
-    "better-sqlite3": "^7.4.1",
-    "discord.js": "^12.5.3",
+    "@discordjs/builders": "^0.5.0",
+    "@discordjs/rest": "^0.1.0-canary.0",
+    "better-sqlite3": "^7.4.3",
+    "discord.js": "^13.2.0",
     "enmap": "^5.8.4",
+    "lodash": "^4.17.21",
     "node-fetch": "^2.6.1",
     "node-schedule": "^2.0.0",
-    "tmi.js": "^1.8.3"
+    "pg": "^8.7.1",
+    "tmi.js": "^1.8.5",
+    "winston": "^3.3.3",
+    "winston-daily-rotate-file": "^4.5.5"
   },
+  "devDependencies": {
+    "@babel/eslint-parser": "^7.15.7",
+    "@types/lodash": "^4.14.175",
+    "@types/pg": "^8.6.1",
+    "@types/tmi.js": "^1.7.2",
+    "clean-jsdoc-theme": "^3.2.8",
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "jsdoc-import-support": "^3.6.4"
+  },
+  "optionalDependencies": {
+    "pidusage": "^2.0.21"
+  },
+  "main": "bot.js",
   "scripts": {
-    "start": "node bot"
-  }
+    "start": "node bot",
+    "init": "node setup",
+    "config": "node setup"
+  },
+  "files": [
+    "./bot.js",
+    "modules/*.js",
+    "events/**/*.js",
+    "commands/**/*.js"
+  ],
+  "babel": {}
 }

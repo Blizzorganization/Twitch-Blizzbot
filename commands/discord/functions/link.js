@@ -1,32 +1,33 @@
-const { Message } = require("discord.js")
-const fs = require("fs")
-const os = require("os")
-const util = require("util")
-const { DiscordClient } = require("../../../modules/discordclient")
-
+exports.adminOnly = false;
 /**
- * @name eval
- * @module DiscordCommands
- * @param {DiscordClient} client 
- * @param {Message} message 
- * @param {string[]} args 
+ * @name link
+ * @namespace DiscordCommands
+ * @param {import("../../../modules/discordclient").DiscordClient} client
+ * @param {import("discord.js").Message} message
+ * @param {string[]} args
  */
-exports.adminOnly = false
 exports.run = async (client, message, args) => {
     if (!args || !args[0]) {
-        var msg = await message.channel.send("Du musst deinen Twitch Nutzernamen angeben.")
-        var coll = msg.channel.createMessageCollector((m => m.author.id == message.author.id))
+        const msg = await message.channel.send("Du musst deinen Twitch Nutzernamen angeben.");
+        const coll = msg.channel.createMessageCollector((m => m.author.id == message.author.id));
         coll.on("collect", (m) => {
             coll.stop();
             if (m.content.startsWith(`${client.config.prefix}`)) return;
-            
-            handle(client, m, m.content.split(" "))
-        })
+            handle(client, m, m.content.split(" "));
+        });
     } else {
-    handle(client, message, args)}
-}
-function handle(client, message, args) {
-    if (!(/^[a-zA-Z0-9][\w]{2,24}$/.test(args[0]))) return message.channel.send("Dies ist kein valider Twitch Nutzername.");
-    client.clients.twitch.db.newDiscordConnection(message.author, args[0].toLowerCase());
-    message.channel.send("Der Name (Name) wurde erfolgreich eingetragen".replace("(Name)", args[0].toLowerCase()))
+        handle(client, message, args);
+    }
+};
+/**
+ * @param {import("../../../modules/discordclient").DiscordClient} client
+ * @param {import("discord.js").Message} message
+ * @param {string[]} args
+ */
+async function handle(client, message, args) {
+    const name = args[0];
+    if (!(/^[a-zA-Z0-9][\w]{2,24}$/.test(name))) return message.channel.send("Dies ist kein valider Twitch Nutzername.");
+    const previous = await client.clients.db.getDiscordConnection(message.author);
+    await client.clients.db.newDiscordConnection(message.author, name.toLowerCase());
+    message.channel.send(previous == null || previous == undefined ? `Der Name **${name.toLowerCase()}** wurde erfolgreich eingetragen` : `Du hast deinen Namen von **${previous}** auf **${name.toLowerCase()}** geändert.`);
 }
