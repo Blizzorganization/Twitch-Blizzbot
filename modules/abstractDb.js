@@ -27,7 +27,6 @@ const { EOL } = require("os");
  * @property {number} watchtime
  * @property {string} user
 */
-
 /**
  * @class DB
  */
@@ -39,14 +38,12 @@ class ProtoDB {
     constructor() {
         this.clients = undefined;
     }
-
     /**
      * Method for manually querying data
      * @param {string} sql
      * @param {any[]} data
      */
     async query() {
-
     }
     /**
      * @description stops the database
@@ -99,7 +96,6 @@ class ProtoDB {
     async getAliases() {
     }
     // #endregion aliasses
-
     // #region counters
     /**
      * @description creates a new counter
@@ -142,7 +138,6 @@ class ProtoDB {
     async delCounter() {
     }
     // #endregion counters
-
     // #region Customcommands
     /**
      * @description get all customcommands
@@ -160,7 +155,6 @@ class ProtoDB {
      */
     async getCcmd() {
     }
-
     /**
      * Create new Customcommand/change its response
      * @param {string} channel
@@ -193,7 +187,6 @@ class ProtoDB {
      */
     async delCcmd() {
     }
-
     /**
      * @description transfers a customcommande to user or mod permission level
      * @param  {string} channel
@@ -203,7 +196,6 @@ class ProtoDB {
     async transferCmd() {
     }
     // #endregion Customcommands
-
     // #region watchtime
     /**
      * @description Default Watchtime Increase (and creation for new users)
@@ -260,7 +252,6 @@ class ProtoDB {
      */
     async newDiscordConnection() {
     }
-
     /**
      * @param  {Discord.User} user
      */

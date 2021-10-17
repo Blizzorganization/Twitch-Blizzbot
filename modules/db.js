@@ -6,7 +6,7 @@ const { EOL } = require("os");
  * @typedef watchtimeuser
  * @property {string} viewer
  * @property {number} watchtime
-*/
+ */
 /**
  * @typedef resolvedAlias
  * @property {string} alias
@@ -111,7 +111,6 @@ class DB {
         } finally {
             client.release();
         }
-
     }
     /**
      * stops the database
@@ -474,7 +473,7 @@ class DB {
         const client = await this.db.connect();
         try {
             const started = new Date;
-            this.clients.logger.log("info", "starting watchtime at " + started.toLocaleTimeString());
+            this.clients.logger.log("debug", "starting watchtime at " + started.toLocaleTimeString());
             channel = channel.replace(/#+/, "");
             const month = currentMonth();
             (async (users) => {
@@ -498,7 +497,7 @@ class DB {
                 client.query("COMMIT").catch((e) => { throw e; });
             })(chatters);
             const endtime = new Date;
-            this.clients.logger.log("info", "finished watchtime at " + endtime.toLocaleTimeString() + EOL + "Took " + (endtime.getTime() - started.getTime()) + "ms.");
+            this.clients.logger.log("debug", "finished watchtime at " + endtime.toLocaleTimeString() + EOL + "Took " + (endtime.getTime() - started.getTime()) + "ms.");
         } catch (e) {
             this.clients.logger.error(e?.toString());
         } finally {
