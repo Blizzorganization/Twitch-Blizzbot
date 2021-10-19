@@ -2,6 +2,7 @@ const { permissions } = require("../../../modules/constants");
 
 exports.help = false;
 exports.perm = true;
+exports.alias = ["ccmds"];
 /**
  * @name ccmd
  * @namespace TwitchCommands
