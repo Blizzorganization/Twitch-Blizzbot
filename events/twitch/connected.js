@@ -32,7 +32,8 @@ exports.event = (client, addr, port) => {
             const uptime = await (await fetch(`https://decapi.me/twitch/uptime/${channel}`)).text();
             if (uptime !== `${channel} is offline`) {
                 if (!client.messages[channel]) return client.clients.logger.error(`Für den Kanal ${channel} sind keine automatischen Nachrichten angegeben.`);
-                client.say(channel, getRandom(client.messages[channel]));
+                const automessage = getRandom(client.messages[channel]);
+                if (automessage) client.say(channel, automessage);
             }
         }
     }, 60000 * client.config.automessagedelay);

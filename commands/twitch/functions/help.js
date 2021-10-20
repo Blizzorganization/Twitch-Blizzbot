@@ -1,6 +1,6 @@
 exports.help = false;
 exports.perm = false;
-exports.alias = ["befehl", "befehle", "command", "commands", "cmd"];
+exports.alias = ["befehl", "befehle", "command", "commands", "cmd", "cmds"];
 /**
  * @name help
  * @namespace TwitchCommands
