@@ -21,6 +21,7 @@
     "delCounter": "DELETE FROM counters WHERE channel = $1 AND name = $2;",
     "allCounters": "SELECT * FROM counters WHERE channel = $1",
 
+    "renameWatchtimeUser": "UPDATE watchtime set viewer = $3 WHERE viewer = $2 AND channel = $1;",
     "getWatchtime": "SELECT watchtime FROM watchtime WHERE viewer = $1 AND channel = $2 AND month = $3;",
     "setWatchtime": "INSERT INTO watchtime (channel, viewer, watchtime, month) VALUES ($1, $2, $3, $4) ON CONFLICT UPDATE SET watchtime = EXCLUDED.watchtime;",
     "watchtimeNew": "INSERT INTO watchtime (channel, viewer, watchtime, month) VALUES ($1, unnest( $2::varchar(25)[])::varchar(25), 0, $3) ON CONFLICT DO NOTHING;",
