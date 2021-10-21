@@ -47,14 +47,14 @@ exports.event = async (client, target, context, msg, self) => {
             const ccmd = await client.clients.db.getCcmd(target, `!${commandName}`);
             let response;
             if (ccmd) {
-                if (ccmd.permissions > userpermission) return client.say(target, "Es bleibt alles so wie es ist, ob du hier bist und nicht. [Du hast keine Rechte]");
+                if (ccmd.permissions > userpermission) return client.say(target, "Du hast keine Rechte für diesen Command");
                 response = await counters(client, ccmd.response, target);
                 client.say(target, response);
                 client.clients.logger.log("command", `* Executed ${commandName} Customcommand`);
             } else {
                 const alias = await client.clients.db.resolveAlias(target, `!${commandName}`);
                 if (alias) {
-                    if (alias.permissions > userpermission) return client.say(target, "Du denkst doch nicht wirklich das du das darfst");
+                    if (alias.permissions > userpermission) return client.say(target, "Du hast keine Rechte");
                     response = await counters(client, alias.response, target);
                     client.say(target, response);
                     client.clients.logger.log("command", `* Executed ${alias.command} caused by alias ${alias.alias}`);

@@ -38,7 +38,6 @@ class DB {
         this.clients = undefined;
         this.#ensureTables();
     }
-
     /**
      * @param {string} sql
      * @param {any[]} data
@@ -340,7 +339,6 @@ class DB {
             client.release();
         }
     }
-
     /**
      * get response of customcommand
      * @param {string} commandname
@@ -359,7 +357,6 @@ class DB {
             client.release();
         }
     }
-
     /**
      * Create new Customcommand/change its response
      * @param {string} channel
@@ -378,7 +375,6 @@ class DB {
             client.release();
         }
     }
-
     /**
      * @param  {cmdData[]} cmdData
      * @param  {string} channel
@@ -434,7 +430,6 @@ class DB {
             client.release();
         }
     }
-
     /**
      * transfers a customcommande to another permission level
      * @param  {string} channel
@@ -503,6 +498,23 @@ class DB {
         } finally {
             client.release();
             this.doingWatchtime = false;
+        }
+    }
+    /**
+     * rename a watchtime user
+     * @param {string} channel Channel where to rename the viewer
+     * @param {string} oldName previous name of the viewer
+     * @param {string} newName new name to change to
+     */
+    async renameWatchtimeUser(channel, oldName, newName) {
+        const client = await this.db.connect();
+        try {
+            channel = channel.replace(/#+/g, "");
+            await client.query(this.#statements.renameWatchtimeUser, [channel, oldName, newName]).catch((e) => { throw e; });
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
         }
     }
     /** @typedef old_watchtime
@@ -575,7 +587,6 @@ class DB {
         }
     }
     // #endregion watchtime
-
     /**
      * get linked twitch account if exists, otherwise returns null
      * @param {import("discord.js").User} user discord user
@@ -607,7 +618,6 @@ class DB {
             client.release();
         }
     }
-
     /**
      * @param  {import("discord.js").User} user
      */
