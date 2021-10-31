@@ -14,5 +14,5 @@ exports.event = (client, channel, username, method, message, userstate) => {
 
     // message for Action
     client.clients.logger.log("info", `${username} subscription`);
-    client.say(channel, `/me Haaaaaallloooooo und Willkommen ${username} bei den Subscrizzors mit deinem ${ave} Sub`);
+    client.say(channel, `/me Haaaaaallloooooo und Willkommen ${username} bei den Subscrizzors mit deinem ${ave}Sub`);
 };
