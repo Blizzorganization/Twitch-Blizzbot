@@ -16,8 +16,9 @@
 
     "newCounter": "INSERT INTO counters (channel, name, cur, inc) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING;",
     "getCounter": "SELECT cur FROM counters WHERE name = $1 AND channel = $2;",
-    "incCounter": "UPDATE counters SET cur = cur + inc WHERE name = $1 AND channel = $2;",
+    "incCounter": "UPDATE counters SET cur = cur + inc WHERE name = $1 AND channel = $2 RETURNING cur;",
     "setCounter": "UPDATE counters SET cur = $1 WHERE name = $2 AND channel = $3;",
+    "editCounter": "UPDATE counters SET inc = $1 WHERE name = $2 AND channel = $3;",
     "delCounter": "DELETE FROM counters WHERE channel = $1 AND name = $2;",
     "allCounters": "SELECT * FROM counters WHERE channel = $1",
 

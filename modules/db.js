@@ -265,9 +265,8 @@ class DB {
         const client = await this.db.connect();
         try {
             channel = channel.replace(/#+/g, "");
-            const data = await client.query(this.#statements.getCounter, [name, channel]).catch((e) => { throw e; });
+            const data = await client.query(this.#statements.incCounter, [name, channel]).catch((e) => { throw e; });
             if (data.rows.length == 0) return;
-            await client.query(this.#statements.incCounter, [name, channel]).catch((e) => { throw e; });
             return data.rows[0]?.cur;
         } catch (e) {
             this.clients.logger.error(e);
@@ -285,6 +284,22 @@ class DB {
         try {
             channel = channel.replace(/#+/g, "");
             await client.query(this.#statements.setCounter, [val, name, channel]).catch((e) => { throw e; });
+        } catch (e) {
+            this.clients.logger.error(e);
+        } finally {
+            client.release();
+        }
+    }
+    /**
+     * @param  {string} channel
+     * @param  {string} name
+     * @param  {number} inc
+     */
+    async editCounter(channel, name, inc) {
+        const client = await this.db.connect();
+        try {
+            channel = channel.replace(/#+/g, "");
+            await client.query(this.#statements.editCounter, [inc, name, channel]).catch((e) => { throw e; });
         } catch (e) {
             this.clients.logger.error(e);
         } finally {
