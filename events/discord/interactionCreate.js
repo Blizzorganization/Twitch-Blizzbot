@@ -1,10 +1,30 @@
 const { MessageActionRow, MessageButton, MessageEmbed } = require("discord.js");
 const { calcWatchtime } = require("../../modules/functions");
+/**
+ * @param  {import("../../modules/discordclient").DiscordClient} client
+ * @param  {import("discord.js").ButtonInteraction} interaction
+ */
+async function blacklistUpdate(client, interaction) {
+    await interaction.update({
+        content: `In der Blacklist für ${client.config.watchtimechannel} sind die Wörter \
+        \`\`\`fix\n${client.clients.twitch.blacklist[client.config.watchtimechannel].join("\n")}\`\`\` enthalten.`,
+        components: [
+            new MessageActionRow()
+                .setComponents(
+                    new MessageButton()
+                        .setCustomId("refresh-blacklist")
+                        .setEmoji("🔄")
+                        .setStyle("PRIMARY"),
+                ),
+        ],
+    });
+}
 
 /**
  * @param {import("discord.js").ButtonInteraction} i
  */
 async function handleButton(i) {
+    if (i.customId == "refresh-blacklist") return blacklistUpdate(i.client, i);
     const message = i.message;
     if (message.embeds[0]?.title !== "Watchtime") return;
     const channel = message.embeds[0]?.description;
