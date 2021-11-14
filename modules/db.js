@@ -525,7 +525,7 @@ class DB {
         const client = await this.db.connect();
         try {
             channel = channel.replace(/#+/g, "");
-            await client.query(this.#statements.renameWatchtimeUser, [channel, oldName, newName]).catch((e) => { throw e; });
+            await client.query(this.#statements.renameWatchtimeUser, [channel, newName, oldName]).catch((e) => { throw e; });
         } catch (e) {
             this.clients.logger.error(e);
         } finally {
