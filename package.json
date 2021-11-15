@@ -15,10 +15,10 @@
     "@discordjs/rest": "^0.1.0-canary.0",
     "better-sqlite3": "^7.4.3",
     "discord-api-types": "^0.24.0",
-    "discord.js": "^13.2.0",
+    "discord.js": "^13.3.1",
     "enmap": "^5.8.4",
     "lodash": "^4.17.21",
-    "node-fetch": "^2.6.1",
+    "node-fetch": "^2.6.6",
     "node-schedule": "^2.0.0",
     "pg": "^8.7.1",
     "request": "^2.88.2",
@@ -31,13 +31,12 @@
     "@babel/eslint-parser": "^7.15.7",
     "@types/lodash": "^4.14.175",
     "@types/pg": "^8.6.1",
-    "@types/tmi.js": "^1.7.2",
+    "@types/tmi.js": "^1.8.0",
     "clean-jsdoc-theme": "^3.2.8",
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.1.0",
-    "jsdoc-import-support": "^3.6.4"
+    "eslint-plugin-promise": "^5.1.0"
   },
   "optionalDependencies": {
     "pidusage": "^2.0.21"
