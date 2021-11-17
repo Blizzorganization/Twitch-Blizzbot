@@ -13,7 +13,7 @@ exports.silent = true;
 exports.run = async (client, target, context) => {
     client.clients.discord.blchannel.send({
         content: `In der Blacklist für ${target} sind die Wörter \
-        \`\`\`fix\n${client.blacklist[target.replace(/#+/g, "")].join("\n")}\`\`\` enthalten.`,
+        \`\`\`fix\n${client.blacklist[target.replace(/#+/g, "")].sort().join("\n")}\`\`\` enthalten.`,
         components: [
             new MessageActionRow()
                 .setComponents(
