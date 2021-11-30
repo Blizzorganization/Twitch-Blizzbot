@@ -11,6 +11,7 @@ exports.perm = true;
  * @param {string[]} args
  */
 exports.run = async (client, target, context, msg, self, args) => {
+    const user = context["display-name"];
     if (!args) return client.say(target, "Welchen Zähler möchtest du bearbeiten?");
     if (args.length == 3) {
         const name = args.shift();
@@ -39,7 +40,7 @@ exports.run = async (client, target, context, msg, self, args) => {
                 client.say(target, "Mögliche Aktionen sind `val` und `inc`.");
                 return;
         }
-        client.say(target, `Zähler ${name} wurde bearbeitet.`);
+        client.say(target, `${user} Zähler ${name} wurde bearbeitet.`);
         client.clients.logger.log("command", `* Edited Counter ${name}`);
     } else {
         client.say(target, "Du musst angeben, welchen Zähler du bearbeiten willst, ob du den Wert oder die Erhöhung ändern willst und auf welchen Wert du dies anpassen willst.");

@@ -10,8 +10,9 @@ exports.perm = true;
  * @param {boolean} self
  */
 exports.run = async (client, target, context, msg, self, args) => {
+    const user = context["display-name"];
     if (args.length == 0) return;
     await client.clients.db.deleteAlias(target.replace(/#+/g, ""), args[0]);
-    client.say(target, `Alias ${args[0]} wurde entfernt.`);
+    client.say(target, `${user} Der Alias ${args[0]} wurde entfernt.`);
     client.clients.logger.log("command", `* Deleted alias ${args[0]}`);
 };

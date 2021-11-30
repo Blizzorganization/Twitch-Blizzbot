@@ -10,6 +10,7 @@ exports.perm = true;
  * @param {boolean} self
  */
 exports.run = async (client, target, context, msg, self, args) => {
+    const user = context["display-name"];
     let cname, increase, defaultVal;
     while (args.length > 0) {
         if (!cname || cname == "") cname = args.shift().toLowerCase();
@@ -18,7 +19,7 @@ exports.run = async (client, target, context, msg, self, args) => {
     }
     if (cname) {
         await client.clients.db.newCounter(target.replace(/#+/g, ""), cname, isNaN(parseInt(increase)) ? undefined : parseInt(increase), isNaN(parseInt(defaultVal)) ? undefined : parseInt(defaultVal));
-        client.say(target, `Der Zähler ${cname} wurde hinzugefügt.`);
+        client.say(target, `${user} Der Zähler ${cname} wurde hinzugefügt.`);
         client.clients.logger.log("command", `* Added Counter ${cname}`);
     } else {
         client.say(target, "Du musst angeben, welchen Zähler (mit optionaler Steigung und einem Startwert) du hinzufügen möchtest.");

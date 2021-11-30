@@ -10,13 +10,14 @@ exports.perm = true;
  * @param {boolean} self
  */
 exports.run = async (client, target, context, msg, self, args) => {
+    const user = context["display-name"];
     let cname;
     while (args.length > 0) {
         if (!cname || cname == "") cname = args.shift().toLowerCase();
     }
     if (cname) {
         await client.clients.db.delCounter(target.replace(/#+/g, ""), cname);
-        client.say(target, `Der Zähler ${cname} wurde entfernt.`);
+        client.say(target, `${user} Der Zähler ${cname} wurde entfernt.`);
         client.clients.logger.log("command", `* Deleted Counter ${cname}`);
     } else {
         client.say(target, "Du musst angeben, welchen Zähler du löschen möchtest.");
