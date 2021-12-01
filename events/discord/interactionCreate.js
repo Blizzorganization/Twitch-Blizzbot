@@ -7,7 +7,7 @@ const { calcWatchtime } = require("../../modules/functions");
 async function blacklistUpdate(client, interaction) {
     await interaction.update({
         content: `In der Blacklist für ${client.config.watchtimechannel} sind die Wörter \
-        \`\`\`fix\n${client.clients.twitch.blacklist[client.config.watchtimechannel].join("\n")}\`\`\` enthalten.`,
+        \`\`\`fix\n${client.clients.twitch.blacklist[client.config.watchtimechannel].sort().join("\n")}\`\`\` enthalten.`,
         components: [
             new MessageActionRow()
                 .setComponents(

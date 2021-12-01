@@ -17,6 +17,7 @@ exports.DiscordClient = class DiscordClient extends Client {
     commands = new Collection;
     slashcommands = new Collection;
     helplist = [];
+    /** @type {import("./clients").Clients} */
     clients;
     started = false;
     blchannel;
