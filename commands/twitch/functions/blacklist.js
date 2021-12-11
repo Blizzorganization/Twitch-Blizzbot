@@ -1,7 +1,7 @@
-const { MessageActionRow, MessageButton } = require("discord.js");
+const { permissions } = require("../../../modules/constants");
 
 exports.help = false;
-exports.perm = true;
+exports.perm = permissions.mod;
 exports.silent = true;
 /**
  * @name blacklist

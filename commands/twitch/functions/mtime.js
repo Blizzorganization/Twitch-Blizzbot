@@ -1,8 +1,9 @@
+const { permissions } = require("../../../modules/constants");
 const { calcWatchtime } = require("../../../modules/functions");
 const { currentMonth } = require("../../../modules/functions");
 
 exports.help = false;
-exports.perm = true;
+exports.perm = permissions.mod;
 /**
  * @name mtime
  * @namespace TwitchCommands

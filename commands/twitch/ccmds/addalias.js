@@ -1,5 +1,7 @@
+const { permissions } = require("../../../modules/constants");
+
 exports.help = false;
-exports.perm = true;
+exports.perm = permissions.mod;
 /**
  * @name addalias
  * @namespace TwitchCommands

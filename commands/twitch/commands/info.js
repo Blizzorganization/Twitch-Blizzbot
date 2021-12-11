@@ -18,5 +18,5 @@ exports.run = async (client, target) => {
     if (viewer == `${target.slice(1)} is offline`) {
         viewer = "0";
     }
-    client.say(target, `${target.slice(1)} hat zur Zeit ${viewer} Zuschauer, ${follow} Follower und ${sub} Subscriber`);
+    client.say(target, `${target.slice(1)} hat zur Zeit ${follow} Follower und ${sub} Subscriber`);
 };
