@@ -6,7 +6,7 @@ const { DiscordClient } = require("./modules/discordclient");
 const { TwitchClient } = require("./modules/twitchclient");
 const { createConfig } = require("./setup");
 (async () => {
-    if (process.argv0.length >= 18) process.title = "Twitch-Blizzbot@" + require("./package.json").version;
+    if (process.argv0.length >= 18) process.title = `Twitch-Blizzbot@${JSON.parse(readFileSync("./package.json", "utf8")).version}`;
     if (!existsSync("./config.json")) await createConfig();
     const config = JSON.parse(readFileSync("./config.json").toString());
     // making sure a links.txt exists
