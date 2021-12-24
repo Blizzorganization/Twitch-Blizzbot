@@ -36,7 +36,7 @@ module.exports = {
             .setTitle("Watchtime")
             .addField("Nutzername", twuser)
             .addField("Watchtime", `${calcWatchtime(watchtime)}`)
-            .addField("Von der gestreamten Zeit", `${Math.round(1000 * watchtime / maxWatchtime) / 10}%`)
+            .addField("Von der registierten Zeit", `${Math.round(1000 * watchtime / maxWatchtime) / 10}%`)
         await interaction.reply({ embeds: [embed] });
     },
 };

@@ -37,7 +37,7 @@ exports.run = async (client, message, args) => {
         .setTitle("Watchtime")
         .addField("Nutzername", user)
         .addField("Watchtime", `${calcWatchtime(watchtime)}`)
-        .addField("Von der gestreamten Zeit", `${Math.round(1000 * watchtime / maxWatchtime) / 10}%`)
+        .addField("Von der registierten Zeit", `${Math.round(1000 * watchtime / maxWatchtime) / 10}%`)
 
     message.channel.send({ embeds: [embed] });
 };
