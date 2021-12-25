@@ -34,10 +34,10 @@ exports.run = async (client, message, args) => {
     const embed = new MessageEmbed()
         .setColor(0xedbc5d)
         .setThumbnail(client.user.avatarURL({ format: "png" }))
-        .setTitle("Watchtime")
+        .setTitle("**__Watchtime__**")
         .addField("Nutzername", user)
         .addField("Watchtime", `${calcWatchtime(watchtime)}`)
-        .addField("Von der registierten Zeit", `${Math.round(1000 * watchtime / maxWatchtime) / 10}%`)
+        .addField("Von der registierten Zeit", `${Math.round(1000 * watchtime / maxWatchtime) / 10}%`);
 
     message.channel.send({ embeds: [embed] });
 };

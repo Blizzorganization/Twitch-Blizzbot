@@ -23,7 +23,7 @@ module.exports = {
         const channel = client.config.watchtimechannel;
         const page = 1;
         const embed = new MessageEmbed()
-            .setTitle("Watchtime")
+            .setTitle("**__Watchtime:__**")
             .setColor(0xedbc5d)
             .setDescription(channel)
             .setFooter("Seite " + page);

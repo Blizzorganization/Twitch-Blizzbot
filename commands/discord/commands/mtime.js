@@ -27,13 +27,15 @@ exports.run = async (client, message, args) => {
     }
     if (user == "") return message.channel.send("Du musst angeben, für welchen Account du die Watchtime abfragen möchtest.");
     const watchtime = await client.clients.db.getWatchtime(channel, user, currentMonth());
+    const maxWatchtime = await client.clients.db.getWatchtime(channel, client.clients.twitch.getUsername(), currentMonth());
     if (!watchtime) return message.channel.send("Diesen Nutzer kenne ich nicht.");
     const embed = new MessageEmbed()
         .setColor(0xedbc5d)
         .setThumbnail(client.user.avatarURL({ format: "png" }))
-        .setTitle("Monthly Watchtime")
+        .setTitle("**__Monthly Watchtime__**")
         .addField("Nutzername", user)
-        .addField("Watchtime", calcWatchtime(watchtime));
+        .addField("Watchtime", calcWatchtime(watchtime))
+        .addField("Von der registierten Zeit", `${Math.round(1000 * watchtime / maxWatchtime) / 10}%`);
 
     message.channel.send({ embeds: [embed] });
 };

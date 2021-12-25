@@ -11,7 +11,7 @@ exports.adminOnly = false;
 exports.run = (client, message) => {
     const embed = new MessageEmbed()
         .setColor(0xedbc5d)
-        .setTitle("**__Der Bot kann folgende Befehle__**")
+        .setTitle("**__Der Bot kann folgende Befehle:__**")
         .addField("!twitchname", "Zeigt den Twitchnamen an der eingespeichert wurde")
         .addField("!top10", "Gibt die aktuellen Top10 der Watchtime liste wieder")
         .addField("!watchtime [Twitch-Name]", "Gibt die aktuelle watchtime des angegebenen Nutzers wieder")

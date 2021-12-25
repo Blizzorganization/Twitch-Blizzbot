@@ -16,7 +16,7 @@ exports.run = async (client, message, args) => {
         if (args[0] && !isNaN(parseInt(args[0]))) page = parseInt(args[0]);
     }
     const embed = new MessageEmbed()
-        .setTitle("Watchtime")
+        .setTitle("**__Watchtime:__**")
         .setColor(0xedbc5d)
         .setDescription(channel)
         .setFooter("Seite " + page);
@@ -39,7 +39,7 @@ exports.run = async (client, message, args) => {
             page = Math.max(--page, 1);
         }
         const editEmbed = new MessageEmbed()
-            .setTitle("Watchtime")
+            .setTitle("**__Watchtime:__**")
             .setColor(0xedbc5d)
             .setFooter("Seite " + page)
             .setDescription(channel);
