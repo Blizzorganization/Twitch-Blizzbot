@@ -1,5 +1,6 @@
 const { permissions } = require("../../../modules/constants");
 const fetch = require("node-fetch").default;
+
 exports.help = false;
 exports.perm = permissions.mod;
 exports.alias = ["so"];

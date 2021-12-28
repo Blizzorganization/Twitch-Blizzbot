@@ -1,6 +1,5 @@
 const { permissions } = require("../../../modules/constants");
 
-
 exports.help = false;
 exports.perm = permissions.mod;
 /**

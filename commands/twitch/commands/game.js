@@ -1,4 +1,5 @@
 const fetch = require("node-fetch").default;
+
 exports.help = true;
 exports.perm = false;
 exports.alias = ["spiel"];
