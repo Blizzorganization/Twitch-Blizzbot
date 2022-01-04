@@ -18,6 +18,6 @@ exports.run = async (client, target, context, msg, self, args) => {
     if (!cmd) return client.say(target, `Ich kenne keinen Befehl ${args[0]}.`);
     if (cmd.permissions !== permissions.mod) return client.say(target, `${args[0]} ist kein Mod Only Customcommand.`);
     await client.clients.db.delCcmd(target.replace(/#+/g, ""), args[0]);
-    client.say(target, `${user} Der Befehl ${args[0]} wurde gelöscht.`);
+    client.say(target, `${user} der Befehl ${args[0]} wurde gelöscht.`);
     client.clients.logger.log("command", `* Deleted Customcommand ${args[0]}`);
 };

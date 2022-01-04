@@ -42,7 +42,7 @@ exports.run = async (client, target, context, msg, self, args) => {
                 client.say(target, "Mögliche Aktionen sind `val` und `inc`.");
                 return;
         }
-        client.say(target, `${user} Der Zähler ${name} wurde bearbeitet.`);
+        client.say(target, `${user} der Zähler ${name} wurde bearbeitet.`);
         client.clients.logger.log("command", `* Edited Counter ${name}`);
     } else {
         client.say(target, "Du musst angeben, welchen Zähler du bearbeiten willst, ob du den Wert oder die Erhöhung ändern willst und auf welchen Wert du dies anpassen willst.");

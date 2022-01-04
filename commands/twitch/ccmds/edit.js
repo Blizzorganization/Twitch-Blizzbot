@@ -21,6 +21,6 @@ exports.run = async (client, target, context, msg, self, args) => {
     const newcmd = args.shift().toLowerCase();
     const res = args.join(" ");
     await client.clients.db.editCcmd(target.replace(/#+/g, ""), newcmd, res);
-    client.say(target, `${user} Der Befehl ${newcmd} wurde bearbeitet.`);
+    client.say(target, `${user} der Befehl ${newcmd} wurde bearbeitet.`);
     client.clients.logger.log("command", `* Edited Customcommand ${newcmd}`);
 };
