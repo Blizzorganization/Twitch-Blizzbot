@@ -56,7 +56,7 @@ async function handleButton(i) {
     const editEmbed = new MessageEmbed()
         .setTitle("Watchtime")
         .setColor(0xdfb82d)
-        .setFooter("Seite" + page)
+        .setFooter({ text: `Seite${page}` })
         .setDescription(channel);
     // @ts-ignore
     const updateWatchtime = await i.client.clients.db.watchtimeList(channel, "alltime", 10, page);
