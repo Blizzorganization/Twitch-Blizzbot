@@ -1,5 +1,4 @@
 const { permissions } = require("../../../modules/constants");
-const fetch = require("node-fetch").default;
 
 exports.help = false;
 exports.perm = permissions.mod;
@@ -15,14 +14,10 @@ exports.alias = ["so"];
  */
 exports.run = async (client, target, context, msg, self, args) => {
     if (!args || args.length == 0) {
-        client.say(target, "Du musst den Namen angeben.");
+        client.say(target, "Du musst einen Namen angeben.");
         return;
     }
     const user = args[0];
-    const resp = await fetch(`https://decapi.me/twitch/title/${user}`);
-    const title = await resp.text();
-    const res = await fetch(`https://decapi.me/twitch/game/${user}`);
-    const game = await res.text();
 
-    client.say(target, `Kleines Shoutout an ${user} er streamte ${game} mit dem Titel: ${title}`);
+    client.say(target, `Kleines Shoutout an ${user} schaut doch auch mal bei https://www.twitch.tv/${user} vorbei`);
 };
