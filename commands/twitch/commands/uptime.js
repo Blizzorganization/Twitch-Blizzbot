@@ -1,4 +1,5 @@
 const fetch = require("node-fetch").default;
+const { time } = require("../../../modules/functions");
 
 exports.help = true;
 exports.perm = false;
@@ -10,11 +11,8 @@ exports.perm = false;
  */
 exports.run = async (client, target) => {
     const uptimerequest = await fetch(`https://decapi.me/twitch/uptime/${target.slice(1)}`, {});
-    const uptime = (await uptimerequest.text())
-        .replace("days", "Tagen").replace("day", "Tag")
-        .replace("hours", "Stunden").replace("hour", "Stunde")
-        .replace("minutes", "Minuten").replace("minute", "Minute")
-        .replace("seconds", "Sekunden").replace("second", "Sekunde");
+    const uptime = time(await uptimerequest.text());
+
     if (uptime == `${target.slice(1)} is offline`) {
         client.say(target, `${target.slice(1)} ist offline.`);
     } else {

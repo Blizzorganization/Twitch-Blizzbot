@@ -95,3 +95,15 @@ exports.getTable = function getTable(data) {
     logger.table(data);
     return (ts.read() || "").toString();
 };
+exports.time = function time(str) {
+    return str
+        .replace("years", "Jahren").replace("year", "Jahr")
+        .replace("months", "Monaten").replace("month", "Monat")
+        .replace("weeks", "Wochen").replace("week", "Woche")
+        .replace("days", "Tage").replace("day", "Tag")
+        .replace("hours", "Stunden").replace("hour", "Stunde")
+        .replace("minutes", "Minuten").replace("minute", "Minute")
+        .replace("seconds", "Sekunden").replace("second", "Sekunde")
+        .replace("has been following", "folgt").replace("for", "seit")
+        .replace("is not following", "ist kein Follower von");
+};
