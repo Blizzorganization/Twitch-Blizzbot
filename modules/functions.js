@@ -105,5 +105,6 @@ exports.time = function time(str) {
         .replace("minutes", "Minuten").replace("minute", "Minute")
         .replace("seconds", "Sekunden").replace("second", "Sekunde")
         .replace("has been following", "folgt").replace("for", "seit")
-        .replace("is not following", "ist kein Follower von");
+        .replace("is not following", "ist kein Follower von")
+        .replace("does not follow", "ist kein Follower von");
 };
