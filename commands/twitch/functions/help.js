@@ -1,5 +1,7 @@
+const { permissions } = require("../../../modules/constants");
+
 exports.help = false;
-exports.perm = false;
+exports.perm = permissions.user;
 exports.alias = ["befehl", "befehle", "command", "commands", "cmd", "cmds"];
 /**
  * @name help

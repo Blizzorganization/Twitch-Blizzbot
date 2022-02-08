@@ -1,7 +1,7 @@
 const fetch = require("node-fetch").default;
 
 exports.help = true;
-exports.perm = false;
+exports.perm = permissions.user;
 /**
  * @name info
  * @namespace TwitchCommands

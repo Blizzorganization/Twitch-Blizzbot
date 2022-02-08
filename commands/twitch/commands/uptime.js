@@ -1,8 +1,9 @@
+const { permissions } = require("../../../modules/constants");
 const fetch = require("node-fetch").default;
 const { time } = require("../../../modules/functions");
 
 exports.help = true;
-exports.perm = false;
+exports.perm = permissions.user;
 /**
  * @name uptime
  * @namespace TwitchCommands

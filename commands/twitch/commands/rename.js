@@ -1,5 +1,7 @@
-exports.help = true;
-exports.perm = false;
+const { permissions } = require("../../../modules/constants");
+
+exports.help = false;
+exports.perm = permissions.dev;
 exports.alias = [];
 /**
  * @name watchtime

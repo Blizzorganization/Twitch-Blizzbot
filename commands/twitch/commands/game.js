@@ -1,7 +1,8 @@
+const { permissions } = require("../../../modules/constants");
 const fetch = require("node-fetch").default;
 
 exports.help = true;
-exports.perm = false;
+exports.perm = permissions.user;
 exports.alias = ["spiel"];
 /**
  * @name game

@@ -1,7 +1,8 @@
+const { permissions } = require("../../../modules/constants");
 const { calcWatchtime } = require("../../../modules/functions");
 
 exports.help = true;
-exports.perm = false;
+exports.perm = permissions.user;
 exports.alias = ["wt"];
 /**
  * @name watchtime

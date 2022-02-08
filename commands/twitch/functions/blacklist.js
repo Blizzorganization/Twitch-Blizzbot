@@ -1,3 +1,4 @@
+const { MessageActionRow, MessageButton } = require("discord.js");
 const { permissions } = require("../../../modules/constants");
 
 exports.help = false;
@@ -11,6 +12,7 @@ exports.silent = true;
  * @param {import("tmi.js").ChatUserstate} context
  */
 exports.run = async (client, target, context) => {
+    const user = context["display-name"];
     client.clients.discord.blchannel.send({
         content: `In der Blacklist für ${target} sind die Wörter \
         \`\`\`fix\n${client.blacklist[target.replace(/#+/g, "")].sort().join("\n")}\`\`\` enthalten.`,
@@ -24,6 +26,6 @@ exports.run = async (client, target, context) => {
                 ),
         ],
     });
-    client.say(target, "Blacklist wurde gesendet");
+    client.say(target, `${user} Blacklist wurde gesendet`);
     client.clients.logger.log("info", `* Sent the blacklist of ${target} to ${context.username}`);
 };
