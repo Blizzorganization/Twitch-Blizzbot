@@ -1,3 +1,4 @@
+const { permissions } = require("../../../modules/constants");
 const fetch = require("node-fetch").default;
 
 exports.help = true;
