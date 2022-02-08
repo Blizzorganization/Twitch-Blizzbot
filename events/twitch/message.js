@@ -100,8 +100,8 @@ function checkModAction(client, msg, ctx, target, args) {
     const delbl = client.blacklist[target.replace(/#+/g, "")];
     const checkmsg = ` ${message} `;
     if (delbl.some((a) => checkmsg.includes(` ${a} `))) return client.deletemessage(target, ctx.id);
-    if (checkmsg.includes(" www.")) {
-        const links = args.filter((a) => a.toLowerCase().includes("www"));
+    if (checkmsg.includes(" www.") || client.deletelinks.some((tld) => checkmsg.includes(tld))) {
+        const links = args.filter((a) => a.toLowerCase().includes("www") || client.deletelinks.some((tld) => a.includes(tld)));
         const forbiddenlinks = links.filter((l) => !(client.permittedlinks.some((purl) => l.toLowerCase().includes(purl))));
         if (forbiddenlinks.length > 0) return client.deletemessage(target, ctx.id);
     }

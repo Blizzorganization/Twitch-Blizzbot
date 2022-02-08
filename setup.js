@@ -1,4 +1,5 @@
 #!node
+/* eslint-disable no-console */
 const readline = require("readline");
 const util = require("util");
 const fs = require("fs");
@@ -149,8 +150,8 @@ let existingconfig = {
         watchtimechannel: undefined,
     },
 };
-if (fs.existsSync("./config.json")) {
-    const file = fs.readFileSync("./config.json", "utf8");
+if (fs.existsSync("./configs/config.json")) {
+    const file = fs.readFileSync("./configs/config.json", "utf8");
     const jsondata = JSON.parse(file);
     if (jsondata) existingconfig = _.merge(existingconfig, jsondata);
 }
@@ -240,7 +241,7 @@ const createConfig = async () => {
     rl.close();
     console.log(initStrings[language].success);
 };
-const writeData = () => fs.writeFileSync("./config.json", JSON.stringify(existingconfig, undefined, 4), "utf8");
+const writeData = () => fs.writeFileSync("./configs/config.json", JSON.stringify(existingconfig, undefined, 4), "utf8");
 
 /**
  * @param {string} response
@@ -257,8 +258,8 @@ if (process.argv[1].endsWith("setup.js") || process.argv[1].endsWith("setup")) {
     createConfig();
 }
 (() => {
-    if (!fs.existsSync("automessages.json")) {
-        fs.writeFileSync("automessages.json", "{\"channelname\": [\"message\"]}");
+    if (!fs.existsSync("configs/automessages.json")) {
+        fs.writeFileSync("configs/automessages.json", "{\"channelname\": [\"message\"]}");
         return console.log("You should fill in the automessages.json");
     }
 })();

@@ -7,10 +7,12 @@ const { TwitchClient } = require("./modules/twitchclient");
 const { createConfig } = require("./setup");
 (async () => {
     if (process.argv0.length >= 18) process.title = `Twitch-Blizzbot@${JSON.parse(readFileSync("./package.json", "utf8")).version}`;
-    if (!existsSync("./config.json")) await createConfig();
-    const config = JSON.parse(readFileSync("./config.json").toString());
+    if (!existsSync("./configs/config.json")) await createConfig();
+    const config = JSON.parse(readFileSync("./configs/config.json").toString());
     // making sure a links.txt exists
-    appendFileSync("links.txt", "");
+    appendFileSync("configs/links.txt", "");
+    // making sure a TLDs.txt exists
+    appendFileSync("configs/TLDs.txt", "");
     require("./modules/logger").debug("starting bot");
     const clients = new Clients(config);
     let discordClient;

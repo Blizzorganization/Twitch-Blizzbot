@@ -1,3 +1,4 @@
+/* eslint-disable no-empty-function */
 const { EOL } = require("os");
 /**
  * @typedef watchtimeuser

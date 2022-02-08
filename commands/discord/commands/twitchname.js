@@ -2,7 +2,7 @@ const { MessageEmbed } = require("discord.js");
 const { time } = require("../../../modules/functions");
 const fetch = require("node-fetch").default;
 
-exports.alias = ["twitchnamen"];
+exports.alias = ["twitchnamen", "twname"];
 exports.adminOnly = false;
 /**
  * @name tname
@@ -28,7 +28,7 @@ exports.run = async (client, message) => {
         .setTitle("**__Linkinginfo__**")
         .addField("__Discord-name__", dcuser.username)
         .addField("__Twitch-name__", dbuser)
-        .addField("__Alter__", age)
+        .addField("__Der Twitchaccount wurde erstellt vor__", age)
         .addField("__Folgt schon__", fage);
 
     message.channel.send({ embeds: [embed] });

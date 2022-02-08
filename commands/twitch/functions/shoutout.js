@@ -19,5 +19,5 @@ exports.run = async (client, target, context, msg, self, args) => {
     }
     const user = args[0];
 
-    client.say(target, `Kleines Shoutout an ${user} schaut doch auch mal bei https://www.twitch.tv/${user} vorbei`);
+    client.say(target, `Kleines Shoutout an ${user} schaut doch auch mal bei https://www.twitch.tv/${user.toLowerCase()} vorbei`);
 };

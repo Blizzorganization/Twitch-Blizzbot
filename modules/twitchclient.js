@@ -21,7 +21,7 @@ const schedule = require("node-schedule");
  * @property {import("./clients").Clients} clients
  * @property {boolean} started
  * @property {Collection} commands
- * @property {Enmap} blacklist
+ * @property {{[key: string]: string[]}} blacklist
  * @property {any} watchtime
  * @property {any} automessage
  * @property {string[]} channels
@@ -38,12 +38,13 @@ exports.TwitchClient = class TwitchClient extends Client {
         this.helplist = [];
         /** @type {string[]}*/
         this.channels = [];
-        this.permittedlinks = readFileSync("./links.txt", "utf8").split(/\r\n|\n\r|\n|\r/).filter((link) => link !== "");
+        this.permittedlinks = readFileSync("./configs/links.txt", "utf8").split(/\r\n|\n\r|\n|\r/).filter((link) => link !== "");
+        this.deletelinks = readFileSync("./configs/TLDs.txt", "utf8").split(/\r\n|\n\r|\n|\r/).filter((link) => link !== "");
         this.watchtime = undefined;
         this.automessage = undefined;
         /** @type {import("./clients").Clients}*/
         this.clients = undefined;
-        /** @type {import("../typings/blacklist").bltype}*/
+        /** @type {{[key: string]: string[]}}*/
         // @ts-ignore
         this.blacklist = [];
         if (!existsSync("./channellogs")) mkdirSync("./channellogs");
@@ -59,7 +60,7 @@ exports.TwitchClient = class TwitchClient extends Client {
         loadCommands(this.commands, "commands/twitch/functions", this.helplist);
         loadEvents("events/twitch", this);
         loadEvents("events/twitch/interaction", this);
-        this.messages = require("../automessages.json");
+        this.messages = require("../configs/automessages.json");
         this.connect();
     }
     /**
