@@ -185,7 +185,7 @@ const createConfig = async () => {
 
     /**
      * @param  {keyof translations} which which question to ask
-     * @param  {(string | number | boolean)?} pre previous value if exists
+     * @param  {(string | number | boolean)} [pre = undefined] previous value if exists
      * @returns {Promise<string>}
      */
     async function request(which, pre) {

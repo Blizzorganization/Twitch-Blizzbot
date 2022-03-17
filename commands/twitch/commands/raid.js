@@ -1,11 +1,11 @@
-const { permissions } = require("../../../modules/constants");
+const { permissions } = require("twitch-blizzbot/constants");
 
 exports.help = false;
-exports.perm = permissions.mod;
+exports.perm = permissions.vip;
 /**
  * @name raid
  * @namespace TwitchCommands
- * @param {import("../../../modules/twitchclient").TwitchClient} client
+ * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  */
 exports.run = (client, target) => {

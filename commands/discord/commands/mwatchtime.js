@@ -1,12 +1,12 @@
 const { MessageEmbed } = require("discord.js");
-const { calcWatchtime, currentMonth } = require("../../../modules/functions");
+const { calcWatchtime, currentMonth } = require("twitch-blizzbot/functions");
 
 exports.adminOnly = true;
 /**
  * @module watchtimelb
  * @namespace DiscordCommands
  * @description displays the watchtime of a user
- * @param {import("../../../modules/discordclient").DiscordClient} client
+ * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
  * @param {string[]} args
  */
@@ -20,7 +20,7 @@ exports.run = async (client, message, args) => {
         .setTitle("Monthly Watchtime")
         .setColor(0xedbc5d)
         .setDescription(channel)
-        .setFooter(`Seite ${page}`);
+        .setFooter({ text: `Seite ${page}` });
     const watchtime = await client.clients.db.watchtimeList(channel, currentMonth(), 10, page);
     for (const viewer in watchtime) {
         embed.addField(watchtime[viewer].viewer, calcWatchtime(watchtime[viewer].watchtime), false);
@@ -42,7 +42,7 @@ exports.run = async (client, message, args) => {
             .setTitle("Monthly Watchtime")
             .setColor(0xedbc5d)
             .setDescription(channel)
-            .setFooter(`Seite ${page}`);
+            .setFooter({ text: `Seite ${page}` });
         const newwatchtime = await client.clients.db.watchtimeList(channel, currentMonth(), 10, page);
         for (const viewer in newwatchtime) {
             editEmbed.addField(newwatchtime[viewer].viewer, calcWatchtime(newwatchtime[viewer].watchtime), false);

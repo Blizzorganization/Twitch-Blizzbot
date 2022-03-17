@@ -1,3 +1,3 @@
 export type bltype = {
-    [key: string]: string[]
+    [key: `${number}`]: string[]
 }

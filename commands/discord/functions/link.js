@@ -2,14 +2,14 @@ exports.adminOnly = false;
 /**
  * @name link
  * @namespace DiscordCommands
- * @param {import("../../../modules/discordclient").DiscordClient} client
+ * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
  * @param {string[]} args
  */
 exports.run = async (client, message, args) => {
     if (!args || !args[0]) {
         const msg = await message.channel.send("Du musst deinen Twitch Nutzernamen angeben.");
-        const coll = msg.channel.createMessageCollector((m => m.author.id == message.author.id));
+        const coll = msg.channel.createMessageCollector(({ filter: m => m.author.id === message.author.id }));
         coll.on("collect", (m) => {
             coll.stop();
             if (m.content.startsWith(`${client.config.prefix}`)) return;
@@ -20,7 +20,7 @@ exports.run = async (client, message, args) => {
     }
 };
 /**
- * @param {import("../../../modules/discordclient").DiscordClient} client
+ * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
  * @param {string[]} args
  */

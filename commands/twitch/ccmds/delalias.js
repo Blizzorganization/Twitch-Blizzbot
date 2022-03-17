@@ -1,15 +1,16 @@
-const { permissions } = require("../../../modules/constants");
+const { permissions } = require("twitch-blizzbot/constants");
 
 exports.help = false;
 exports.perm = permissions.mod;
 /**
  * @name delalias
  * @namespace TwitchCommands
- * @param {import("../../../modules/twitchclient").TwitchClient} client
+ * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  * @param {import("tmi.js").ChatUserstate} context
  * @param {string} msg
  * @param {boolean} self
+ * @param {string[]} args
  */
 exports.run = async (client, target, context, msg, self, args) => {
     const user = context["display-name"];

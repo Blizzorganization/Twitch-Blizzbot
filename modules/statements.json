@@ -36,6 +36,6 @@
     "getAliases": "SELECT * FROM aliases WHERE channel = $1;",
 
     "newBlacklist": "INSERT INTO blacklist(channel, blwords) VALUES ($1, array[]::text[]) ON CONFLICT DO NOTHING;",
-    "saveBlacklist": "UPDATE blacklist SET blwords = $2 WHERE channel = $1;",
+    "saveBlacklist": "UPDATE blacklist SET blwords = $2 WHERE channel = $1 AND action = $3;",
     "loadBlacklist": "SELECT * FROM blacklist;"
 }

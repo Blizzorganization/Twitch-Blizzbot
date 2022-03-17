@@ -1,15 +1,15 @@
 global.util = require("util");
 global.fs = require("fs");
 /**
- * @param {import("../../modules/clients").Clients} clients
+ * @param {import("twitch-blizzbot/clients").Clients} clients
  * @param {string[]} args
  */
 exports.run = (clients, args) => {
     const evaled = eval(args.join(" "));
-    clients.logger.log("info", global.util.inspect(evaled));
+    clients.logger.info(global.util.inspect(evaled));
 };
 /**
- * @param  {import("../../modules/clients").Clients} clients
+ * @param  {import("twitch-blizzbot/clients").Clients} clients
  * @param  {string} line
  */
 exports.completer = (clients, line) => {

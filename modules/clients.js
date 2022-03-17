@@ -19,14 +19,14 @@ exports.Clients = class Clients {
      * stops all Clients supplied
      */
     async stop() {
-        this.logger.log("info", "stopping");
+        this.logger.info("stopping");
         const stopping = [];
         stopping.push(this.db.stop());
         stopping.push(this.twitch.stop());
         stopping.push(this.console.stop());
         if (this.discord) stopping.push(this.discord.stop());
         const stopped = await Promise.all(stopping);
-        this.logger.log("info", "Goodbye");
+        this.logger.info("Goodbye");
         process.exit(0);
         return stopped;
     }

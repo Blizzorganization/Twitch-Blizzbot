@@ -1,0 +1,37 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "target": "ES2021",
+        "strictFunctionTypes": true,
+        "baseUrl": ".",
+        "paths": {
+            "twitch-blizzbot/functions": [
+                "./modules/functions.js"
+            ],
+            "twitch-blizzbot/discordclient": [
+                "./modules/discordclient.js"
+            ],
+            "twitch-blizzbot/twitchclient": [
+                "./modules/twitchclient.js"
+            ],
+            "twitch-blizzbot/constants": [
+                "./modules/constants.js"
+            ],
+            "twitch-blizzbot/clients": [
+                "./modules/clients.js"
+            ]
+        },
+        "resolveJsonModule": true,
+        "checkJs": true,
+        "allowJs": true
+    },
+    "include": [
+        "modules/*",
+        "commands/**/*",
+        "events/**/*",
+        "bot.js",
+        "typings/*",
+        "package.json"
+    ],
+    "exclude": ["modules/abstractDb.js", "node_modules/**/*", "node_modules/pidusage/lib/stats.js"],
+}

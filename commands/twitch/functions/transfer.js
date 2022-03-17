@@ -1,4 +1,4 @@
-const { permissions } = require("../../../modules/constants");
+const { permissions } = require("twitch-blizzbot/constants");
 
 exports.help = false;
 exports.perm = permissions.mod;
@@ -6,7 +6,7 @@ exports.alias = ["tf"];
 /**
  * @name transferCmd
  * @namespace TwitchCommands
- * @param {import("../../../modules/twitchclient").TwitchClient} client
+ * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  * @param {import("tmi.js").ChatUserstate} context
  * @param {string} msg
@@ -22,18 +22,18 @@ exports.run = async (client, target, context, msg, self, args) => {
             {
                 const alias = await client.clients.db.resolveAlias(target, cmd);
                 if (alias) {
-                    client.clients.logger.log("warn", `${cmd} is an alias so it's permissions didn't get changed.`);
+                    client.clients.logger.warn(`${cmd} is an alias so it's permissions didn't get changed.`);
                     return client.say(target, `'${cmd}' ist ein Alias, wenn du wechseln möchtest nutze bitte den Befehl ${alias.command}.`);
                 }
                 return client.say(target, `Der Befehl ${cmd} ist nicht vorhanden.`);
             }
             case "ok":
                 client.say(target, `Die Befehlsberechtigungen von ${cmd} wurden aktualisiert.`);
-                client.clients.logger.log("info", `* Changed Customcommand ${cmd}'s permissions `);
+                client.clients.logger.info(`* Changed Customcommand ${cmd}'s permissions `);
                 break;
             default:
                 client.say(target, "Ein unerwarteter Fehler ist aufgetreten.");
-                client.clients.logger.error("Unknown Keyword at transfer command: " + dbres);
+                client.clients.logger.error(`Unknown Keyword at transfer command: ${dbres}`);
                 break;
         }
     } else {

@@ -1,6 +1,9 @@
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
-
+/**
+ * @param  {import("twitch-blizzbot/discordclient").DiscordClient} client
+ * @param  {import("discord.js").Snowflake} guildid
+ */
 module.exports = async function(client, guildid) {
     const commands = client.slashcommands.map(({ data }) => data);
 
@@ -12,7 +15,7 @@ module.exports = async function(client, guildid) {
             Routes.applicationGuildCommands(client.user.id, guildid),
             { body: commands },
         ));
-        client.clients.logger.log("info", "Successfully reloaded application (/) commands.");
+        client.clients.logger.info("Successfully reloaded application (/) commands.");
         client.clients.logger.log("debug", await rest.get(Routes.applicationGuildCommands(client.application.id || client.user.id, guildid)));
     } catch (error) {
         client.clients.logger.error(error.message);
