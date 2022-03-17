@@ -1,15 +1,15 @@
-const { permissions } = require("twitch-blizzbot/constants");
+import fetch from "node-fetch";
+import { permissions } from "twitch-blizzbot/constants";
 
-exports.help = true;
-exports.perm = permissions.mod;
+export const help = true;
+export const perm = permissions.mod;
 /**
  * @name emotes
  * @namespace TwitchCommands
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  */
-exports.run = async (client, target) => {
-    const fetch = (await import("node-fetch")).default;
+export async function run(client, target) {
     const subEmoteRequest = await fetch(`https://decapi.me/twitch/subscriber_emotes/${target.slice(1)}`);
     const subEmotes = await subEmoteRequest.text();
     const bttvRequest = await fetch(`https://decapi.me/bttv/emotes/${target.slice(1)}`);
@@ -22,4 +22,4 @@ exports.run = async (client, target) => {
     }
 
 
-};
+}

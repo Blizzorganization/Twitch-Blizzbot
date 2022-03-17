@@ -1,8 +1,11 @@
-const { permissions } = require("twitch-blizzbot/constants");
-const _ = require("lodash");
+import lodash from "lodash";
+import { permissions } from "twitch-blizzbot/constants";
+import { logger } from "twitch-blizzbot/logger";
 
-exports.help = false;
-exports.perm = permissions.mod;
+const { find, findKey } = lodash;
+
+export const help = false;
+export const perm = permissions.mod;
 /**
  * @name delbl
  * @namespace TwitchCommands
@@ -13,15 +16,15 @@ exports.perm = permissions.mod;
  * @param {boolean} self
  * @param {string[]} args
  */
-exports.run = async (client, target, context, msg, self, args) => {
+export async function run(client, target, context, msg, self, args) {
     if (!args || args.length == 0) return client.say(target, "Du musst angeben, was du von der Blacklist entfernen willst!");
     const blremove = args.join(" ").toLowerCase();
     const blacklists = client.blacklist[target.replace(/#+/g, "")];
-    const blacklist = _.find(blacklists, (bl) => bl.includes(blremove));
-    const blacklistName = _.findKey(blacklists, (bl) => bl.includes(blremove));
+    const blacklist = find(blacklists, (bl) => bl.includes(blremove));
+    const blacklistName = findKey(blacklists, (bl) => bl.includes(blremove));
     if (!blacklist) return client.say(target, `"${blremove}" ist in keiner Blacklist vorhanden, kann also auch nicht aus der Blacklist entfernt werden.`);
     client.blacklist[target.replace(/#+/g, "")][blacklistName] = blacklist.filter(b => b !== blremove);
     await client.clients.db.saveBlacklist();
     client.say(target, `"${blremove}" wurde von der Blacklist entfernt`);
-    client.clients.logger.info(`* Removed "${blremove}" from the Blacklist of ${target}`);
-};
+    logger.info(`* Removed "${blremove}" from the Blacklist of ${target}`);
+}

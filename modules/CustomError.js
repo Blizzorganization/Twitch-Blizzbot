@@ -1,4 +1,4 @@
-exports.CustomError = class CustomError extends Error {
+export class CustomError extends Error {
     /**
      * generates a custom Error
      * @param {string} type Errortype
@@ -10,4 +10,4 @@ exports.CustomError = class CustomError extends Error {
         this.name = type;
         this.stack = stack;
     }
-};
+}

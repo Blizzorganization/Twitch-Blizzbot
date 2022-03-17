@@ -1,5 +1,7 @@
-const { WriteStream } = require("fs");
-const { permissions } = require("twitch-blizzbot/constants");
+import { WriteStream } from "fs";
+import { permissions } from "twitch-blizzbot/constants";
+import { logger } from "twitch-blizzbot/logger";
+
 // eslint-disable-next-line no-control-regex
 const linkTest = new RegExp("(^|[ \t\r\n])((sftp|ftp|http|https):(([A-Za-z0-9$_.+!*(),;/?:@&~=-])|%[A-Fa-f0-9]{2}){2,}(#([a-zA-Z0-9][a-zA-Z0-9$_.+!*(),;/?:@&~=%-]*))?([A-Za-z0-9$_+!*();/?:~-]))", "g");
 const counterTest = new RegExp(/\{(.*?)\}/g);
@@ -12,13 +14,13 @@ const counterTest = new RegExp(/\{(.*?)\}/g);
  * @param {string} msg
  * @param {boolean} self
  */
-exports.event = async (client, target, context, msg, self) => {
+export async function event(client, target, context, msg, self) {
     switch (target[0]) {
         case "#":
             {
                 const channellog = client.channellogs[target.replace("#", "")];
                 if (!channellog || !(channellog instanceof WriteStream)) {
-                    client.clients.logger.error(`channellogs for channel ${target.slice(1)} is not available!`);
+                    logger.error(`channellogs for channel ${target.slice(1)} is not available!`);
                 } else {
                     channellog.write(`[${(new Date()).toLocaleTimeString()}]${context["display-name"]}: ${msg}\n`);
                 }
@@ -40,7 +42,7 @@ exports.event = async (client, target, context, msg, self) => {
             }
             if ((Date.now() - client.cooldowns.get(target.replace("#", ""))) > 1000 * client.config.Cooldown) {
                 cmd.run(client, target, context, msg, self, args);
-                client.clients.logger.log("command", `* Executed ${commandName} command`);
+                logger.log("command", `* Executed ${commandName} command`);
                 client.cooldowns.set(target.replace("#", ""), Date.now());
             }
         } else {
@@ -51,7 +53,7 @@ exports.event = async (client, target, context, msg, self) => {
                 if ((Date.now() - client.cooldowns.get(target.replace("#", ""))) > 1000 * client.config.Cooldown) {
                     response = await counters(client, ccmd.response, target);
                     client.say(target, response);
-                    client.clients.logger.log("command", `* Executed ${commandName} Customcommand`);
+                    logger.log("command", `* Executed ${commandName} Customcommand`);
                 }
             } else {
                 const alias = await client.clients.db.resolveAlias(target, `!${commandName}`);
@@ -60,13 +62,13 @@ exports.event = async (client, target, context, msg, self) => {
                     if ((Date.now() - client.cooldowns.get(target.replace("#", ""))) > 1000 * client.config.Cooldown) {
                         response = await counters(client, alias.response, target);
                         client.say(target, response);
-                        client.clients.logger.log("command", `* Executed ${alias.command} caused by alias ${alias.alias}`);
+                        logger.log("command", `* Executed ${alias.command} caused by alias ${alias.alias}`);
                     }
                 }
             }
         }
     }
-};
+}
 /**
  * @async counters
  * @description resolves counters in customcommands

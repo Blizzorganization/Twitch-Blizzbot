@@ -1,7 +1,8 @@
-const { permissions } = require("twitch-blizzbot/constants");
+import { permissions } from "twitch-blizzbot/constants";
+import { logger } from "twitch-blizzbot/logger";
 
-exports.help = false;
-exports.perm = permissions.mod;
+export const help = false;
+export const perm = permissions.mod;
 /**
  * @name editcounter
  * @namespace TwitchCommands
@@ -12,7 +13,7 @@ exports.perm = permissions.mod;
  * @param {boolean} self
  * @param {string[]} args
  */
-exports.run = async (client, target, context, msg, self, args) => {
+export async function run(client, target, context, msg, self, args) {
     const user = context["display-name"];
     if (!args) return client.say(target, "Welchen Zähler möchtest du bearbeiten?");
     if (args.length == 3) {
@@ -43,8 +44,8 @@ exports.run = async (client, target, context, msg, self, args) => {
                 return;
         }
         client.say(target, `${user} der Zähler ${name} wurde bearbeitet.`);
-        client.clients.logger.log("command", `* Edited Counter ${name}`);
+        logger.log("command", `* Edited Counter ${name}`);
     } else {
         client.say(target, "Du musst angeben, welchen Zähler du bearbeiten willst, ob du den Wert oder die Erhöhung ändern willst und auf welchen Wert du dies anpassen willst.");
     }
-};
+}

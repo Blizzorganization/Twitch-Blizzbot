@@ -1,10 +1,12 @@
 #!node
 /* eslint-disable no-console */
-const readline = require("readline");
-const util = require("util");
-const fs = require("fs");
-const { EOL } = require("os");
-const _ = require("lodash");
+import { existsSync, readFileSync, writeFileSync } from "fs";
+import lodash from "lodash";
+import { EOL } from "os";
+import { createInterface } from "readline";
+import { promisify } from "util";
+
+const { merge } = lodash;
 
 /** @typedef translations
  * @property {string} welcome
@@ -150,13 +152,13 @@ let existingconfig = {
         watchtimechannel: undefined,
     },
 };
-if (fs.existsSync("./configs/config.json")) {
-    const file = fs.readFileSync("./configs/config.json", "utf8");
+if (existsSync("./configs/config.json")) {
+    const file = readFileSync("./configs/config.json", "utf8");
     const jsondata = JSON.parse(file);
-    if (jsondata) existingconfig = _.merge(existingconfig, jsondata);
+    if (jsondata) existingconfig = merge(existingconfig, jsondata);
 }
 const createConfig = async () => {
-    const rl = readline.createInterface({
+    const rl = createInterface({
         input: process.stdin,
         output: process.stdout,
         prompt: "> ",
@@ -167,7 +169,7 @@ const createConfig = async () => {
      * @param {string} question
      * @returns {Promise<string>}
      */
-    const protoQuestion = util.promisify(rl.question).bind(rl);
+    const protoQuestion = promisify(rl.question).bind(rl);
     /**
      * @param {string} q
      * @returns {Promise<string>}
@@ -241,7 +243,7 @@ const createConfig = async () => {
     rl.close();
     console.log(initStrings[language].success);
 };
-const writeData = () => fs.writeFileSync("./configs/config.json", JSON.stringify(existingconfig, undefined, 4), "utf8");
+const writeData = () => writeFileSync("./configs/config.json", JSON.stringify(existingconfig, undefined, 4), "utf8");
 
 /**
  * @param {string} response
@@ -258,9 +260,10 @@ if (process.argv[1].endsWith("setup.js") || process.argv[1].endsWith("setup")) {
     createConfig();
 }
 (() => {
-    if (!fs.existsSync("configs/automessages.json")) {
-        fs.writeFileSync("configs/automessages.json", "{\"channelname\": [\"message\"]}");
+    if (!existsSync("configs/automessages.json")) {
+        writeFileSync("configs/automessages.json", "{\"channelname\": [\"message\"]}");
         return console.log("You should fill in the automessages.json");
     }
 })();
-exports.createConfig = createConfig;
+const _createConfig = createConfig;
+export { _createConfig as createConfig };

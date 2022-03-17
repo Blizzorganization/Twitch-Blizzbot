@@ -7,10 +7,14 @@
   },
   "exports": {
     ".": "./bot.js",
-    "./functions": "./modules/functions.js",
+    "./clients": "./modules/clients.js",
+    "./consoleclient": "./modules/consoleclient.js",
+    "./constants": "./modules/constants.js",
+    "./CustomError": "./modules/CustomError.js",
     "./discordclient": "./modules/discordclient.js",
-    "./twitchclient": "./modules/twitchclient.js",
-    "./constants": "./modules/constants.js"
+    "./functions": "./modules/functions.js",
+    "./logger": "./modules/logger.js",
+    "./twitchclient": "./modules/twitchclient.js"
   },
   "license": "MIT",
   "repository": {
@@ -57,5 +61,5 @@
     "events/**/*.js",
     "commands/**/*.js"
   ],
-  "type": "commonjs"
+  "type": "module"
 }

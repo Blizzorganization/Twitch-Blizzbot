@@ -1,9 +1,9 @@
-const { permissions } = require("twitch-blizzbot/constants");
-const { calcWatchtime } = require("twitch-blizzbot/functions");
+import { permissions } from "twitch-blizzbot/constants";
+import { calcWatchtime } from "twitch-blizzbot/functions";
 
-exports.help = true;
-exports.perm = permissions.user;
-exports.alias = ["wt"];
+export const help = true;
+export const perm = permissions.user;
+export const alias = ["wt"];
 /**
  * @name watchtime
  * @namespace TwitchCommands
@@ -14,7 +14,7 @@ exports.alias = ["wt"];
  * @param {boolean} self
  * @param {string[]} args
  */
-exports.run = async (client, target, context, msg, self, args) => {
+export async function run(client, target, context, msg, self, args) {
     let user, watchtime;
     user = args[0]?.toLowerCase().replace("@", "");
     if (user) {
@@ -26,4 +26,4 @@ exports.run = async (client, target, context, msg, self, args) => {
         if (!watchtime) watchtime = 1;
     }
     client.say(target, `${user} schaut ${target.slice(1)} schon seit ${calcWatchtime(watchtime)}`);
-};
+}

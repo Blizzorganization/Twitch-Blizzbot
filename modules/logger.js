@@ -1,12 +1,12 @@
-const fs = require("fs");
-const { EOL } = require("os");
-const winston = require("winston");
-const DailyRotateFile = require("winston-daily-rotate-file");
+import { existsSync, mkdirSync } from "fs";
+import { EOL } from "os";
+import { createLogger, format as _format, transports as _transports } from "winston";
+import DailyRotateFile from "winston-daily-rotate-file";
 
-if (!fs.existsSync("./logs")) fs.mkdirSync("./logs");
-const Logger = winston.createLogger({
+if (!existsSync("./logs")) mkdirSync("./logs");
+export const logger = createLogger({
     level: "silly",
-    format: winston.format.prettyPrint({
+    format: _format.prettyPrint({
         colorize: true,
     }),
     transports: [
@@ -20,13 +20,13 @@ const Logger = winston.createLogger({
             symlinkName: "latest.log",
             filename: "%DATE%.log",
             level: "unused",
-            format: winston.format.combine(winston.format.uncolorize(), winston.format.simple()),
+            format: _format.combine(_format.uncolorize(), _format.simple()),
             maxFiles: "14d",
         }),
-        new winston.transports.Console({
+        new _transports.Console({
             level: "info",
-            format: winston.format.combine(
-                winston.format.colorize({
+            format: _format.combine(
+                _format.colorize({
                     level: true,
                     message: false,
                     colors: {
@@ -35,7 +35,7 @@ const Logger = winston.createLogger({
                         error: "red",
                     },
                 }),
-                winston.format.cli(),
+                _format.cli(),
             ),
         }),
     ],
@@ -51,4 +51,3 @@ const Logger = winston.createLogger({
         unused: 8,
     },
 });
-module.exports = Logger;

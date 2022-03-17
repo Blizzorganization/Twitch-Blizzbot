@@ -1,6 +1,8 @@
-const { CustomError } = require("./CustomError");
-const { existsSync, readdir } = require("fs");
-const Logger = require("./logger");
+import { Console } from "console";
+import { existsSync, readdir } from "fs";
+import { Transform } from "stream";
+import { CustomError } from "./CustomError.js";
+import { logger } from "./logger.js";
 /**
  * @module functions
  */
@@ -11,16 +13,16 @@ const Logger = require("./logger");
  * @param {string[]} helplist
  * @throws {LoadError} missing command directory
  */
-exports.loadCommands = (commandmap, commanddir, helplist = []) => {
+export function loadCommands(commandmap, commanddir, helplist = []) {
     const readcommanddir = `./${commanddir}`;
     if (existsSync(readcommanddir)) {
         readdir(`./${readcommanddir}/`, (err, files) => {
-            if (err) return Logger.error(err);
-            files.forEach(file => {
+            if (err) return logger.error(err);
+            files.forEach(async (file) => {
                 if (!(file.endsWith(".js"))) return;
                 const command = file.split(".")[0];
-                const props = require(`../${commanddir}/${command}`);
-                Logger.log("command", `Attempting to load Command ${command}`);
+                const props = await import(`../${commanddir}/${command}.js`);
+                logger.log("command", `Attempting to load Command ${command}`);
                 commandmap.set(command, props);
                 if (props.help) helplist.push(command);
                 if (!props.alias) return;
@@ -30,7 +32,7 @@ exports.loadCommands = (commandmap, commanddir, helplist = []) => {
             });
         });
     } else {throw new CustomError("LoadError", `CommandDirectory ${commanddir} does not exist.`);}
-};
+}
 /**
  *
  * @param {string} eventdir Event directory relative to project root
@@ -38,28 +40,28 @@ exports.loadCommands = (commandmap, commanddir, helplist = []) => {
  * @example loadEvents("events/twitch", client)
  * @throws {LoadError} missing command directory
  */
-exports.loadEvents = (eventdir, eventemitter) => {
+export function loadEvents(eventdir, eventemitter) {
     const readeventdir = `./${eventdir}`;
     if (existsSync(readeventdir)) {
         readdir(`./${readeventdir}/`, (err, files) => {
-            if (err) return Logger.error("Error reading discord events directory:", err);
-            files.forEach(file => {
+            if (err) return logger.error("Error reading discord events directory:", err);
+            files.forEach(async (file) => {
                 if (!(file.endsWith(".js"))) return;
                 const eventname = file.split(".")[0];
-                const { event } = require(`../${eventdir}/${eventname}`);
+                const { event } = await import(`../${eventdir}/${eventname}.js`);
                 // @ts-ignore
                 eventemitter.on(eventname, event.bind(null, eventemitter));
             });
         });
     } else {throw new CustomError("LoadError", `EventDirectory ${eventdir} does not exist.`);}
-};
+}
 /**
  *
  * @param {number} watchtime raw watchtime as stored in Database
  * @returns {string} Watchtime String
  * @throws {TypeError} Watchtime has to be a Number
  */
-exports.calcWatchtime = (watchtime) => {
+export function calcWatchtime(watchtime) {
     if (typeof watchtime !== "number") throw new CustomError("TypeError", "Watchtime has to be a Number");
     const timeTotalMinutes = Math.floor(watchtime / 2);
     const timeMinutes = timeTotalMinutes % 60;
@@ -68,37 +70,37 @@ exports.calcWatchtime = (watchtime) => {
     timeHours /= 60;
     timeDays /= 1440;
     return `${timeDays} Tag(en), ${timeHours} Stunde(n) und ${timeMinutes} Minute(n)`;
-};
-exports.getRandom = (list) => {
+}
+export function getRandom(list) {
     if (!Array.isArray(list)) throw new CustomError("TypeError", "getRandom erfordert ein Array.");
     const index = Math.floor(list.length * Math.random());
     return list[index];
-};
+}
 /**
  * @returns {string}
  * @example '08-2021'
  */
-exports.currentMonth = () => {
+export function currentMonth() {
     const date = new Date();
     const mon = date.getMonth() + 1;
     const m = mon > 9 ? `${mon}` : `0${mon}`;
     const y = date.getFullYear();
     return `${m}-${y}`;
-};
-const { Console } = require("console");
-const { Transform } = require("stream");
+}
 
 const ts = new Transform({ transform(chunk, enc, cb) { cb(null, chunk); } });
-const logger = new Console({ stdout: ts });
-
-exports.getTable = function getTable(data) {
-    logger.table(data);
+const con = new Console({ stdout: ts });
+/**
+ * @param  {any} data
+ */
+export function getTable(data) {
+    con.table(data);
     return (ts.read() || "").toString();
-};
+}
 /**
  * @param  {string} str
  */
-exports.time = function time(str) {
+export function time(str) {
     return str
         .replace("years", "Jahren").replace("year", "Jahr")
         .replace("months", "Monaten").replace("month", "Monat")
@@ -111,4 +113,4 @@ exports.time = function time(str) {
         .replace("is not following", "ist kein Follower von")
         .replace("does not follow", "ist kein Follower von")
         .replace("404 Page Not Found", "Keine Informationen");
-};
+}

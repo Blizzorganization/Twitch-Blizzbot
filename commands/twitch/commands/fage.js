@@ -1,9 +1,10 @@
-const { permissions } = require("twitch-blizzbot/constants");
-const { time } = require("twitch-blizzbot/functions");
+import fetch from "node-fetch";
+import { permissions } from "twitch-blizzbot/constants";
+import { time } from "twitch-blizzbot/functions";
 
-exports.help = true;
-exports.perm = permissions.user;
-exports.alias = ["folgezeit", "followage"];
+export const help = true;
+export const perm = permissions.user;
+export const alias = ["folgezeit", "followage"];
 /**
  * @name followage
  * @namespace TwitchCommands
@@ -14,12 +15,11 @@ exports.alias = ["folgezeit", "followage"];
  * @param {boolean} self
  * @param {string[]} args
  */
-exports.run = async (client, target, context, msg, self, args) => {
-    const fetch = (await import("node-fetch")).default;
+export async function run(client, target, context, msg, self, args) {
     let user = args[0].replace("@", "");
     if (!user || user == "") user = context["display-name"];
     const resp = await fetch(`https://2g.be/twitch/following.php?user=${user}&channel=${target.slice(1)}&format=mwdhms`);
     const followage = time(await resp.text());
 
     client.say(target, followage);
-};
+}

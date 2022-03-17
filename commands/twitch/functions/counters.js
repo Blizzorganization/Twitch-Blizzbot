@@ -1,15 +1,15 @@
-const { permissions } = require("twitch-blizzbot/constants");
+import { permissions } from "twitch-blizzbot/constants";
 
-exports.help = false;
-exports.perm = permissions.mod;
-exports.alias = ["counter"];
+export const help = false;
+export const perm = permissions.mod;
+export const alias = ["counter"];
 /**
  * @name counters
  * @namespace TwitchCommands
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  */
-exports.run = async (client, target) => {
+export async function run(client, target) {
     let appHelp = "";
     const counters = await client.clients.db.allCounters(target);
     if (counters && counters.length > 0) {
@@ -19,4 +19,4 @@ exports.run = async (client, target) => {
         appHelp = "Es sind keine Zähler hinterlegt.";
     }
     client.say(target, appHelp);
-};
+}

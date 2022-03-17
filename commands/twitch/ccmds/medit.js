@@ -1,7 +1,8 @@
-const { permissions } = require("twitch-blizzbot/constants");
+import { permissions } from "twitch-blizzbot/constants";
+import { logger } from "twitch-blizzbot/logger";
 
-exports.help = false;
-exports.perm = permissions.mod;
+export const help = false;
+export const perm = permissions.mod;
 /**
  * @name cedit
  * @namespace TwitchCommands
@@ -12,7 +13,7 @@ exports.perm = permissions.mod;
  * @param {boolean} self
  * @param {string[]} args
  */
-exports.run = async (client, target, context, msg, self, args) => {
+export async function run(client, target, context, msg, self, args) {
     const user = context["display-name"];
     if (!args || args.length == 0) return client.say(target, "Welchen Befehl möchtest du bearbeiten?");
 
@@ -23,5 +24,5 @@ exports.run = async (client, target, context, msg, self, args) => {
     const res = args.join(" ");
     await client.clients.db.editCcmd(target.replace(/#+/g, ""), newcmd, res);
     client.say(target, `${user} der Mod-Befehl ${newcmd} wurde bearbeitet.`);
-    client.clients.logger.log("command", `* Edited Customcommand ${newcmd}`);
-};
+    logger.log("command", `* Edited Customcommand ${newcmd}`);
+}

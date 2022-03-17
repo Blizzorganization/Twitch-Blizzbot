@@ -1,14 +1,18 @@
-const { Pool } = require("pg");
-const { permissions } = require("./constants");
-const { currentMonth } = require("./functions");
-const { readFileSync } = require("fs");
+import { readFileSync } from "fs";
+import pg from "pg";
+import { permissions } from "./constants.js";
+import { currentMonth } from "./functions.js";
+import { logger } from "./logger.js";
+
 /**
  * @typedef watchtimeuser
  * @property {string} viewer
  * @property {number} watchtime
  */
 
-class DB {
+const { Pool } = pg;
+
+export class DB {
     /**
      * @param {import("../typings/dbtypes").Config} config
      */
@@ -28,7 +32,7 @@ class DB {
         const client = await this.db.connect();
         try {
             const tables = (await client.query("SELECT * FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema';")).rows;
-            this.clients.logger.debug(`Existing databases: ${tables.map(t => t.tablename).join(", ")}`);
+            logger.debug(`Existing databases: ${tables.map(t => t.tablename).join(", ")}`);
             let todoTables = [
                 [
                     "streamer",
@@ -93,11 +97,11 @@ class DB {
                 todoTables = todoTables.filter((val) => tablenames.indexOf(val[0]) == -1);
             }
             for (const stmt of todoTables) {
-                this.clients.logger.debug(`creating table ${stmt[0]}`);
+                logger.debug(`creating table ${stmt[0]}`);
                 client.query(stmt[1]);
             }
         } catch (e) {
-            this.clients.logger.error(e);
+            logger.error(e);
             throw e;
         } finally {
             client.release();
@@ -130,7 +134,7 @@ class DB {
                 throw e;
             });
         } catch (e) {
-            this.clients.logger.error(e);
+            logger.error(e);
         } finally {
             client.release();
         }
@@ -144,7 +148,7 @@ class DB {
             this.statements.getChannel,
             [channel],
         ).catch((e) => {
-            this.clients.logger.error(e);
+            logger.error(e);
         });
         if (!data) return null;
         return data.rows.length == 0 ? null : data.rows[0];
@@ -162,7 +166,7 @@ class DB {
             this.statements.newAlias,
             [channel, name, command],
         ).catch((e) => {
-            this.clients.logger.error(e);
+            logger.error(e);
         });
     }
     /**
@@ -176,7 +180,7 @@ class DB {
             this.statements.resolveAlias,
             [name, channel],
         ).catch((e) => {
-            this.clients.logger.error(e);
+            logger.error(e);
         });
         if (!data) return null;
         /** @type {import("../typings/dbtypes").Alias} */
@@ -195,7 +199,7 @@ class DB {
             this.statements.delAlias,
             [channel, name],
         ).catch((e) => {
-            this.clients.logger.error(e);
+            logger.error(e);
         });
     }
     /**
@@ -209,7 +213,7 @@ class DB {
             this.statements.getAliases,
             [channel],
         ).catch((e) => {
-            this.clients.logger.error(e);
+            logger.error(e);
         });
         if (!data) return [];
         /** @type {import("../typings/dbtypes").Alias[]} */
@@ -233,7 +237,7 @@ class DB {
             this.statements.newCounter,
             [channel, name, defaultVal, inc],
         ).catch((e) => {
-            this.clients.logger.error(e);
+            logger.error(e);
         });
     }
     /**
@@ -248,7 +252,7 @@ class DB {
             this.statements.getCounter,
             [name, channel],
         ).catch((e) => {
-            this.clients.logger.error(e);
+            logger.error(e);
         });
         if (!data) return;
         if (data.rows.length == 0) return;
@@ -266,7 +270,7 @@ class DB {
             this.statements.incCounter,
             [name, channel],
         ).catch((e) => {
-            this.clients.logger.error(e);
+            logger.error(e);
         });
         if (!data) return;
         if (data.rowCount === 0) return;
@@ -284,7 +288,7 @@ class DB {
             this.statements.setCounter,
             [val, name, channel],
         ).catch((e) => {
-            this.clients.logger.error(e);
+            logger.error(e);
         });
     }
     /**
@@ -298,7 +302,7 @@ class DB {
             this.statements.editCounter,
             [inc, name, channel],
         ).catch((e) => {
-            this.clients.logger.error(e);
+            logger.error(e);
         });
     }
     /**
@@ -311,7 +315,7 @@ class DB {
             this.statements.delCounter,
             [channel, name],
         ).catch((e) => {
-            this.clients.logger.error(e.message);
+            logger.error(e.message);
         });
     }
     /**
@@ -324,7 +328,7 @@ class DB {
             this.statements.allCounters,
             [channel],
         ).catch((e) => {
-            this.clients.logger.error(e.message);
+            logger.error(e.message);
         });
         if (!data) return [];
         /** @type {import("../typings/dbtypes").Counter[]} */
@@ -347,7 +351,7 @@ class DB {
             this.statements.getAllCommands,
             [channel, permission],
         ).catch((e) => {
-            this.clients.logger.error(e);
+            logger.error(e);
         });
         if (!data) return;
         /** @type {import("../typings/dbtypes").CustomCommand[]} */
@@ -367,7 +371,7 @@ class DB {
             this.statements.getCommand,
             [commandname, channel],
         ).catch((e) => {
-            this.clients.logger.error(e);
+            logger.error(e);
         });
         if (!data) return undefined;
         // @ts-ignore
@@ -386,7 +390,7 @@ class DB {
             this.statements.newCommand,
             [commandname, response, channel, perms],
         ).catch((e) => {
-            this.clients.logger.error(e);
+            logger.error(e);
         });
     }
     /**
@@ -409,7 +413,7 @@ class DB {
                 return await client.query("COMMIT").catch((e) => { throw e; });
             })(cmdData);
         } catch (e) {
-            this.clients.logger.error(e);
+            logger.error(e);
         } finally {
             client.release();
         }
@@ -426,7 +430,7 @@ class DB {
             this.statements.updateCommand,
             [response, commandname, channel],
         ).catch((e) => {
-            this.clients.logger.error(e);
+            logger.error(e);
         });
     }
     /**
@@ -440,7 +444,7 @@ class DB {
             this.statements.deleteCommand,
             [commandname, channel],
         ).catch((e) => {
-            this.clients.logger.error(e);
+            logger.error(e);
         });
     }
     /**
@@ -471,7 +475,7 @@ class DB {
             });
             return "ok";
         } catch (e) {
-            this.clients.logger.error(e);
+            logger.error(e);
         } finally {
             client.release();
         }
@@ -486,15 +490,16 @@ class DB {
      */
     async watchtime(channel, chatters) {
         if (this.doingWatchtime) {
-            return this.clients.logger.error(
+            logger.error(
                 `watchtime already in progress at ${(new Date).toLocaleTimeString()}`,
             );
+            return;
         }
         this.doingWatchtime = true;
         const client = await this.db.connect();
         try {
             const started = new Date;
-            this.clients.logger.debug(`starting watchtime at ${started.toLocaleTimeString()}`);
+            logger.debug(`starting watchtime at ${started.toLocaleTimeString()}`);
             channel = channel.replace(/#+/, "");
             const month = currentMonth();
             (async (users) => {
@@ -503,38 +508,38 @@ class DB {
                     this.statements.watchtimeNew,
                     [channel, users, month],
                 ).catch((e) => {
-                    this.clients.logger.error(`insert month ${e?.toString()}`);
+                    logger.error(`insert month ${e?.toString()}`);
                     client.query("ROLLBACK");
                 });
                 await client.query(
                     this.statements.watchtimeNew,
                     [channel, users, "alltime"],
                 ).catch((e) => {
-                    this.clients.logger.error(`insert alltime ${e?.toString()}`);
+                    logger.error(`insert alltime ${e?.toString()}`);
                     client.query("ROLLBACK");
                 });
                 await client.query(
                     this.statements.watchtimeInc,
                     [users, channel, month],
                 ).catch((e) => {
-                    this.clients.logger.error(`inc month ${e?.toString()}`);
+                    logger.error(`inc month ${e?.toString()}`);
                     client.query("ROLLBACK");
                 });
                 await client.query(
                     this.statements.watchtimeInc,
                     [users, channel, "alltime"],
                 ).catch((e) => {
-                    this.clients.logger.error(`inc alltime ${e?.toString()}`);
+                    logger.error(`inc alltime ${e?.toString()}`);
                     client.query("ROLLBACK");
                 });
                 client.query("COMMIT").catch((e) => { throw e; });
             })(chatters);
             const endtime = new Date;
-            this.clients.logger.debug(
+            logger.debug(
                 `finished watchtime at ${endtime.toLocaleTimeString()}
                 Took ${endtime.getTime() - started.getTime()}ms.`);
         } catch (e) {
-            this.clients.logger.error(e?.toString());
+            logger.error(e?.toString());
         } finally {
             client.release();
             this.doingWatchtime = false;
@@ -552,7 +557,7 @@ class DB {
             this.statements.renameWatchtimeUser,
             [channel, newName, oldName],
         ).catch((e) => {
-            this.clients.logger.error(e);
+            logger.error(e);
         });
     }
     /** @typedef old_watchtime
@@ -591,7 +596,7 @@ class DB {
                 });
             })(chatters);
         } catch (e) {
-            this.clients.logger.error(e);
+            logger.error(e);
         } finally {
             client.release();
         }
@@ -613,7 +618,7 @@ class DB {
                 this.statements.watchtimeList,
                 [month, channel, max, (page - 1) * max],
             ).catch((e) => {
-                this.clients.logger.error(e);
+                logger.error(e);
             })
             // @ts-ignore
         )?.rows;
@@ -631,7 +636,7 @@ class DB {
             this.statements.getWatchtime,
             [user, channel, month],
         ).catch((e) => {
-            this.clients.logger.error(e);
+            logger.error(e);
         });
         // @ts-ignore
         return data.rows.length > 0 ? data.rows[0].watchtime : undefined;
@@ -647,7 +652,7 @@ class DB {
             this.statements.getDiscordConnection,
             [user.id],
         ).catch((e) => {
-            this.clients.logger.error(e);
+            logger.error(e);
         });
         // @ts-ignore
         return data?.rows?.length > 0 ? data.rows[0].twitchname : null;
@@ -662,7 +667,7 @@ class DB {
             this.statements.newDiscordConnection,
             [user.id, twitchname],
         ).catch((e) => {
-            this.clients.logger.error(e);
+            logger.error(e);
         });
     }
     /**
@@ -673,7 +678,7 @@ class DB {
             this.statements.deleteDiscordConnection,
             [user.id],
         ).catch((e) => {
-            this.clients.logger.error(e);
+            logger.error(e);
         });
     }
     // #region blacklist
@@ -701,7 +706,7 @@ class DB {
                 });
             })();
         } catch (e) {
-            this.clients.logger.error(e);
+            logger.error(e);
         } finally {
             client.release();
         }
@@ -710,7 +715,7 @@ class DB {
         const data = await this.db.query(
             this.statements.loadBlacklist,
         ).catch((e) => {
-            this.clients.logger.error(e);
+            logger.error(e);
         });
         if (!data) return;
         data.rows.forEach((b) => {
@@ -720,4 +725,3 @@ class DB {
     }
     // #endregion
 }
-exports.DB = DB;

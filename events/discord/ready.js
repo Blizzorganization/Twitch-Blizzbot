@@ -1,12 +1,13 @@
-const { TextChannel } = require("discord.js");
-const { CustomError } = require("../../modules/CustomError");
+import { TextChannel } from "discord.js";
+import { CustomError } from "twitch-blizzbot/CustomError";
+import { logger } from "twitch-blizzbot/logger";
 
 /**
  *
  * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  */
-exports.event = (client) => {
-    client.clients.logger.info("Discord connected.");
+export function event(client) {
+    logger.info("Discord connected.");
     const blchannel = client.channels.resolve(client.config.channels.blacklist);
     if (!blchannel) throw new CustomError("UnknownChannelError", "Discord Blacklist Channel ID could not be resolved.");
     if (blchannel instanceof TextChannel) {
@@ -24,4 +25,4 @@ exports.event = (client) => {
     } else {throw new CustomError("ChanneltypeError", "The Command Channel ID supplied in the config.json file does not belong to a text channel.");}
     client.started = true;
     client.clients.db.newDiscordConnection(client.user, client.clients.twitch.config.identity.username);
-};
+}

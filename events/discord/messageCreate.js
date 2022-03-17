@@ -3,7 +3,7 @@
  * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
  */
-exports.event = (client, message) => {
+export function event(client, message) {
     if (message.author.id == client.user.id) return;
     if (message.author.bot) return;
     let args = message.content.split(" ");
@@ -38,4 +38,4 @@ exports.event = (client, message) => {
         default:
             break;
     }
-};
+}

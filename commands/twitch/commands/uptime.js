@@ -1,16 +1,16 @@
-const { permissions } = require("twitch-blizzbot/constants");
-const { time } = require("twitch-blizzbot/functions");
+import fetch from "node-fetch";
+import { permissions } from "twitch-blizzbot/constants";
+import { time } from "twitch-blizzbot/functions";
 
-exports.help = true;
-exports.perm = permissions.user;
+export const help = true;
+export const perm = permissions.user;
 /**
  * @name uptime
  * @namespace TwitchCommands
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  */
-exports.run = async (client, target) => {
-    const fetch = (await import("node-fetch")).default;
+export async function run(client, target) {
     const uptimerequest = await fetch(`https://decapi.me/twitch/uptime/${target.slice(1)}`, {});
     const uptime = time(await uptimerequest.text());
 
@@ -19,4 +19,4 @@ exports.run = async (client, target) => {
     } else {
         client.say(target, `${target.slice(1)} ist seit ${uptime} live. blizzorLogo`);
     }
-};
+}

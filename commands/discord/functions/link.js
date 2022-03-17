@@ -1,4 +1,4 @@
-exports.adminOnly = false;
+export const adminOnly = false;
 /**
  * @name link
  * @namespace DiscordCommands
@@ -6,7 +6,7 @@ exports.adminOnly = false;
  * @param {import("discord.js").Message} message
  * @param {string[]} args
  */
-exports.run = async (client, message, args) => {
+export async function run(client, message, args) {
     if (!args || !args[0]) {
         const msg = await message.channel.send("Du musst deinen Twitch Nutzernamen angeben.");
         const coll = msg.channel.createMessageCollector(({ filter: m => m.author.id === message.author.id }));
@@ -18,7 +18,7 @@ exports.run = async (client, message, args) => {
     } else {
         handle(client, message, args);
     }
-};
+}
 /**
  * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message

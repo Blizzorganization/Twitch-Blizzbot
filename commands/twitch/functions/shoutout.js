@@ -1,8 +1,8 @@
-const { permissions } = require("twitch-blizzbot/constants");
+import { permissions } from "twitch-blizzbot/constants";
 
-exports.help = false;
-exports.perm = permissions.mod;
-exports.alias = ["so"];
+export const help = false;
+export const perm = permissions.mod;
+export const alias = ["so"];
 /**
  * @name Shoutout
  * @namespace TwitchCommands
@@ -13,7 +13,7 @@ exports.alias = ["so"];
  * @param {boolean} self
  * @param {string[]} args
  */
-exports.run = async (client, target, context, msg, self, args) => {
+export async function run(client, target, context, msg, self, args) {
     if (!args || args.length == 0) {
         client.say(target, "Du musst einen Namen angeben.");
         return;
@@ -21,4 +21,4 @@ exports.run = async (client, target, context, msg, self, args) => {
     const user = args[0];
 
     client.say(target, `Kleines Shoutout an ${user} schaut doch auch mal bei https://www.twitch.tv/${user.toLowerCase()} vorbei`);
-};
+}

@@ -1,18 +1,22 @@
-global.util = require("util");
-global.fs = require("fs");
+import fs from "fs";
+import { logger } from "twitch-blizzbot/logger";
+import Util from "util";
+
+global.util = Util;
+global.fs = fs;
 /**
  * @param {import("twitch-blizzbot/clients").Clients} clients
  * @param {string[]} args
  */
-exports.run = (clients, args) => {
+export function run(clients, args) {
     const evaled = eval(args.join(" "));
-    clients.logger.info(global.util.inspect(evaled));
-};
+    logger.info(global.util.inspect(evaled));
+}
 /**
  * @param  {import("twitch-blizzbot/clients").Clients} clients
  * @param  {string} line
  */
-exports.completer = (clients, line) => {
+export function completer(clients, line) {
     const completions = Object.keys(global).filter(i => !i.startsWith("_"));
     const args = line.split(" ");
     // eslint-disable-next-line no-sparse-arrays
@@ -24,4 +28,4 @@ exports.completer = (clients, line) => {
         hits[key] = `${cmd} ${val}`;
     });
     return [hits, line];
-};
+}

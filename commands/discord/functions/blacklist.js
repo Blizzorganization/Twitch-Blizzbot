@@ -1,13 +1,13 @@
-const { MessageActionRow, MessageButton } = require("discord.js");
-const { getTable } = require("twitch-blizzbot/functions");
+import { MessageActionRow, MessageButton } from "discord.js";
+import { getTable } from "twitch-blizzbot/functions";
 
-exports.adminOnly = true;
+export const adminOnly = true;
 /**
  * @name blacklist
  * @namespace DiscordCommands
  * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  */
-exports.run = (client) => {
+export function run(client) {
     client.blchannel.send({
         content: `\`\`\`fix\n${getTable(client.clients.twitch.blacklist[client.config.watchtimechannel]).slice(0, 1990)}\`\`\``,
         components: [
@@ -20,4 +20,4 @@ exports.run = (client) => {
                 ),
         ],
     });
-};
+}

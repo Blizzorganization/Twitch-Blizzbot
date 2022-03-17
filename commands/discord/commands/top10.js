@@ -1,7 +1,7 @@
-const { MessageEmbed } = require("discord.js");
-const { calcWatchtime } = require("twitch-blizzbot/functions");
+import { MessageEmbed } from "discord.js";
+import { calcWatchtime } from "twitch-blizzbot/functions";
 
-exports.adminOnly = false;
+export const adminOnly = false;
 /**
  * @name watchtimelb
  * @namespace DiscordCommands
@@ -9,7 +9,7 @@ exports.adminOnly = false;
  * @param {import("discord.js").Message} message
  * @param {string[]} args
  */
-exports.run = async (client, message, args) => {
+export async function run(client, message, args) {
     const channel = client.config.watchtimechannel;
     let page = 1;
     if (args && args.length > 0) {
@@ -54,4 +54,4 @@ exports.run = async (client, message, args) => {
     coll.on("end", () => {
         outmsg.edit({ content: "Die Zeit ist abgelaufen, wenn du erneut abfragen möchtest, so frage erneut an.", embeds: outmsg.embeds });
     });
-};
+}

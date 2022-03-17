@@ -1,10 +1,11 @@
-const { MessageActionRow, MessageButton } = require("discord.js");
-const { permissions } = require("twitch-blizzbot/constants");
-const { getTable } = require("twitch-blizzbot/functions");
+import { MessageActionRow, MessageButton } from "discord.js";
+import { permissions } from "twitch-blizzbot/constants";
+import { getTable } from "twitch-blizzbot/functions";
+import { logger } from "twitch-blizzbot/logger";
 
-exports.help = false;
-exports.perm = permissions.mod;
-exports.silent = true;
+export const help = false;
+export const perm = permissions.mod;
+export const silent = true;
 /**
  * @name blacklist
  * @namespace TwitchCommands
@@ -12,7 +13,7 @@ exports.silent = true;
  * @param {string} target
  * @param {import("tmi.js").ChatUserstate} context
  */
-exports.run = async (client, target, context) => {
+export async function run(client, target, context) {
     const user = context["display-name"];
     client.clients.discord.blchannel.send({
         content: `In der Blacklist für ${target} sind die Wörter \
@@ -28,5 +29,5 @@ exports.run = async (client, target, context) => {
         ],
     });
     client.say(target, `${user} Blacklist wurde gesendet`);
-    client.clients.logger.info(`* Sent the blacklist of ${target} to ${context.username}`);
-};
+    logger.info(`* Sent the blacklist of ${target} to ${context.username}`);
+}
