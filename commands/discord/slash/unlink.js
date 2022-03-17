@@ -8,7 +8,7 @@ module.exports = {
      * @param  {import("discord.js").CommandInteraction} interaction
      */
     execute: async (interaction) => {
-        /** @type {import("../../../modules/discordclient").DiscordClient}*/
+        /** @type {import("twitch-blizzbot/discordclient").DiscordClient}*/
         // @ts-ignore
         const client = interaction.client;
         const previous = await client.clients.db.getDiscordConnection(interaction.user);

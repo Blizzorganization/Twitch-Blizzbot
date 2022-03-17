@@ -5,7 +5,7 @@ const { MessageEmbed } = require("discord.js");
 exports.alias = ["hilfe"];
 exports.adminOnly = false;
 /**
- * @param  {import("../../../modules/discordclient").DiscordClient} client
+ * @param  {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param  {import("discord.js").Message} message
  */
 exports.run = (client, message) => {

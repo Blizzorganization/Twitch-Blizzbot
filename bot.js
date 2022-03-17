@@ -34,7 +34,7 @@ const { createConfig } = require("./setup");
         const twReady = new Promise((resolve) => twitchClient.once("connected", () => resolve()));
         Promise.all([dcReady, twReady]).then(() => {
             setTimeout(() => {
-                clients.logger.log("debug", "changing channel topics");
+                clients.logger.info("changing channel topics");
                 discordClient.channelTopic();
             }, 300000);
         });

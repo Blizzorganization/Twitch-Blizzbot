@@ -1,10 +1,10 @@
 const sqlite = require("better-sqlite3");
 const { readdirSync, existsSync } = require("fs");
-const enmap = require("enmap");
+const Enmap = require("enmap").default;
 /**
  * @name eval
  * @namespace ConsoleCommands
- * @param {import("../../modules/clients").Clients} clients
+ * @param {import("twitch-blizzbot/clients").Clients} clients
  * @param {string[]} args
  */
 exports.run = async (clients, args) => {
@@ -14,13 +14,12 @@ exports.run = async (clients, args) => {
     if (args[0] === "blacklist") {
         const channel = args[1].toLowerCase();
         if (!(await clients.db.getChannel(channel))) return clients.logger.error("Diesen Kanal kenne ich nicht.");
-        /** @type {enmap.default}*/
-        // @ts-ignore
-        const em = new enmap({ name: "blacklist" });
+        /** @type {import("enmap").default}*/
+        const em = new Enmap({ name: "blacklist" });
         const bldata = em.get("delmsg");
         clients.twitch.blacklist[channel] = bldata;
         await clients.db.saveBlacklist();
-        clients.logger.log("info", "Blacklist Migration erfolgreich.");
+        clients.logger.info("Blacklist Migration erfolgreich.");
         return;
     }
     const dbname = args[1];
@@ -34,9 +33,9 @@ exports.run = async (clients, args) => {
                 {
                     const month = args[3]?.toLowerCase();
                     if (!/((\d){2}-(\d){4}|(alltime))/.test(month)) return clients.logger.error("Dies ist kein valider Monat.");
-                    const watchtimeData = db.prepare("SELECT * FROM " + channel + ";").all();
+                    const watchtimeData = db.prepare(`SELECT * FROM ${channel};`).all();
                     await clients.db.migrateWatchtime(channel, watchtimeData, month);
-                    clients.logger.log("info", "Watchtime Migration erfolgreich.");
+                    clients.logger.info("Watchtime Migration erfolgreich.");
                 }
                 break;
             case "customcommands":
@@ -44,9 +43,9 @@ exports.run = async (clients, args) => {
                     const cmdtype = args[3]?.toLowerCase();
                     if (cmdtype !== "mod" && cmdtype !== "user") return clients.logger.error("Du musst angeben ob du die USER oder MOD commands migrieren möchtest.");
                     const tblname = cmdtype === "mod" ? "coms" : "ccmds";
-                    const commandData = db.prepare("SELECT * FROM " + tblname + ";").all();
+                    const commandData = db.prepare(`SELECT * FROM ${tblname};`).all();
                     await clients.db.migrateCustomcommands(commandData, channel, cmdtype);
-                    clients.logger.log("info", "Customcommand Migration erfolgreich.");
+                    clients.logger.info("Customcommand Migration erfolgreich.");
                 }
                 break;
             default:
@@ -56,7 +55,7 @@ exports.run = async (clients, args) => {
     } finally { db.close(); }
 };
 /**
- * @param  {import("../../modules/clients").Clients} clients
+ * @param  {import("twitch-blizzbot/clients").Clients} clients
  * @param  {string} line
  */
 exports.completer = (clients, line) => {
@@ -84,7 +83,7 @@ exports.completer = (clients, line) => {
             }
             break;
         default:
-            clients.logger.log("received unhandled number of arguments: ", args.length);
+            clients.logger.warn(`received unhandled number of arguments: ${args.length}`);
             args.shift();
             hits = [args.join(" ")];
     }

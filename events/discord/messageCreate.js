@@ -1,6 +1,6 @@
 /**
  *
- * @param {import("../../modules/discordclient").DiscordClient} client
+ * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
  */
 exports.event = (client, message) => {
@@ -17,7 +17,7 @@ exports.event = (client, message) => {
                 } else {
                     channel = args.shift().toLowerCase();
                 }
-                if (!channel.startsWith("#")) return message.channel.send("Es wurde nicht angegeben, wo die Nachricht gesendet werden soll.");
+                if (!channel.startsWith("#")) return message.channel.send({ content: "Es wurde nicht angegeben, wo die Nachricht gesendet werden soll." });
                 client.clients.twitch.say(channel, args.join(" "));
             }
             break;

@@ -1,9 +1,9 @@
-const { getTable } = require("../../modules/functions");
+const { getTable } = require("twitch-blizzbot/functions");
 
 global.util = require("util");
 global.fs = require("fs");
 /**
- * @param {import("../../modules/clients").Clients} clients
+ * @param {import("twitch-blizzbot/clients").Clients} clients
  */
 exports.run = async (clients) => {
     const query_size = `SELECT
@@ -22,12 +22,12 @@ exports.run = async (clients) => {
     SELECT 'counters', count(*) from counters union
     SELECT 'userlink', count(*) from userlink union
     SELECT 'blacklist', count(*) from blacklist;`;
-    const size = (await clients.db.query(query_size)).rows[0];
+    const size = (await clients.db.db.query(query_size)).rows[0];
     const lines = [];
-    const lines_data = (await clients.db.query(query_lines)).rows;
+    const lines_data = (await clients.db.db.query(query_lines)).rows;
     lines_data.forEach(line => { lines[line["?column?"]] = line.count; });
     lines["total"] = `${lines_data.reduce((a, b) => parseInt(a) + parseInt(b.count), 0)}`;
-    clients.logger.log("info", "\n" + getTable({ size, lines }));
+    clients.logger.info(`\n${getTable({ size, lines })}`);
 };
 /**
  * @param  {import("../../modules/clients").Clients} clients

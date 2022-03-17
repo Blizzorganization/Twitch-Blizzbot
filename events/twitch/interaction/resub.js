@@ -1,6 +1,6 @@
 /**
  * @listens resub
- * @param {import("../../../modules/twitchclient").TwitchClient} client
+ * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} channel
  * @param {string} username
  * @param {number} months
@@ -15,6 +15,6 @@ exports.event = (client, channel, username, months, message, userstate) => {
     const ave = tierlist[tiers];
 
     // message for Action
-    client.clients.logger.log("info", `${username} resub ${cumulativeMonths}. month`);
-    client.say(channel, `/me Danke ${username} für deinen ${ave} Sub im insgesamt ${cumulativeMonths}. Monat${resubmessage ? " Mit der Nachricht: " + message : ""}.`);
+    client.clients.logger.info(`${username} resub ${cumulativeMonths}. month`);
+    client.say(channel, `/me Danke ${username} für deinen ${ave} Sub im insgesamt ${cumulativeMonths}. Monat${resubmessage ? ` Mit der Nachricht: ${message}` : ""} .`);
 };

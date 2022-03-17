@@ -1,17 +1,18 @@
-const { permissions } = require("../../../modules/constants");
-const { calcWatchtime } = require("../../../modules/functions");
-const { currentMonth } = require("../../../modules/functions");
+const { permissions } = require("twitch-blizzbot/constants");
+const { calcWatchtime } = require("twitch-blizzbot/functions");
+const { currentMonth } = require("twitch-blizzbot/functions");
 
 exports.help = false;
 exports.perm = permissions.mod;
 /**
  * @name mtime
  * @namespace TwitchCommands
- * @param {import("../../../modules/twitchclient").TwitchClient} client
+ * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  * @param {import("tmi.js").ChatUserstate} context
  * @param {string} msg
  * @param {boolean} self
+ * @param {string[]} args
  */
 exports.run = async (client, target, context, msg, self, args) => {
     if (!args || args.length == 0) {

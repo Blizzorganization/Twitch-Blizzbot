@@ -1,4 +1,4 @@
-const { calcWatchtime } = require("../../../modules/functions");
+const { calcWatchtime } = require("twitch-blizzbot/functions");
 const { MessageEmbed } = require("discord.js");
 
 exports.alias = ["wt"];
@@ -6,7 +6,7 @@ exports.adminOnly = false;
 /**
  * @name uwtime
  * @namespace DiscordCommands
- * @param {import("../../../modules/discordclient").DiscordClient} client
+ * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
  * @param {string[]} args
  */
@@ -37,7 +37,7 @@ exports.run = async (client, message, args) => {
         .setTitle("**__Watchtime__**")
         .addField("Nutzername", user)
         .addField("Watchtime", `${calcWatchtime(watchtime)}`)
-        .addField("Von der registierten Zeit", `${Math.round(1000 * watchtime / maxWatchtime) / 10}%`);
+        .addField("Von der registrierten Zeit", `${Math.round(1000 * watchtime / maxWatchtime) / 10}%`);
 
     message.channel.send({ embeds: [embed] });
 };

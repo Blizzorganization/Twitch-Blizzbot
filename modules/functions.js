@@ -12,7 +12,7 @@ const Logger = require("./logger");
  * @throws {LoadError} missing command directory
  */
 exports.loadCommands = (commandmap, commanddir, helplist = []) => {
-    const readcommanddir = "./" + commanddir;
+    const readcommanddir = `./${commanddir}`;
     if (existsSync(readcommanddir)) {
         readdir(`./${readcommanddir}/`, (err, files) => {
             if (err) return Logger.error(err);
@@ -39,7 +39,7 @@ exports.loadCommands = (commandmap, commanddir, helplist = []) => {
  * @throws {LoadError} missing command directory
  */
 exports.loadEvents = (eventdir, eventemitter) => {
-    const readeventdir = "./" + eventdir;
+    const readeventdir = `./${eventdir}`;
     if (existsSync(readeventdir)) {
         readdir(`./${readeventdir}/`, (err, files) => {
             if (err) return Logger.error("Error reading discord events directory:", err);
@@ -95,6 +95,9 @@ exports.getTable = function getTable(data) {
     logger.table(data);
     return (ts.read() || "").toString();
 };
+/**
+ * @param  {string} str
+ */
 exports.time = function time(str) {
     return str
         .replace("years", "Jahren").replace("year", "Jahr")

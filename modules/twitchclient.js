@@ -44,7 +44,7 @@ exports.TwitchClient = class TwitchClient extends Client {
         this.automessage = undefined;
         /** @type {import("./clients").Clients}*/
         this.clients = undefined;
-        /** @type {{[key: string]: string[]}}*/
+        /** @type {{[key: string]: {[key: string]: string[]}}}*/
         // @ts-ignore
         this.blacklist = [];
         if (!existsSync("./channellogs")) mkdirSync("./channellogs");
@@ -69,11 +69,9 @@ exports.TwitchClient = class TwitchClient extends Client {
      */
     newChannellogs(channels = this.channels) {
         const date = new Date();
-        let month = "" + (date.getMonth() + 1);
-        let day = "" + date.getDate();
+        const month = `${date.getMonth() + 1}`.padStart(2, "0");
+        const day = `${date.getDate()}`.padStart(2, "0");
         const year = date.getFullYear();
-        if (month.length < 2) { month = "0" + month; }
-        if (day.length < 2) { day = "0" + day; }
         const dateString = [year, month, day].join("-");
         for (let channel of channels) {
             channel = channel.replace("#", "");
@@ -86,12 +84,12 @@ exports.TwitchClient = class TwitchClient extends Client {
      */
     async stop() {
         clearInterval(this.watchtime);
-        this.clients.logger.log("info", "stopped watchtime collector");
+        this.clients.logger.info("stopped watchtime collector");
         if (this.config.automessagedelay !== 0) {
             clearInterval(this.automessage);
-            this.clients.logger.log("info", "stopped automessaging");
+            this.clients.logger.info("stopped automessaging");
         }
         await this.disconnect();
-        this.clients.logger.log("info", "disconnected from twitch");
+        this.clients.logger.info("disconnected from twitch");
     }
 };

@@ -1,16 +1,16 @@
-const { permissions } = require("../../../modules/constants");
-const fetch = require("node-fetch").default;
-const { time } = require("../../../modules/functions");
+const { permissions } = require("twitch-blizzbot/constants");
+const { time } = require("twitch-blizzbot/functions");
 
 exports.help = true;
 exports.perm = permissions.user;
 /**
  * @name uptime
  * @namespace TwitchCommands
- * @param {import("../../../modules/twitchclient").TwitchClient} client
+ * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  */
 exports.run = async (client, target) => {
+    const fetch = (await import("node-fetch")).default;
     const uptimerequest = await fetch(`https://decapi.me/twitch/uptime/${target.slice(1)}`, {});
     const uptime = time(await uptimerequest.text());
 

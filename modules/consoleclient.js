@@ -10,14 +10,13 @@ const { createInterface } = require("readline");
  * @property {Collection} commands
  */
 exports.ConsoleClient = class ConsoleClient extends EventEmitter {
-    #processStats;
     constructor() {
         super();
         /** @type {import("./clients").Clients} */
         this.clients = undefined;
         this.stopping = false;
         this.commands = new Collection;
-        this.#processStats = undefined;
+        this.processStats = undefined;
         loadCommands(this.commands, "commands/console");
         const commands = this.commands;
         const cc = this;
@@ -40,7 +39,7 @@ exports.ConsoleClient = class ConsoleClient extends EventEmitter {
 
         try {
             const pidu = require("pidusage");
-            this.#processStats = setInterval(() => pidu(process.pid, (err, data) => require("./logger").log("verbose", `cpu: ${Math.round(data.cpu * 100) / 100}%; memory: ${Math.round(data.memory / 1024 / 1024 * 100) / 100}MB`)), 10000);
+            this.processStats = setInterval(() => pidu(process.pid, (err, data) => require("./logger").log("verbose", `cpu: ${Math.round(data.cpu * 100) / 100}%; memory: ${Math.round(data.memory / 1024 / 1024 * 100) / 100}MB`)), 10000);
             pidu(process.pid, (err, data) => require("./logger").log("verbose", `cpu: ${Math.round(data.cpu * 100) / 100}%; memory: ${Math.round(data.memory / 1024 / 1024 * 100) / 100}MB`));
         } catch (e) {
             require("./logger").log("silly", "Process metrics are not collected.");
@@ -66,7 +65,7 @@ exports.ConsoleClient = class ConsoleClient extends EventEmitter {
         if (cmd) {
             cmd.run(this.clients, args);
         } else {
-            this.clients.logger.log("warn", "Diese Funktion kenne ich nicht.");
+            this.clients.logger.warn("Diese Funktion kenne ich nicht.");
         }
     }
     /**
@@ -74,7 +73,7 @@ exports.ConsoleClient = class ConsoleClient extends EventEmitter {
      */
     async stop() {
         this.stopping = true;
-        if (this.#processStats) clearInterval(this.#processStats);
+        if (this.processStats) clearInterval(this.processStats);
         return this.rl.close();
     }
 };

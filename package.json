@@ -1,9 +1,16 @@
 {
   "name": "twitch-blizzbot",
-  "version": "8.0.9",
+  "version": "8.1.0",
   "homepage": "https://github.com/blizzor/Twitch-Blizzbot#readme",
   "bugs": {
     "url": "https://github.com/blizzor/Twitch-Blizzbot/issues"
+  },
+  "exports": {
+    ".": "./bot.js",
+    "./functions": "./modules/functions.js",
+    "./discordclient": "./modules/discordclient.js",
+    "./twitchclient": "./modules/twitchclient.js",
+    "./constants": "./modules/constants.js"
   },
   "license": "MIT",
   "repository": {
@@ -11,41 +18,38 @@
     "url": "https://github.com/blizzor/Twitch-blizzbot.git"
   },
   "dependencies": {
-    "@discordjs/builders": "^0.5.0",
-    "@discordjs/rest": "^0.1.0-canary.0",
-    "better-sqlite3": "^7.4.3",
-    "discord-api-types": "^0.24.0",
+    "@discordjs/builders": "^0.12.0",
+    "@discordjs/rest": "^0.3.0",
+    "better-sqlite3": "^7.5.0",
     "discord.js": "^13.6.0",
-    "enmap": "^5.8.4",
+    "enmap": "^5.8.8",
     "lodash": "^4.17.21",
-    "node-fetch": "^2.6.6",
-    "node-schedule": "^2.0.0",
-    "pg": "^8.7.1",
-    "request": "^2.65.0",
-    "snowflake": "^0.1.2",
+    "node-fetch": "^3.2.3",
+    "node-schedule": "^2.1.0",
+    "pg": "^8.7.3",
+    "request": "^2.88.2",
     "tmi.js": "^1.8.5",
-    "winston": "^3.3.3",
-    "winston-daily-rotate-file": "^4.5.5"
+    "winston": "^3.6.0",
+    "winston-daily-rotate-file": "^4.6.1"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.15.7",
-    "@types/lodash": "^4.14.175",
-    "@types/pg": "^8.6.1",
-    "@types/tmi.js": "^1.8.0",
-    "clean-jsdoc-theme": "^3.2.8",
-    "eslint": "^7.32.0",
-    "eslint-config-standard": "^16.0.3",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.1.0"
+    "@types/lodash": "^4.14.180",
+    "@types/node-schedule": "^1.3.2",
+    "@types/pg": "^8.6.5",
+    "@types/pidusage": "^2.0.2",
+    "@types/tmi.js": "^1.8.1",
+    "eslint": "^8.11.0",
+    "js2xmlparser": "^4.0.2"
   },
   "optionalDependencies": {
-    "pidusage": "^2.0.21"
+    "pidusage": "^3.0.0"
   },
   "main": "bot.js",
   "scripts": {
     "start": "node bot",
     "init": "node setup",
-    "config": "node setup"
+    "config": "node setup",
+    "lint": "eslint ."
   },
   "files": [
     "./bot.js",
@@ -53,5 +57,5 @@
     "events/**/*.js",
     "commands/**/*.js"
   ],
-  "babel": {}
+  "type": "commonjs"
 }

@@ -3,10 +3,10 @@ const { CustomError } = require("../../modules/CustomError");
 
 /**
  *
- * @param {import("../../modules/discordclient").DiscordClient} client
+ * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  */
 exports.event = (client) => {
-    client.clients.logger.log("info", "Discord connected.");
+    client.clients.logger.info("Discord connected.");
     const blchannel = client.channels.resolve(client.config.channels.blacklist);
     if (!blchannel) throw new CustomError("UnknownChannelError", "Discord Blacklist Channel ID could not be resolved.");
     if (blchannel instanceof TextChannel) {

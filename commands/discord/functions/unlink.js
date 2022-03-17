@@ -2,7 +2,7 @@ exports.adminOnly = false;
 /**
  * @name unlink
  * @namespace DiscordCommands
- * @param {import("../../../modules/discordclient").DiscordClient} client
+ * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
  */
 exports.run = async (client, message) => {
@@ -12,7 +12,7 @@ exports.run = async (client, message) => {
     message.channel.send(`Deine Twitch Verknüpfung zu **${name}** wurde soeben gelöscht.`);
 };
 /**
- * @param {import("../../../modules/discordclient").DiscordClient} client
+ * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
  * @param {string[]} args
  */

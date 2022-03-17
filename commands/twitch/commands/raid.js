@@ -1,4 +1,4 @@
-import { permissions } from "twitch-blizzbot/constants";
+const { permissions } = require("../../../modules/constants");
 
 export const help = false;
 export const perm = permissions.vip;
@@ -8,6 +8,7 @@ export const alias = [];
  * @author Speed-r
  * @name Raidminutes
  * @namespace TwitchCommands
+ * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  */

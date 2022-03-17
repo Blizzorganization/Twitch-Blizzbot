@@ -1,12 +1,12 @@
 const { WriteStream } = require("fs");
-const { permissions } = require("../../modules/constants");
+const { permissions } = require("twitch-blizzbot/constants");
 // eslint-disable-next-line no-control-regex
 const linkTest = new RegExp("(^|[ \t\r\n])((sftp|ftp|http|https):(([A-Za-z0-9$_.+!*(),;/?:@&~=-])|%[A-Fa-f0-9]{2}){2,}(#([a-zA-Z0-9][a-zA-Z0-9$_.+!*(),;/?:@&~=%-]*))?([A-Za-z0-9$_+!*();/?:~-]))", "g");
 const counterTest = new RegExp(/\{(.*?)\}/g);
 
 /**
  *
- * @param {import("../../modules/twitchclient").TwitchClient} client
+ * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  * @param {import("tmi.js").ChatUserstate} context
  * @param {string} msg
@@ -18,7 +18,7 @@ exports.event = async (client, target, context, msg, self) => {
             {
                 const channellog = client.channellogs[target.replace("#", "")];
                 if (!channellog || !(channellog instanceof WriteStream)) {
-                    client.clients.logger.error("channellogs for channel " + target.slice(1) + " is not available!");
+                    client.clients.logger.error(`channellogs for channel ${target.slice(1)} is not available!`);
                 } else {
                     channellog.write(`[${(new Date()).toLocaleTimeString()}]${context["display-name"]}: ${msg}\n`);
                 }
@@ -70,7 +70,7 @@ exports.event = async (client, target, context, msg, self) => {
 /**
  * @async counters
  * @description resolves counters in customcommands
- * @param  {import("../../modules/twitchclient").TwitchClient} client
+ * @param  {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param  {string} response
  * @param  {string} target
  * @returns {Promise<string>}
@@ -88,7 +88,7 @@ async function counters(client, response, target) {
     return response;
 }
 /**
- * @param {import("../../modules/twitchclient").TwitchClient} client
+ * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} msg
  * @param {import("tmi.js").ChatUserstate} ctx
  * @param {string} target
@@ -97,7 +97,7 @@ async function counters(client, response, target) {
 function checkModAction(client, msg, ctx, target, args) {
     if (hasPerm(client, ctx)) return;
     const message = msg.toLowerCase();
-    const delbl = client.blacklist[target.replace(/#+/g, "")];
+    const delbl = client.blacklist[target.replace(/#+/g, "")].delete;
     const checkmsg = ` ${message} `;
     if (delbl.some((a) => checkmsg.includes(` ${a} `))) return client.deletemessage(target, ctx.id);
     if (checkmsg.includes(" www.") || client.deletelinks.some((tld) => checkmsg.includes(tld))) {
@@ -113,13 +113,16 @@ function checkModAction(client, msg, ctx, target, args) {
     if (urls.some((url) => !permittedlink(client, url))) return client.deletemessage(target, ctx.id);
 }
 /**
- * @param {import("../../modules/twitchclient").TwitchClient} client
+ * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {import("tmi.js").ChatUserstate} ctx
  * @returns {number}
  */
 function hasPerm(client, ctx) {
     if (client.config.devs.includes(ctx.username)) return permissions.dev;
-    if (ctx.badges) if (ctx.badges["broadcaster"]) return permissions.streamer;
+    if (ctx.badges) {
+        if (ctx.badges["broadcaster"]) return permissions.streamer;
+        if (ctx.badges["vip"]) return permissions.vip;
+    }
     if (ctx.mod) return permissions.mod;
     if (ctx.subscriber) return permissions.sub;
     return permissions.user;

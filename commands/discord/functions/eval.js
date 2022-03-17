@@ -2,7 +2,7 @@ exports.adminOnly = true;
 /**
  * @name eval
  * @namespace DiscordCommands
- * @param {import("../../../modules/discordclient").DiscordClient} client
+ * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
  * @param {string[]} args
  */

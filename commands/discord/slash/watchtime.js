@@ -1,5 +1,5 @@
 const { MessageEmbed } = require("discord.js");
-const { calcWatchtime } = require("../../../modules/functions");
+const { calcWatchtime } = require("twitch-blizzbot/functions");
 
 module.exports = {
     data: {
@@ -19,8 +19,12 @@ module.exports = {
             required: false,
         }],
     },
+    /**
+     * @param  {import("discord.js").CommandInteraction} interaction
+     */
     execute: async (interaction) => {
-        /** @type {import("../../../modules/discordclient").DiscordClient}*/
+        /** @type {import("twitch-blizzbot/discordclient").DiscordClient}*/
+        // @ts-expect-error
         const client = interaction.client;
         const channel = client.config.watchtimechannel;
         const dcuser = interaction.options.getUser("user") || interaction.user;
@@ -36,7 +40,7 @@ module.exports = {
             .setTitle("**__Watchtime__**")
             .addField("Nutzername", twuser)
             .addField("Watchtime", `${calcWatchtime(watchtime)}`)
-            .addField("Von der registierten Zeit", `${Math.round(1000 * watchtime / maxWatchtime) / 10}%`);
+            .addField("Von der registrierten Zeit", `${Math.round(1000 * watchtime / maxWatchtime) / 10}%`);
         await interaction.reply({ embeds: [embed] });
     },
 };

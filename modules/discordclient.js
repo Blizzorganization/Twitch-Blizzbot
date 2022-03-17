@@ -5,36 +5,27 @@ const { loadCommands, loadEvents } = require("./functions");
  * @property {string} token
  * @property {string} prefix
  * @property {string} watchtimechannel
- * @property {string[]} evalusers
+ * @property {string[]} evalUsers
  * @property {Object} channels
  * @property {string} channels.blacklist
  * @property {string} channels.commands
  * @property {string} channels.relay
  * @property {string} channels.adminCommands
  */
+
+/**
+ * Discord Client
+ * @class DiscordClient
+ * @extends Client
+ * @property {config} config
+ * @property {Collection} commands
+ * @property {string[]} helplist
+ * @property {import("./clients").Clients} clients
+ * @property {boolean} started
+ * @property {import("discord.js").TextChannel} blchannel
+ * @property {import("discord.js").TextChannel} statuschannel channel for sending status logs
+ */
 exports.DiscordClient = class DiscordClient extends Client {
-    config;
-    commands = new Collection;
-    slashcommands = new Collection;
-    helplist = [];
-    /** @type {import("./clients").Clients} */
-    clients;
-    started = false;
-    blchannel;
-    commandchannel;
-    relaychannel;
-    /**
-     * Discord Client
-     * @class DiscordClient
-     * @extends Client
-     * @property {config} config
-     * @property {Collection} commands
-     * @property {string[]} helplist
-     * @property {import("./clients").Clients} clients
-     * @property {boolean} started
-     * @property {import("discord.js").TextChannel} blchannel
-     * @property {import("discord.js").TextChannel} statuschannel channel for sending status logs
-     */
     /**
      * https://github.com/Blizzor/Twitch-Blizzbot.wiki.git
      * @param {config} config discord part of the config file
@@ -48,12 +39,27 @@ exports.DiscordClient = class DiscordClient extends Client {
                 Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
             ],
         });
+        this.commands = new Collection;
+        this.slashcommands = new Collection;
         this.config = config;
+        this.helplist = [];
+        /** @type {import("discord.js").TextChannel} */
+        this.blchannel = undefined;
+        /** @type {import("discord.js").TextChannel} */
+        this.relaychannel = undefined;
+        /** @type {import("discord.js").TextChannel} */
+        this.adminchannel = undefined;
+        /** @type {import("discord.js").TextChannel} */
+        this.commandchannel = undefined;
+        this.started = false;
+        /** @type {import("./clients").Clients} */
+        this.clients = undefined;
         loadCommands(this.commands, "commands/discord/commands");
         loadCommands(this.commands, "commands/discord/functions");
         loadCommands(this.slashcommands, "commands/discord/slash");
+        loadCommands(this.commands, "commands/discord/ccmds");
         loadEvents("events/discord", this);
-        require("./logger").log("info", "logging in");
+        require("./logger").info("logging in");
         this.login(config.token);
     }
     /**
@@ -62,19 +68,30 @@ exports.DiscordClient = class DiscordClient extends Client {
     async channelTopic() {
         const blchannel = await this.channels.fetch(this.config.channels.blacklist);
         if (blchannel instanceof TextChannel) {
-            await blchannel.setTopic(":green_circle: Hier wir die Blacklist vom Bot angezeigt");
+            this.blchannel = blchannel;
+            await this.blchannel.setTopic(":green_circle: Hier wir die Blacklist vom Bot angezeigt");
         } else {
             this.clients.logger.error("blchannel is not a Guild Text Channel.");
         }
         const relaychannel = await this.channels.fetch(this.config.channels.relay);
         if (relaychannel instanceof TextChannel) {
-            await relaychannel.setTopic(":green_circle: Nachrichten werden über den Bot ausgegeben.");
+            this.relaychannel = relaychannel;
+            await this.relaychannel.setTopic(":green_circle: Nachrichten werden über den Bot ausgegeben.");
         } else {
             this.clients.logger.error("Relay channel is not a Guild Text Channel.");
         }
         const adminchannel = await this.channels.fetch(this.config.channels.adminCommands);
         if (adminchannel instanceof TextChannel) {
-            await adminchannel.setTopic(":green_circle: Commands für den Twitch-Bot.");
+            this.adminchannel = adminchannel;
+            await this.adminchannel.setTopic(":green_circle: Commands für den Twitch-Bot.");
+        } else {
+            this.clients.logger.error("Admin channel is not a Guild Text Channel.");
+        }
+        // eslint-disable-next-line no-unused-vars
+        const commandchannel = await this.channels.fetch(this.config.channels.adminCommands);
+        if (adminchannel instanceof TextChannel) {
+            this.adminchannel = adminchannel;
+            await this.adminchannel.setTopic(":green_circle: Commands für den Twitch-Bot.");
         } else {
             this.clients.logger.error("Admin channel is not a Guild Text Channel.");
         }
@@ -88,6 +105,6 @@ exports.DiscordClient = class DiscordClient extends Client {
         this.relaychannel?.setTopic(":red_circle: Bot Offline");
         this.clients.logger.log("debug", "set status to offline");
         setTimeout(() => this.destroy(), 500);
-        this.clients.logger.log("info", "disconnected from discord");
+        this.clients.logger.info("disconnected from discord");
     }
 };

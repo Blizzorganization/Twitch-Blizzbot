@@ -1,16 +1,16 @@
 const { MessageEmbed } = require("discord.js");
-const { time } = require("../../../modules/functions");
-const fetch = require("node-fetch").default;
+const { time } = require("twitch-blizzbot/functions");
 
 exports.alias = ["twitchnamen", "twname"];
 exports.adminOnly = false;
 /**
  * @name tname
  * @namespace DiscordCommands
- * @param {import("../../../modules/discordclient").DiscordClient} client
+ * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
  */
 exports.run = async (client, message) => {
+    const fetch = (await import("node-fetch")).default;
 
     const dcuser = message.mentions.users.first() || message.author;
     let dbuser = await client.clients.db.getDiscordConnection(dcuser);

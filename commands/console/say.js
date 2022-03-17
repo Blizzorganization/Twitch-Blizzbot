@@ -1,7 +1,7 @@
 /* eslint-disable no-sparse-arrays */
 /**
  * @namespace ConsoleCommands
- * @param {import("../../modules/clients").Clients} clients
+ * @param {import("twitch-blizzbot/clients").Clients} clients
  * @param {string[]} args
  */
 exports.run = (clients, args) => {
@@ -15,7 +15,7 @@ exports.run = (clients, args) => {
     clients.twitch.say(channel, args.join(" "));
 };
 /**
- * @param  {import("../../modules/clients").Clients} clients
+ * @param  {import("twitch-blizzbot/clients").Clients} clients
  * @param  {string} line
  */
 exports.completer = (clients, line) => {
