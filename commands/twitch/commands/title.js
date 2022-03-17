@@ -1,18 +1,18 @@
-const { permissions } = require("twitch-blizzbot/constants");
+import fetch from "node-fetch";
+import { permissions } from "twitch-blizzbot/constants";
 
-exports.help = true;
-exports.perm = permissions.user;
-exports.alias = ["titel"];
+export const help = true;
+export const perm = permissions.user;
+export const alias = ["titel"];
 /**
  * @name title
  * @namespace TwitchCommands
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  */
-exports.run = async (client, target) => {
-    const fetch = (await import("node-fetch")).default;
+export async function run(client, target) {
     const resp = await fetch(`https://decapi.me/twitch/title/${target.slice(1)}`);
     const title = await resp.text();
 
     client.say(target, `Der Titel des Streams lautet: ${title}`);
-};
+}

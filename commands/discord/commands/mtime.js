@@ -1,14 +1,14 @@
-const { calcWatchtime, currentMonth } = require("twitch-blizzbot/functions");
-const { MessageEmbed } = require("discord.js");
+import { MessageEmbed } from "discord.js";
+import { calcWatchtime, currentMonth } from "twitch-blizzbot/functions";
 
-exports.adminOnly = true;
+export const adminOnly = true;
 /**
  * @namespace DiscordCommands
  * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
  * @param {string[]} args
  */
-exports.run = async (client, message, args) => {
+export async function run(client, message, args) {
     let user = "";
     if (!args || args.length == 0) {
         const dbuser = await client.clients.db.getDiscordConnection(message.author);
@@ -38,4 +38,4 @@ exports.run = async (client, message, args) => {
         .addField("Von der registrierten Zeit", `${Math.round(1000 * watchtime / maxWatchtime) / 10}%`);
 
     message.channel.send({ embeds: [embed] });
-};
+}

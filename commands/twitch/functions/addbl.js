@@ -1,7 +1,8 @@
-const { permissions } = require("twitch-blizzbot/constants");
+import { permissions } from "twitch-blizzbot/constants";
+import { logger } from "twitch-blizzbot/logger";
 
-exports.help = false;
-exports.perm = permissions.mod;
+export const help = false;
+export const perm = permissions.mod;
 /**
  * @name addbl
  * @namespace TwitchCommands
@@ -12,12 +13,12 @@ exports.perm = permissions.mod;
  * @param {boolean} self
  * @param {string[]} args
  */
-exports.run = async (client, target, context, msg, self, args) => {
+export async function run(client, target, context, msg, self, args) {
     if (!args || args.length < 2) return client.say(target, "Du musst angeben, welches Wort du mit welcher Aktion versehen willst!");
     const action = args.shift();
     const blword = args.join(" ").toLowerCase();
     client.blacklist[target.replace(/#+/g, "")][action].push(blword);
     await client.clients.db.saveBlacklist();
     client.say(target, `"${blword}" wurde in die Blacklist eingetragen TPFufun`);
-    client.clients.logger.info(`* Added "${blword}" to the "${action}" Blacklist of ${target.replace(/#+/g, "")}`);
-};
+    logger.info(`* Added "${blword}" to the "${action}" Blacklist of ${target.replace(/#+/g, "")}`);
+}

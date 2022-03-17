@@ -1,7 +1,8 @@
-const { permissions } = require("twitch-blizzbot/constants");
+import { permissions } from "twitch-blizzbot/constants";
+import { logger } from "twitch-blizzbot/logger";
 
-exports.help = false;
-exports.perm = permissions.mod;
+export const help = false;
+export const perm = permissions.mod;
 /**
  * @name Del
  * @namespace TwitchCommands
@@ -12,7 +13,7 @@ exports.perm = permissions.mod;
  * @param {boolean} self
  * @param {string[]} args
  */
-exports.run = async (client, target, context, msg, self, args) => {
+export async function run(client, target, context, msg, self, args) {
     const user = context["display-name"];
     if (args.length == 0) return client.say(target, "Du musst einen Befehl angeben, der gelöscht werden soll.");
     const cmd = await client.clients.db.getCcmd(target, args[0]);
@@ -20,5 +21,5 @@ exports.run = async (client, target, context, msg, self, args) => {
     if (cmd.permissions !== permissions.user) return client.say(target, `${args[0]} ist kein Nutzer Customcommand.`);
     await client.clients.db.delCcmd(target.replace(/#+/g, ""), args[0]);
     client.say(target, `${user} der Befehl ${args[0]} wurde gelöscht.`);
-    client.clients.logger.log("command", `* Deleted Customcommand ${args[0]}`);
-};
+    logger.log("command", `* Deleted Customcommand ${args[0]}`);
+}

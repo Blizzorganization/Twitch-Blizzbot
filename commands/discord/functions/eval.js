@@ -1,4 +1,4 @@
-exports.adminOnly = true;
+export const adminOnly = true;
 /**
  * @name eval
  * @namespace DiscordCommands
@@ -6,7 +6,7 @@ exports.adminOnly = true;
  * @param {import("discord.js").Message} message
  * @param {string[]} args
  */
-exports.run = (client, message, args) => {
+export function run(client, message, args) {
     const permitted = client.config.evalUsers;
     if (!permitted.includes(message.author.id)) return;
     let evaled = eval(args.join(" "));
@@ -17,4 +17,4 @@ exports.run = (client, message, args) => {
     if (!response || response.length == 0) response = "Your command did not return any data.";
     if (response.length > 2000) response = response.slice(0, 1999);
     message.channel.send({ content: response });
-};
+}

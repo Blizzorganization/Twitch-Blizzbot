@@ -1,17 +1,17 @@
-const { permissions } = require("twitch-blizzbot/constants");
+import fetch from "node-fetch";
+import { permissions } from "twitch-blizzbot/constants";
 
-exports.help = false;
-exports.perm = permissions.mod;
+export const help = false;
+export const perm = permissions.mod;
 /**
  * @name Subpoints
  * @namespace TwitchCommands
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  */
-exports.run = async (client, target) => {
-    const fetch = (await import("node-fetch")).default;
+export async function run(client, target) {
     const pointsrequest = await fetch(`https://decapi.me/twitch/subpoints/${target.slice(1)}`);
     const points = await pointsrequest.text();
 
     client.say(target, `${target.slice(1)} hat zur Zeit ${points} Subpoints`);
-};
+}

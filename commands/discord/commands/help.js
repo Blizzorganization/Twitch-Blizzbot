@@ -1,14 +1,11 @@
-const { MessageEmbed } = require("discord.js");
-/**
- * @namespace DiscordCommands
- */
-exports.alias = ["hilfe"];
-exports.adminOnly = false;
+import { MessageEmbed } from "discord.js";
+export const alias = ["hilfe"];
+export const adminOnly = false;
 /**
  * @param  {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param  {import("discord.js").Message} message
  */
-exports.run = (client, message) => {
+export function run(client, message) {
     const embed = new MessageEmbed()
         .setColor(0xedbc5d)
         .setThumbnail(client.user.avatarURL({ format: "png" }))
@@ -20,4 +17,4 @@ exports.run = (client, message) => {
         .addField("!unlink [Twitch-Name]", "Entfernt die Verbindung zu deinem Twitch Account");
 
     message.channel.send({ embeds: [embed] });
-};
+}

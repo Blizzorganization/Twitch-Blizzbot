@@ -1,23 +1,24 @@
-const { REST } = require("@discordjs/rest");
-const { Routes } = require("discord-api-types/v9");
+import { REST } from "@discordjs/rest";
+import { Routes } from "discord-api-types/v9";
+import { logger } from "./logger.js";
 /**
  * @param  {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param  {import("discord.js").Snowflake} guildid
  */
-module.exports = async function(client, guildid) {
+export default async function(client, guildid) {
     const commands = client.slashcommands.map(({ data }) => data);
 
     const rest = new REST({ version: "9" }).setToken(client.token);
     try {
-        client.clients.logger.log("debug", "Started refreshing application (/) commands.");
+        logger.debug("Started refreshing application (/) commands.");
 
-        client.clients.logger.log("silly", await rest.put(
+        logger.silly(await rest.put(
             Routes.applicationGuildCommands(client.user.id, guildid),
             { body: commands },
         ));
-        client.clients.logger.info("Successfully reloaded application (/) commands.");
-        client.clients.logger.log("debug", await rest.get(Routes.applicationGuildCommands(client.application.id || client.user.id, guildid)));
+        logger.info("Successfully reloaded application (/) commands.");
+        logger.log("debug", await rest.get(Routes.applicationGuildCommands(client.application.id || client.user.id, guildid)));
     } catch (error) {
-        client.clients.logger.error(error.message);
+        logger.error(error.message);
     }
-};
+}

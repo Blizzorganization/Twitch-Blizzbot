@@ -1,14 +1,14 @@
-const { permissions } = require("twitch-blizzbot/constants");
+import { permissions } from "twitch-blizzbot/constants";
 
-exports.help = false;
-exports.perm = permissions.vip;
+export const help = false;
+export const perm = permissions.vip;
 /**
  * @name raid
  * @namespace TwitchCommands
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  */
-exports.run = (client, target) => {
+export function run(client, target) {
     const minutes = client.config.Raidminutes;
     setTimeout(ende, 60000 * minutes);
 
@@ -21,4 +21,4 @@ exports.run = (client, target) => {
         client.say(target, "/followers 5");
         client.say(target, "/me Der Follower Modus wurde Aktiviert.");
     }
-};
+}

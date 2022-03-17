@@ -1,16 +1,16 @@
-const { MessageEmbed } = require("discord.js");
-const { time } = require("twitch-blizzbot/functions");
+import { MessageEmbed } from "discord.js";
+import fetch from "node-fetch";
+import { time } from "twitch-blizzbot/functions";
 
-exports.alias = ["twitchnamen", "twname"];
-exports.adminOnly = false;
+export const alias = ["twitchnamen", "twname"];
+export const adminOnly = false;
 /**
  * @name tname
  * @namespace DiscordCommands
  * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
  */
-exports.run = async (client, message) => {
-    const fetch = (await import("node-fetch")).default;
+export async function run(client, message) {
 
     const dcuser = message.mentions.users.first() || message.author;
     let dbuser = await client.clients.db.getDiscordConnection(dcuser);
@@ -32,4 +32,4 @@ exports.run = async (client, message) => {
         .addField("__Folgt schon__", fage);
 
     message.channel.send({ embeds: [embed] });
-};
+}

@@ -1,7 +1,8 @@
-const { Collection } = require("discord.js");
-const EventEmitter = require("events");
-const { loadCommands } = require("./functions");
-const { createInterface } = require("readline");
+import { Collection } from "discord.js";
+import EventEmitter from "events";
+import { createInterface } from "readline";
+import { loadCommands } from "./functions.js";
+import { logger } from "./logger.js";
 /**
  * ConsoleClient Class
  * @class
@@ -9,7 +10,7 @@ const { createInterface } = require("readline");
  * @property {Clients} clients Access to the other clients
  * @property {Collection} commands
  */
-exports.ConsoleClient = class ConsoleClient extends EventEmitter {
+export class ConsoleClient extends EventEmitter {
     constructor() {
         super();
         /** @type {import("./clients").Clients} */
@@ -30,7 +31,7 @@ exports.ConsoleClient = class ConsoleClient extends EventEmitter {
             return [hits.length ? hits : completions, line];
         }
         this.rl = createInterface({ input: process.stdin, output: process.stdout, prompt: "", completer });
-        require("./logger").log("verbose", "Listening to Console Commands");
+        logger.log("verbose", "Listening to Console Commands");
         this.rl.on("line", (line) => this.online(line));
         this.rl.on("SIGINT", () => this.stopping ? null : this.clients.stop());
         this.rl.on("SIGCONT", () => this.stopping ? null : this.clients.stop());
@@ -39,16 +40,16 @@ exports.ConsoleClient = class ConsoleClient extends EventEmitter {
 
         try {
             const pidu = require("pidusage");
-            this.processStats = setInterval(() => pidu(process.pid, (err, data) => require("./logger").log("verbose", `cpu: ${Math.round(data.cpu * 100) / 100}%; memory: ${Math.round(data.memory / 1024 / 1024 * 100) / 100}MB`)), 10000);
-            pidu(process.pid, (err, data) => require("./logger").log("verbose", `cpu: ${Math.round(data.cpu * 100) / 100}%; memory: ${Math.round(data.memory / 1024 / 1024 * 100) / 100}MB`));
+            this.processStats = setInterval(() => pidu(process.pid, (err, data) => logger.verbose(`cpu: ${Math.round(data.cpu * 100) / 100}%; memory: ${Math.round(data.memory / 1024 / 1024 * 100) / 100}MB`)), 10000);
+            pidu(process.pid, (err, data) => logger.log("verbose", `cpu: ${Math.round(data.cpu * 100) / 100}%; memory: ${Math.round(data.memory / 1024 / 1024 * 100) / 100}MB`));
         } catch (e) {
-            require("./logger").log("silly", "Process metrics are not collected.");
+            logger.silly("Process metrics are not collected.");
         }
     }
     /**
      *
      * @param {string|Buffer} data
-     * @param [key]
+     * @param {import("readline").Key} key
      */
     write(data, key) {
         this.rl.write(data, key);
@@ -58,14 +59,14 @@ exports.ConsoleClient = class ConsoleClient extends EventEmitter {
      * @param {string} line
      */
     online(line) {
-        this.clients.logger.log("stdin", line);
+        logger.log("stdin", line);
         const args = line.split(" ");
         const commandName = args.shift().toLowerCase();
         const cmd = this.commands.get(commandName);
         if (cmd) {
             cmd.run(this.clients, args);
         } else {
-            this.clients.logger.warn("Diese Funktion kenne ich nicht.");
+            logger.warn("Diese Funktion kenne ich nicht.");
         }
     }
     /**
@@ -76,4 +77,4 @@ exports.ConsoleClient = class ConsoleClient extends EventEmitter {
         if (this.processStats) clearInterval(this.processStats);
         return this.rl.close();
     }
-};
+}

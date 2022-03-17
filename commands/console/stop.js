@@ -3,14 +3,14 @@
  * @namespace ConsoleCommands
  * @param {import("twitch-blizzbot/clients").Clients} clients
  */
-exports.run = async (clients) => {
+export async function run(clients) {
     await clients.stop();
     process.exit(0);
-};
+}
 /**
  * @param  {import("twitch-blizzbot/clients").Clients} clients
  * @param  {string} line
  */
-exports.completer = (clients, line) => {
+export function completer(clients, line) {
     return [["stop"], line];
-};
+}

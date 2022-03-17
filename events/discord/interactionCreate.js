@@ -1,5 +1,6 @@
-const { MessageActionRow, MessageButton, MessageEmbed } = require("discord.js");
-const { calcWatchtime, getTable } = require("twitch-blizzbot/functions");
+import { MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
+import { calcWatchtime, getTable } from "twitch-blizzbot/functions";
+import { logger } from "twitch-blizzbot/logger";
 /**
  * @param  {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param  {import("discord.js").ButtonInteraction} interaction
@@ -31,7 +32,7 @@ async function handleButton(i) {
     const message = i.message;
     if (message.embeds[0]?.title !== "Watchtime") return;
     const channel = message.embeds[0]?.description;
-    if (!channel) return client.clients.logger.error("Tried to read data from a nonexistent embed in the top10 slash command");
+    if (!channel) return logger.error("Tried to read data from a nonexistent embed in the top10 slash command");
     let page = parseInt(message.embeds[0].footer?.text.replace("Seite", ""));
     switch (i.customId) {
         case "-":
@@ -73,7 +74,7 @@ async function handleButton(i) {
  * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Interaction} interaction
  */
-exports.event = (client, interaction) => {
+export function event(client, interaction) {
     if (interaction.isButton()) return handleButton(interaction);
     if (!interaction.isCommand()) return;
     const commands = client.slashcommands;
@@ -81,7 +82,7 @@ exports.event = (client, interaction) => {
     try {
         commands.get(interaction.commandName).execute(interaction);
     } catch (e) {
-        client.clients.logger.error(e);
+        logger.error(e);
         return interaction.reply({ content: "There was an error while executing this command!", ephemeral: true });
     }
-};
+}

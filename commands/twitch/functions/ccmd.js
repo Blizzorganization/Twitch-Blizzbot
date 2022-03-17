@@ -1,15 +1,15 @@
-const { permissions } = require("twitch-blizzbot/constants");
+import { permissions } from "twitch-blizzbot/constants";
 
-exports.help = false;
-exports.perm = permissions.mod;
-exports.alias = ["ccmds"];
+export const help = false;
+export const perm = permissions.mod;
+export const alias = ["ccmds"];
 /**
  * @name ccmd
  * @namespace TwitchCommands
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  */
-exports.run = async (client, target) => {
+export async function run(client, target) {
     let appHelp = "";
     const coms = await client.clients.db.allCcmds(target, permissions.mod);
     if (coms.length > 0) {
@@ -18,4 +18,4 @@ exports.run = async (client, target) => {
         appHelp = "Es sind keine Commands hinterlegt.";
     }
     client.say(target, appHelp);
-};
+}

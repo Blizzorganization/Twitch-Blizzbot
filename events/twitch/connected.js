@@ -1,5 +1,9 @@
-const { flatMap } = require("lodash");
-const { getRandom } = require("twitch-blizzbot/functions");
+import lodash from "lodash";
+import fetch from "node-fetch";
+import { getRandom } from "twitch-blizzbot/functions";
+import { logger } from "twitch-blizzbot/logger";
+
+const { flatMap } = lodash;
 
 /**
  * @listens twitch:connected
@@ -7,9 +11,8 @@ const { getRandom } = require("twitch-blizzbot/functions");
  * @param {string} addr
  * @param {number} port
  */
-exports.event = async (client, addr, port) => {
-    const fetch = (await import("node-fetch")).default;
-    client.clients.logger.info(`* Connected to ${addr}:${port}`);
+export async function event(client, addr, port) {
+    logger.info(`* Connected to ${addr}:${port}`);
     client.started = true;
     for (const channel of client.config.channels) {
         client.clients.db.newChannel(channel);
@@ -34,10 +37,10 @@ exports.event = async (client, addr, port) => {
             channel = channel.replace(/#+/g, "");
             const uptime = await (await fetch(`https://decapi.me/twitch/uptime/${channel}`)).text();
             if (uptime !== `${channel} is offline`) {
-                if (!client.messages[channel]) return client.clients.logger.error(`Für den Kanal ${channel} sind keine automatischen Nachrichten angegeben.`);
+                if (!client.messages[channel]) return logger.error(`Für den Kanal ${channel} sind keine automatischen Nachrichten angegeben.`);
                 const automessage = getRandom(client.messages[channel]);
                 if (automessage) client.say(channel, automessage);
             }
         }
     }, 60000 * client.config.automessagedelay);
-};
+}

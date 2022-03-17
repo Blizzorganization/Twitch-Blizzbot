@@ -1,8 +1,9 @@
-const { Collection } = require("discord.js");
-const { createWriteStream, existsSync, mkdirSync, readFileSync } = require("fs");
-const { Client } = require("tmi.js");
-const { loadCommands, loadEvents } = require("./functions");
-const schedule = require("node-schedule");
+import { Collection } from "discord.js";
+import { createWriteStream, existsSync, mkdirSync, readFileSync } from "fs";
+import { scheduleJob } from "node-schedule";
+import { Client } from "tmi.js";
+import { loadCommands, loadEvents } from "./functions.js";
+import { logger } from "./logger.js";
 /**
  * @typedef configExtension
  * @property {number} Cooldown
@@ -26,7 +27,7 @@ const schedule = require("node-schedule");
  * @property {any} automessage
  * @property {string[]} channels
  */
-exports.TwitchClient = class TwitchClient extends Client {
+export class TwitchClient extends Client {
     /**
      * @param  {config} opts
      */
@@ -54,13 +55,13 @@ exports.TwitchClient = class TwitchClient extends Client {
         });
         this.cooldowns = new Map;
         this.channellogs = [];
-        schedule.scheduleJob("newchannellogs", "0 1 * * *", () => this.newChannellogs(opts.channels));
+        scheduleJob("newchannellogs", "0 1 * * *", () => this.newChannellogs(opts.channels));
         loadCommands(this.commands, "commands/twitch/commands", this.helplist);
         loadCommands(this.commands, "commands/twitch/ccmds", this.helplist);
         loadCommands(this.commands, "commands/twitch/functions", this.helplist);
         loadEvents("events/twitch", this);
         loadEvents("events/twitch/interaction", this);
-        this.messages = require("../configs/automessages.json");
+        this.messages = JSON.parse(readFileSync("./configs/automessages.json", "utf8"));
         this.connect();
     }
     /**
@@ -84,12 +85,12 @@ exports.TwitchClient = class TwitchClient extends Client {
      */
     async stop() {
         clearInterval(this.watchtime);
-        this.clients.logger.info("stopped watchtime collector");
+        logger.info("stopped watchtime collector");
         if (this.config.automessagedelay !== 0) {
             clearInterval(this.automessage);
-            this.clients.logger.info("stopped automessaging");
+            logger.info("stopped automessaging");
         }
         await this.disconnect();
-        this.clients.logger.info("disconnected from twitch");
+        logger.info("disconnected from twitch");
     }
-};
+}

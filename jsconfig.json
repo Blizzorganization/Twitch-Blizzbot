@@ -1,12 +1,15 @@
 {
     "compilerOptions": {
-        "module": "commonjs",
-        "target": "ES2021",
+        "module": "ESNEXT",
+        "moduleResolution": "node",
         "strictFunctionTypes": true,
         "baseUrl": ".",
         "paths": {
             "twitch-blizzbot/functions": [
                 "./modules/functions.js"
+            ],
+            "twitch-blizzbot/consoleclient": [
+                "./modules/consoleclient.js"
             ],
             "twitch-blizzbot/discordclient": [
                 "./modules/discordclient.js"
@@ -19,9 +22,14 @@
             ],
             "twitch-blizzbot/clients": [
                 "./modules/clients.js"
-            ]
+            ],
+            "twitch-blizzbot/logger": [
+                "./modules/logger.js"
+            ],
+            "twitch-blizzbot/CustomError": [
+                "./modules/CustomError.js"
+            ],
         },
-        "resolveJsonModule": true,
         "checkJs": true,
         "allowJs": true
     },
