@@ -47,3 +47,9 @@ export interface resolvedAlias {
     response: string
     permissions: number
 }
+export interface Command {
+    channel: string
+    command: string
+    permission: number
+    enabled: boolean
+}
