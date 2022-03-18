@@ -12,14 +12,10 @@ export const perm = permissions.mod;
 export async function run(client, target) {
     const subEmoteRequest = await fetch(`https://decapi.me/twitch/subscriber_emotes/${target.slice(1)}`);
     const subEmotes = await subEmoteRequest.text();
-    const bttvRequest = await fetch(`https://decapi.me/bttv/emotes/${target.slice(1)}`);
-    const bttvEmotes = await bttvRequest.text();
     if (subEmotes === "This channel does not have any subscriber emotes.") {
         // Wenn Keine vorhanden dann wird das nicht ausgegeben
-        client.say(target, `Auf dem Kanal${target.slice(1)} sind zur Zeit folgende Bettertwitch-Emote vorhanden: ${bttvEmotes}`);
+        client.say(target, "Auf diesem Kanal sind keine Emotes verfügbar");
     } else {
-        client.say(target, `Auf dem Kanal${target.slice(1)} sind zur Zeit folgende Subscriber-emotes vorhanden: ${subEmotes}`);
+        client.say(target, `Auf dem Kanal ${target.slice(1)} sind zur Zeit folgende Subscriber-emotes vorhanden: ${subEmotes}`);
     }
-
-
 }
