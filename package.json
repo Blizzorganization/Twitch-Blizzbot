@@ -31,7 +31,6 @@
     "node-fetch": "^3.2.3",
     "node-schedule": "^2.1.0",
     "pg": "^8.7.3",
-    "request": "^2.88.2",
     "tmi.js": "^1.8.5",
     "winston": "^3.6.0",
     "winston-daily-rotate-file": "^4.6.1"
@@ -45,7 +44,7 @@
     "eslint": "^8.11.0",
     "js2xmlparser": "^4.0.2"
   },
-  "optionalDependencies": {
+  "peerDependencies": {
     "pidusage": "^3.0.0"
   },
   "main": "bot.js",
