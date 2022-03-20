@@ -2,7 +2,7 @@
     "twitch": {
         "identity": {
             "username": "username",
-            "password": "OAuth-Token"
+            "password": "OAuth-Token: TMI-Token https://twitchapps.com/tmi/"
         },
         "connection": {
             "reconnect": true,
