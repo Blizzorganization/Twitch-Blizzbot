@@ -34,16 +34,16 @@ export async function run(client, target, context, msg, self, args) {
                 }
             }
             break;
+    // Bettertwitch Emotes
         case "bttv":
         case "bettertwitchtv":
-            // Bettertwitch Emotes
             {
                 const bttvRequest = await fetch(`https://decapi.me/bttv/emotes/${target.slice(1)}`);
                 const bttvEmotes = await bttvRequest.text();
                 if (bttvEmotes === `Unable to retrieve BetterTTV details for channel: ${target.slice(1)}`) {
                     client.say(target, "Auf diesem Kanal sind keine BTTV-Emotes verfügbar");
                 } else {
-                    client.say(target, `Auf dem Kanal ${target.slice(1)} sind folgende Bttv-Emotes vorhanden: ${bttvEmotes}`);
+                    client.say(target, `Auf dem Kanal ${target.slice(1)} sind folgende BTTV-Emotes vorhanden: ${bttvEmotes}`);
                 }
             }
             break;
