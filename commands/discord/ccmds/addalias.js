@@ -10,8 +10,12 @@ export async function run(client, message, args) {
     if (args.length > 1) {
         const newcmd = args.shift().toLowerCase();
         const res = args.join(" ");
-        if (!res || res == "") return message.reply({ content: "Du musst angeben, worauf der Alias verknüpft sein soll." });
-        if (!await client.clients.db.getCcmd(twchannel, res)) return message.reply({ content: "Diesen Befehl kenne ich nicht." });
+        if (!res || res == "") {
+            return message.reply({ content: "Du musst angeben, worauf der Alias verknüpft sein soll." });
+        }
+        if (!(await client.clients.db.getCcmd(twchannel, res))) {
+            return message.reply({ content: "Diesen Befehl kenne ich nicht." });
+        }
         await client.clients.db.newAlias(twchannel, newcmd, res);
         message.reply({ content: `Der Alias ${newcmd} für ${res} wurde hinzugefügt.` });
         logger.log("command", `* Added Alias ${newcmd} for Customcommand ${res}`);

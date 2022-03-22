@@ -7,7 +7,9 @@ import { logger } from "twitch-blizzbot/logger";
 import { TwitchClient } from "twitch-blizzbot/twitchclient";
 import { createConfig } from "./setup.js";
 (async () => {
-    if (process.argv0.length >= 18) process.title = `Twitch-Blizzbot@${JSON.parse(readFileSync("./package.json", "utf8")).version}`;
+    if (process.argv0.length >= 18) {
+        process.title = `Twitch-Blizzbot@${JSON.parse(readFileSync("./package.json", "utf8")).version}`;
+    }
     if (!existsSync("./configs/config.json")) await createConfig();
     const config = JSON.parse(readFileSync("./configs/config.json").toString());
     // making sure a links.txt exists

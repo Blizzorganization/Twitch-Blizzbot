@@ -40,8 +40,8 @@ export class DiscordClient extends Client {
                 Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
             ],
         });
-        this.commands = new Collection;
-        this.slashcommands = new Collection;
+        this.commands = new Collection();
+        this.slashcommands = new Collection();
         this.config = config;
         this.helplist = [];
         /** @type {import("discord.js").TextChannel} */

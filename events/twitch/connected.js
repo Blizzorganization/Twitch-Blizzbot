@@ -24,7 +24,9 @@ export async function event(client, addr, port) {
             if (`#${uptime}` !== `${channel} is offline`) {
                 /** @type {{chatters: {[key: string]: string[]}}} */
                 // @ts-ignore
-                const jsonResponse = await (await fetch(`http://tmi.twitch.tv/group/user/${channel.slice(1)}/chatters`)).json();
+                const jsonResponse = await (
+                    await fetch(`http://tmi.twitch.tv/group/user/${channel.slice(1)}/chatters`)
+                ).json();
                 const active = jsonResponse.chatters;
                 const viewers = flatMap(active);
                 await client.clients.db.watchtime(channel, flatMap(viewers));
@@ -37,7 +39,9 @@ export async function event(client, addr, port) {
             channel = channel.replace(/#+/g, "");
             const uptime = await (await fetch(`https://decapi.me/twitch/uptime/${channel}`)).text();
             if (uptime !== `${channel} is offline`) {
-                if (!client.messages[channel]) return logger.error(`Für den Kanal ${channel} sind keine automatischen Nachrichten angegeben.`);
+                if (!client.messages[channel]) {
+                    return logger.error(`Für den Kanal ${channel} sind keine automatischen Nachrichten angegeben.`);
+                }
                 const automessage = getRandom(client.messages[channel]);
                 if (automessage) client.say(channel, automessage);
             }

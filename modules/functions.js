@@ -19,7 +19,7 @@ export function loadCommands(commandmap, commanddir, helplist = []) {
         readdir(`./${readcommanddir}/`, (err, files) => {
             if (err) return logger.error(err);
             files.forEach(async (file) => {
-                if (!(file.endsWith(".js"))) return;
+                if (!file.endsWith(".js")) return;
                 const command = file.split(".")[0];
                 const props = await import(`../${commanddir}/${command}.js`);
                 logger.log("command", `Attempting to load Command ${command}`);
@@ -31,7 +31,9 @@ export function loadCommands(commandmap, commanddir, helplist = []) {
                 }
             });
         });
-    } else {throw new CustomError("LoadError", `CommandDirectory ${commanddir} does not exist.`);}
+    } else {
+        throw new CustomError("LoadError", `CommandDirectory ${commanddir} does not exist.`);
+    }
 }
 /**
  *
@@ -46,14 +48,16 @@ export function loadEvents(eventdir, eventemitter) {
         readdir(`./${readeventdir}/`, (err, files) => {
             if (err) return logger.error("Error reading discord events directory:", err);
             files.forEach(async (file) => {
-                if (!(file.endsWith(".js"))) return;
+                if (!file.endsWith(".js")) return;
                 const eventname = file.split(".")[0];
                 const { event } = await import(`../${eventdir}/${eventname}.js`);
                 // @ts-ignore
                 eventemitter.on(eventname, event.bind(null, eventemitter));
             });
         });
-    } else {throw new CustomError("LoadError", `EventDirectory ${eventdir} does not exist.`);}
+    } else {
+        throw new CustomError("LoadError", `EventDirectory ${eventdir} does not exist.`);
+    }
 }
 /**
  *
@@ -66,7 +70,7 @@ export function calcWatchtime(watchtime) {
     const timeTotalMinutes = Math.floor(watchtime / 2);
     const timeMinutes = timeTotalMinutes % 60;
     let timeHours = (timeTotalMinutes % 1440) - timeMinutes;
-    let timeDays = (timeTotalMinutes - timeMinutes) - timeHours;
+    let timeDays = timeTotalMinutes - timeMinutes - timeHours;
     timeHours /= 60;
     timeDays /= 1440;
     return `${timeDays} Tag(en), ${timeHours} Stunde(n) und ${timeMinutes} Minute(n)`;
@@ -88,7 +92,11 @@ export function currentMonth() {
     return `${m}-${y}`;
 }
 
-const ts = new Transform({ transform(chunk, enc, cb) { cb(null, chunk); } });
+const ts = new Transform({
+    transform(chunk, enc, cb) {
+        cb(null, chunk);
+    },
+});
 const con = new Console({ stdout: ts });
 /**
  * @param  {any} data
@@ -102,14 +110,22 @@ export function getTable(data) {
  */
 export function time(str) {
     return str
-        .replace("years", "Jahren").replace("year", "Jahr")
-        .replace("months", "Monaten").replace("month", "Monat")
-        .replace("weeks", "Wochen").replace("week", "Woche")
-        .replace("days", "Tage").replace("day", "Tag")
-        .replace("hours", "Stunden").replace("hour", "Stunde")
-        .replace("minutes", "Minuten").replace("minute", "Minute")
-        .replace("seconds", "Sekunden").replace("second", "Sekunde")
-        .replace("has been following", "folgt").replace("for", "seit")
+        .replace("years", "Jahren")
+        .replace("year", "Jahr")
+        .replace("months", "Monaten")
+        .replace("month", "Monat")
+        .replace("weeks", "Wochen")
+        .replace("week", "Woche")
+        .replace("days", "Tage")
+        .replace("day", "Tag")
+        .replace("hours", "Stunden")
+        .replace("hour", "Stunde")
+        .replace("minutes", "Minuten")
+        .replace("minute", "Minute")
+        .replace("seconds", "Sekunden")
+        .replace("second", "Sekunde")
+        .replace("has been following", "folgt")
+        .replace("for", "seit")
         .replace("is not following", "ist kein Follower von")
         .replace("does not follow", "ist kein Follower von")
         .replace("404 Page Not Found", "Keine Informationen");

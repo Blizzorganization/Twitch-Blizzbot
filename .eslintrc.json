@@ -3,12 +3,11 @@
         "es2021": true,
         "node": true
     },
-    "extends": "eslint:recommended",
+    "extends": ["eslint:recommended"],
     "parserOptions": {
         "ecmaVersion": "latest",
         "sourceType": "module"
     },
-    
     "rules": {
         "indent": [
             2,
@@ -26,13 +25,6 @@
             {
                 "before": true,
                 "after": true
-            }
-        ],
-        "brace-style": [
-            "error",
-            "1tbs",
-            {
-                "allowSingleLine": true
             }
         ],
         "comma-dangle": [
@@ -91,18 +83,25 @@
             "error"
         ],
         "no-var": "error",
-        "object-curly-spacing": [
-            "error",
-            "always"
-        ],
         "prefer-const": "error",
-        "quotes": [
-            "error",
-            "double"
-        ],
         "semi": [
             "error",
             "always"
+        ],
+        "sort-imports": [
+            "error",
+            {
+                "ignoreCase": true,
+                "ignoreDeclarationSort": true,
+                "ignoreMemberSort": false,
+                "allowSeparatedGroups": false,
+                "memberSyntaxSortOrder": [
+                    "none",
+                    "all",
+                    "multiple",
+                    "single"
+                ]
+            }
         ],
         "space-before-blocks": "error",
         "space-before-function-paren": [
@@ -113,7 +112,7 @@
                 "asyncArrow": "always"
             }
         ],
-        "space-in-parens": "error",
+        "space-in-parens": "off",
         "space-infix-ops": "error",
         "space-unary-ops": "error",
         "spaced-comment": "error",

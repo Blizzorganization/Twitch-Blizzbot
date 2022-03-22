@@ -16,7 +16,7 @@ export class ConsoleClient extends EventEmitter {
         /** @type {import("./clients").Clients} */
         this.clients = undefined;
         this.stopping = false;
-        this.commands = new Collection;
+        this.commands = new Collection();
         this.processStats = undefined;
         loadCommands(this.commands, "commands/console");
         const commands = this.commands;
@@ -33,15 +33,32 @@ export class ConsoleClient extends EventEmitter {
         this.rl = createInterface({ input: process.stdin, output: process.stdout, prompt: "", completer });
         logger.log("verbose", "Listening to Console Commands");
         this.rl.on("line", (line) => this.online(line));
-        this.rl.on("SIGINT", () => this.stopping ? null : this.clients.stop());
-        this.rl.on("SIGCONT", () => this.stopping ? null : this.clients.stop());
-        this.rl.on("SIGTSTP", () => this.stopping ? null : this.clients.stop());
-        this.rl.on("close", () => this.stopping ? null : this.clients.stop());
+        this.rl.on("SIGINT", () => (this.stopping ? null : this.clients.stop()));
+        this.rl.on("SIGCONT", () => (this.stopping ? null : this.clients.stop()));
+        this.rl.on("SIGTSTP", () => (this.stopping ? null : this.clients.stop()));
+        this.rl.on("close", () => (this.stopping ? null : this.clients.stop()));
 
         try {
             const pidu = require("pidusage");
-            this.processStats = setInterval(() => pidu(process.pid, (err, data) => logger.verbose(`cpu: ${Math.round(data.cpu * 100) / 100}%; memory: ${Math.round(data.memory / 1024 / 1024 * 100) / 100}MB`)), 10000);
-            pidu(process.pid, (err, data) => logger.log("verbose", `cpu: ${Math.round(data.cpu * 100) / 100}%; memory: ${Math.round(data.memory / 1024 / 1024 * 100) / 100}MB`));
+            this.processStats = setInterval(
+                () =>
+                    pidu(process.pid, (err, data) =>
+                        logger.verbose(
+                            `cpu: ${Math.round(data.cpu * 100) / 100}%; memory: ${
+                                Math.round((data.memory / 1024 / 1024) * 100) / 100
+                            }MB`,
+                        ),
+                    ),
+                10000,
+            );
+            pidu(process.pid, (err, data) =>
+                logger.log(
+                    "verbose",
+                    `cpu: ${Math.round(data.cpu * 100) / 100}%; memory: ${
+                        Math.round((data.memory / 1024 / 1024) * 100) / 100
+                    }MB`,
+                ),
+            );
         } catch (e) {
             logger.silly("Process metrics are not collected.");
         }

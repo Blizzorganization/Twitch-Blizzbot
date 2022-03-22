@@ -2,8 +2,11 @@ import { WriteStream } from "fs";
 import { permissions } from "twitch-blizzbot/constants";
 import { logger } from "twitch-blizzbot/logger";
 
-// eslint-disable-next-line no-control-regex
-const linkTest = new RegExp("(^|[ \t\r\n])((sftp|ftp|http|https):(([A-Za-z0-9$_.+!*(),;/?:@&~=-])|%[A-Fa-f0-9]{2}){2,}(#([a-zA-Z0-9][a-zA-Z0-9$_.+!*(),;/?:@&~=%-]*))?([A-Za-z0-9$_+!*();/?:~-]))", "g");
+const linkTest = new RegExp(
+    // eslint-disable-next-line no-control-regex
+    "(^|[ \t\r\n])((sftp|ftp|http|https):(([A-Za-z0-9$_.+!*(),;/?:@&~=-])|%[A-Fa-f0-9]{2}){2,}(#([a-zA-Z0-9][a-zA-Z0-9$_.+!*(),;/?:@&~=%-]*))?([A-Za-z0-9$_+!*();/?:~-]))",
+    "g",
+);
 const counterTest = new RegExp(/\{(.*?)\}/g);
 
 /**
@@ -22,7 +25,7 @@ export async function event(client, target, context, msg, self) {
                 if (!channellog || !(channellog instanceof WriteStream)) {
                     logger.error(`channellogs for channel ${target.slice(1)} is not available!`);
                 } else {
-                    channellog.write(`[${(new Date()).toLocaleTimeString()}]${context["display-name"]}: ${msg}\n`);
+                    channellog.write(`[${new Date().toLocaleTimeString()}]${context["display-name"]}: ${msg}\n`);
                 }
             }
             break;
@@ -36,11 +39,11 @@ export async function event(client, target, context, msg, self) {
         const commandName = args.shift().toLowerCase().slice(1);
         const cmd = client.commands.get(commandName);
         if (cmd) {
-            if (cmd.perm && (hasPerm(client, context) < cmd.perm)) {
+            if (cmd.perm && hasPerm(client, context) < cmd.perm) {
                 if (!cmd.silent) client.say(target, "Du hast keine Rechte");
                 return;
             }
-            if ((Date.now() - client.cooldowns.get(target.replace("#", ""))) > 1000 * client.config.Cooldown) {
+            if (Date.now() - client.cooldowns.get(target.replace("#", "")) > 1000 * client.config.Cooldown) {
                 cmd.run(client, target, context, msg, self, args);
                 logger.log("command", `* Executed ${commandName} command`);
                 client.cooldowns.set(target.replace("#", ""), Date.now());
@@ -49,8 +52,10 @@ export async function event(client, target, context, msg, self) {
             const ccmd = await client.clients.db.getCcmd(target, `!${commandName}`);
             let response;
             if (ccmd) {
-                if (ccmd.permissions > userpermission) return client.say(target, "Du hast keine Rechte für diesen Command");
-                if ((Date.now() - client.cooldowns.get(target.replace("#", ""))) > 1000 * client.config.Cooldown) {
+                if (ccmd.permissions > userpermission) {
+                    return client.say(target, "Du hast keine Rechte für diesen Command");
+                }
+                if (Date.now() - client.cooldowns.get(target.replace("#", "")) > 1000 * client.config.Cooldown) {
                     response = await counters(client, ccmd.response, target);
                     client.say(target, response);
                     logger.log("command", `* Executed ${commandName} Customcommand`);
@@ -59,7 +64,7 @@ export async function event(client, target, context, msg, self) {
                 const alias = await client.clients.db.resolveAlias(target, `!${commandName}`);
                 if (alias) {
                     if (alias.permissions > userpermission) return client.say(target, "Du hast keine Rechte");
-                    if ((Date.now() - client.cooldowns.get(target.replace("#", ""))) > 1000 * client.config.Cooldown) {
+                    if (Date.now() - client.cooldowns.get(target.replace("#", "")) > 1000 * client.config.Cooldown) {
                         response = await counters(client, alias.response, target);
                         client.say(target, response);
                         logger.log("command", `* Executed ${alias.command} caused by alias ${alias.alias}`);
@@ -103,8 +108,12 @@ function checkModAction(client, msg, ctx, target, args) {
     const checkmsg = ` ${message} `;
     if (delbl.some((a) => checkmsg.includes(` ${a} `))) return client.deletemessage(target, ctx.id);
     if (checkmsg.includes(" www.") || client.deletelinks.some((tld) => checkmsg.includes(tld))) {
-        const links = args.filter((a) => a.toLowerCase().includes("www") || client.deletelinks.some((tld) => a.includes(tld)));
-        const forbiddenlinks = links.filter((l) => !(client.permittedlinks.some((purl) => l.toLowerCase().includes(purl))));
+        const links = args.filter(
+            (a) => a.toLowerCase().includes("www") || client.deletelinks.some((tld) => a.includes(tld)),
+        );
+        const forbiddenlinks = links.filter(
+            (l) => !client.permittedlinks.some((purl) => l.toLowerCase().includes(purl)),
+        );
         if (forbiddenlinks.length > 0) return client.deletemessage(target, ctx.id);
     }
     if (ctx["message-type"] == "action") return client.deletemessage(target, ctx.id);
@@ -134,5 +143,7 @@ function hasPerm(client, ctx) {
  * @param {string} url
  */
 function permittedlink(client, url) {
-    return client.permittedlinks.some((purl) => url.includes(purl));
+    return client.permittedlinks.some((purl) => {
+        return url.includes(purl);
+    });
 }

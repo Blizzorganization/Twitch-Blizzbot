@@ -10,13 +10,9 @@ async function blacklistUpdate(client, interaction) {
         content: `In der Blacklist für ${client.config.watchtimechannel} sind die Wörter \
         \`\`\`fix\n${getTable(client.clients.twitch.blacklist[client.config.watchtimechannel])}\`\`\` enthalten.`,
         components: [
-            new MessageActionRow()
-                .setComponents(
-                    new MessageButton()
-                        .setCustomId("refresh-blacklist")
-                        .setEmoji("🔄")
-                        .setStyle("PRIMARY"),
-                ),
+            new MessageActionRow().setComponents(
+                new MessageButton().setCustomId("refresh-blacklist").setEmoji("🔄").setStyle("PRIMARY"),
+            ),
         ],
     });
 }
@@ -44,18 +40,14 @@ async function handleButton(i) {
         default:
             break;
     }
-    const updateRow = new MessageActionRow()
-        .addComponents(
-            new MessageButton()
-                .setCustomId("-")
-                .setLabel("Vorherige Seite")
-                .setStyle("PRIMARY")
-                .setDisabled(page == 1),
-            new MessageButton()
-                .setCustomId("+")
-                .setLabel("Nächste Seite")
-                .setStyle("PRIMARY"),
-        );
+    const updateRow = new MessageActionRow().addComponents(
+        new MessageButton()
+            .setCustomId("-")
+            .setLabel("Vorherige Seite")
+            .setStyle("PRIMARY")
+            .setDisabled(page == 1),
+        new MessageButton().setCustomId("+").setLabel("Nächste Seite").setStyle("PRIMARY"),
+    );
     const editEmbed = new MessageEmbed()
         .setTitle("Watchtime")
         .setColor(0xdfb82d)
@@ -67,7 +59,6 @@ async function handleButton(i) {
     }
     await i.update({ embeds: [editEmbed], components: [updateRow] });
 }
-
 
 /**
  *

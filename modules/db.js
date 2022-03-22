@@ -31,8 +31,12 @@ export class DB {
     async ensureTables() {
         const client = await this.db.connect();
         try {
-            const tables = (await client.query("SELECT * FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema';")).rows;
-            logger.debug(`Existing databases: ${tables.map(t => t.tablename).join(", ")}`);
+            const tables = (
+                await client.query(
+                    "SELECT * FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema';",
+                )
+            ).rows;
+            logger.debug(`Existing databases: ${tables.map((t) => t.tablename).join(", ")}`);
             let todoTables = [
                 [
                     "streamer",
@@ -93,7 +97,7 @@ export class DB {
             ];
             if (tables && tables.length > 0) {
                 /** @type {string[]}*/
-                const tablenames = tables.map(t => t.tablename);
+                const tablenames = tables.map((t) => t.tablename);
                 todoTables = todoTables.filter((val) => tablenames.indexOf(val[0]) == -1);
             }
             for (const stmt of todoTables) {
@@ -121,16 +125,10 @@ export class DB {
         const client = await this.db.connect();
         try {
             channel = channel.replace(/#+/g, "");
-            await client.query(
-                this.statements.newChannel,
-                [channel, true],
-            ).catch((e) => {
+            await client.query(this.statements.newChannel, [channel, true]).catch((e) => {
                 throw e;
             });
-            await client.query(
-                this.statements.newBlacklist,
-                [channel],
-            ).catch((e) => {
+            await client.query(this.statements.newBlacklist, [channel]).catch((e) => {
                 throw e;
             });
         } catch (e) {
@@ -144,10 +142,7 @@ export class DB {
      * @param {string} channel
      */
     async getChannel(channel) {
-        const data = await this.db.query(
-            this.statements.getChannel,
-            [channel],
-        ).catch((e) => {
+        const data = await this.db.query(this.statements.getChannel, [channel]).catch((e) => {
             logger.error(e);
         });
         if (!data) return null;
@@ -162,10 +157,7 @@ export class DB {
      */
     async newAlias(channel, name, command) {
         channel = channel.replace(/#+/g, "");
-        await this.db.query(
-            this.statements.newAlias,
-            [channel, name, command],
-        ).catch((e) => {
+        await this.db.query(this.statements.newAlias, [channel, name, command]).catch((e) => {
             logger.error(e);
         });
     }
@@ -176,10 +168,7 @@ export class DB {
      */
     async resolveAlias(channel, name) {
         channel = channel.replace(/#+/g, "");
-        const data = await this.db.query(
-            this.statements.resolveAlias,
-            [name, channel],
-        ).catch((e) => {
+        const data = await this.db.query(this.statements.resolveAlias, [name, channel]).catch((e) => {
             logger.error(e);
         });
         if (!data) return null;
@@ -195,10 +184,7 @@ export class DB {
      */
     async deleteAlias(channel, name) {
         channel = channel.replace(/#+/g, "");
-        await this.db.query(
-            this.statements.delAlias,
-            [channel, name],
-        ).catch((e) => {
+        await this.db.query(this.statements.delAlias, [channel, name]).catch((e) => {
             logger.error(e);
         });
     }
@@ -209,10 +195,7 @@ export class DB {
      */
     async getAliases(channel) {
         channel = channel.replace(/#+/g, "");
-        const data = await this.db.query(
-            this.statements.getAliases,
-            [channel],
-        ).catch((e) => {
+        const data = await this.db.query(this.statements.getAliases, [channel]).catch((e) => {
             logger.error(e);
         });
         if (!data) return [];
@@ -233,10 +216,7 @@ export class DB {
      */
     async newCounter(channel, name, inc = 1, defaultVal = 0) {
         channel = channel.replace(/#+/g, "");
-        await this.db.query(
-            this.statements.newCounter,
-            [channel, name, defaultVal, inc],
-        ).catch((e) => {
+        await this.db.query(this.statements.newCounter, [channel, name, defaultVal, inc]).catch((e) => {
             logger.error(e);
         });
     }
@@ -248,10 +228,7 @@ export class DB {
      */
     async readCounter(channel, name) {
         channel = channel.replace(/#+/g, "");
-        const data = await this.db.query(
-            this.statements.getCounter,
-            [name, channel],
-        ).catch((e) => {
+        const data = await this.db.query(this.statements.getCounter, [name, channel]).catch((e) => {
             logger.error(e);
         });
         if (!data) return;
@@ -266,10 +243,7 @@ export class DB {
      */
     async getCounter(channel, name) {
         channel = channel.replace(/#+/g, "");
-        const data = await this.db.query(
-            this.statements.incCounter,
-            [name, channel],
-        ).catch((e) => {
+        const data = await this.db.query(this.statements.incCounter, [name, channel]).catch((e) => {
             logger.error(e);
         });
         if (!data) return;
@@ -284,10 +258,7 @@ export class DB {
      */
     async setCounter(channel, name, val) {
         channel = channel.replace(/#+/g, "");
-        await this.db.query(
-            this.statements.setCounter,
-            [val, name, channel],
-        ).catch((e) => {
+        await this.db.query(this.statements.setCounter, [val, name, channel]).catch((e) => {
             logger.error(e);
         });
     }
@@ -298,10 +269,7 @@ export class DB {
      */
     async editCounter(channel, name, inc) {
         channel = channel.replace(/#+/g, "");
-        await this.db.query(
-            this.statements.editCounter,
-            [inc, name, channel],
-        ).catch((e) => {
+        await this.db.query(this.statements.editCounter, [inc, name, channel]).catch((e) => {
             logger.error(e);
         });
     }
@@ -311,10 +279,7 @@ export class DB {
      */
     async delCounter(channel, name) {
         channel = channel.replace(/#+/g, "");
-        await this.db.query(
-            this.statements.delCounter,
-            [channel, name],
-        ).catch((e) => {
+        await this.db.query(this.statements.delCounter, [channel, name]).catch((e) => {
             logger.error(e.message);
         });
     }
@@ -324,10 +289,7 @@ export class DB {
      */
     async allCounters(channel) {
         channel = channel.replace(/#+/g, "");
-        const data = await this.db.query(
-            this.statements.allCounters,
-            [channel],
-        ).catch((e) => {
+        const data = await this.db.query(this.statements.allCounters, [channel]).catch((e) => {
             logger.error(e.message);
         });
         if (!data) return [];
@@ -347,10 +309,7 @@ export class DB {
      */
     async allCcmds(channel, permission = permissions.user) {
         channel = channel.replace(/#+/g, "");
-        const data = await this.db.query(
-            this.statements.getAllCommands,
-            [channel, permission],
-        ).catch((e) => {
+        const data = await this.db.query(this.statements.getAllCommands, [channel, permission]).catch((e) => {
             logger.error(e);
         });
         if (!data) return;
@@ -367,10 +326,7 @@ export class DB {
      */
     async getCcmd(channel, commandname) {
         channel = channel.replace(/#+/g, "");
-        const data = await this.db.query(
-            this.statements.getCommand,
-            [commandname, channel],
-        ).catch((e) => {
+        const data = await this.db.query(this.statements.getCommand, [commandname, channel]).catch((e) => {
             logger.error(e);
         });
         if (!data) return undefined;
@@ -386,10 +342,7 @@ export class DB {
      */
     async newCcmd(channel, commandname, response, perms) {
         channel = channel.replace(/#+/g, "");
-        await this.db.query(
-            this.statements.newCommand,
-            [commandname, response, channel, perms],
-        ).catch((e) => {
+        await this.db.query(this.statements.newCommand, [commandname, response, channel, perms]).catch((e) => {
             logger.error(e);
         });
     }
@@ -405,12 +358,15 @@ export class DB {
             (async (cmds) => {
                 await client.query("BEGIN");
                 for (const cmd of cmds) {
-                    await client.query(
-                        this.statements.newCommand,
-                        [cmd.command, cmd.response, channel, permissions[cmdType]],
-                    ).catch((e) => { throw e; });
+                    await client
+                        .query(this.statements.newCommand, [cmd.command, cmd.response, channel, permissions[cmdType]])
+                        .catch((e) => {
+                            throw e;
+                        });
                 }
-                return await client.query("COMMIT").catch((e) => { throw e; });
+                return await client.query("COMMIT").catch((e) => {
+                    throw e;
+                });
             })(cmdData);
         } catch (e) {
             logger.error(e);
@@ -419,17 +375,14 @@ export class DB {
         }
     }
     /**
-    * Edit a Customcommand/change its response
-    * @param {string} channel
-    * @param {string} commandname
-    * @param {string} response
-    */
+     * Edit a Customcommand/change its response
+     * @param {string} channel
+     * @param {string} commandname
+     * @param {string} response
+     */
     async editCcmd(channel, commandname, response) {
         channel = channel.replace(/#+/g, "");
-        await this.db.query(
-            this.statements.updateCommand,
-            [response, commandname, channel],
-        ).catch((e) => {
+        await this.db.query(this.statements.updateCommand, [response, commandname, channel]).catch((e) => {
             logger.error(e);
         });
     }
@@ -440,10 +393,7 @@ export class DB {
      */
     async delCcmd(channel, commandname) {
         channel = channel.replace(/#+/g, "");
-        await this.db.query(
-            this.statements.deleteCommand,
-            [commandname, channel],
-        ).catch((e) => {
+        await this.db.query(this.statements.deleteCommand, [commandname, channel]).catch((e) => {
             logger.error(e);
         });
     }
@@ -456,10 +406,7 @@ export class DB {
         const client = await this.db.connect();
         try {
             channel = channel.replace(/#+/g, "");
-            const cmd = await client.query(
-                this.statements.getCommandPermission,
-                [commandname, channel],
-            ).catch((e) => {
+            const cmd = await client.query(this.statements.getCommandPermission, [commandname, channel]).catch((e) => {
                 throw e;
             });
             if (cmd?.rows?.length == 0) {
@@ -467,10 +414,7 @@ export class DB {
             }
             // @ts-ignore
             const newPerm = cmd.rows[0].permissions == permissions.user ? permissions.mod : permissions.user;
-            await client.query(
-                this.statements.changeCommandPermissions,
-                [newPerm, commandname, channel],
-            ).catch((e) => {
+            await client.query(this.statements.changeCommandPermissions, [newPerm, commandname, channel]).catch((e) => {
                 throw e;
             });
             return "ok";
@@ -490,54 +434,43 @@ export class DB {
      */
     async watchtime(channel, chatters) {
         if (this.doingWatchtime) {
-            logger.error(
-                `watchtime already in progress at ${(new Date).toLocaleTimeString()}`,
-            );
+            logger.error(`watchtime already in progress at ${new Date().toLocaleTimeString()}`);
             return;
         }
         this.doingWatchtime = true;
         const client = await this.db.connect();
         try {
-            const started = new Date;
+            const started = new Date();
             logger.debug(`starting watchtime at ${started.toLocaleTimeString()}`);
             channel = channel.replace(/#+/, "");
             const month = currentMonth();
             (async (users) => {
                 await client.query("BEGIN");
-                await client.query(
-                    this.statements.watchtimeNew,
-                    [channel, users, month],
-                ).catch((e) => {
+                await client.query(this.statements.watchtimeNew, [channel, users, month]).catch((e) => {
                     logger.error(`insert month ${e?.toString()}`);
                     client.query("ROLLBACK");
                 });
-                await client.query(
-                    this.statements.watchtimeNew,
-                    [channel, users, "alltime"],
-                ).catch((e) => {
+                await client.query(this.statements.watchtimeNew, [channel, users, "alltime"]).catch((e) => {
                     logger.error(`insert alltime ${e?.toString()}`);
                     client.query("ROLLBACK");
                 });
-                await client.query(
-                    this.statements.watchtimeInc,
-                    [users, channel, month],
-                ).catch((e) => {
+                await client.query(this.statements.watchtimeInc, [users, channel, month]).catch((e) => {
                     logger.error(`inc month ${e?.toString()}`);
                     client.query("ROLLBACK");
                 });
-                await client.query(
-                    this.statements.watchtimeInc,
-                    [users, channel, "alltime"],
-                ).catch((e) => {
+                await client.query(this.statements.watchtimeInc, [users, channel, "alltime"]).catch((e) => {
                     logger.error(`inc alltime ${e?.toString()}`);
                     client.query("ROLLBACK");
                 });
-                client.query("COMMIT").catch((e) => { throw e; });
+                client.query("COMMIT").catch((e) => {
+                    throw e;
+                });
             })(chatters);
-            const endtime = new Date;
+            const endtime = new Date();
             logger.debug(
                 `finished watchtime at ${endtime.toLocaleTimeString()}
-                Took ${endtime.getTime() - started.getTime()}ms.`);
+                Took ${endtime.getTime() - started.getTime()}ms.`,
+            );
         } catch (e) {
             logger.error(e?.toString());
         } finally {
@@ -553,17 +486,14 @@ export class DB {
      */
     async renameWatchtimeUser(channel, oldName, newName) {
         channel = channel.replace(/#+/g, "");
-        await this.db.query(
-            this.statements.renameWatchtimeUser,
-            [channel, newName, oldName],
-        ).catch((e) => {
+        await this.db.query(this.statements.renameWatchtimeUser, [channel, newName, oldName]).catch((e) => {
             logger.error(e);
         });
     }
     /** @typedef old_watchtime
      * @property {number} watchtime
      * @property {string} user
-    */
+     */
     /**
      * Watchtime migration method (and creation for new users)
      * @param {string} channel Channel where to add Watchtime
@@ -577,19 +507,15 @@ export class DB {
             (async (users) => {
                 await client.query("BEGIN");
                 const usernames = users.map((u) => u.user);
-                await client.query(
-                    this.statements.watchtimeNew,
-                    [channel, usernames, month],
-                ).catch((e) => {
+                await client.query(this.statements.watchtimeNew, [channel, usernames, month]).catch((e) => {
                     throw e;
                 });
                 for (const user of users) {
-                    await client.query(
-                        this.statements.watchtimeIncBy,
-                        [user.user, channel, month, user.watchtime],
-                    ).catch((e) => {
-                        throw e;
-                    });
+                    await client
+                        .query(this.statements.watchtimeIncBy, [user.user, channel, month, user.watchtime])
+                        .catch((e) => {
+                            throw e;
+                        });
                 }
                 return await client.query("COMMIT").catch((e) => {
                     throw e;
@@ -613,15 +539,14 @@ export class DB {
         channel = channel.replace(/#+/g, "");
         if (!(typeof max == "number")) throw new TypeError("You have to select how many entries you need as a number.");
         if (!(typeof page == "number")) throw new TypeError("You need to supply a number as page");
-        return (
-            await this.db.query(
-                this.statements.watchtimeList,
-                [month, channel, max, (page - 1) * max],
-            ).catch((e) => {
+        const data = await this.db
+            .query(this.statements.watchtimeList, [month, channel, max, (page - 1) * max])
+            .catch((e) => {
                 logger.error(e);
-            })
-            // @ts-ignore
-        )?.rows;
+            });
+
+        // @ts-ignore
+        return data?.rows;
     }
     /**
      * get Watchtime for User on Channel
@@ -632,10 +557,7 @@ export class DB {
      */
     async getWatchtime(channel, user, month = "alltime") {
         channel = channel.replace("#", "");
-        const data = await this.db.query(
-            this.statements.getWatchtime,
-            [user, channel, month],
-        ).catch((e) => {
+        const data = await this.db.query(this.statements.getWatchtime, [user, channel, month]).catch((e) => {
             logger.error(e);
         });
         // @ts-ignore
@@ -648,10 +570,7 @@ export class DB {
      * @returns {Promise<string | null>} twitch username
      */
     async getDiscordConnection(user) {
-        const data = await this.db.query(
-            this.statements.getDiscordConnection,
-            [user.id],
-        ).catch((e) => {
+        const data = await this.db.query(this.statements.getDiscordConnection, [user.id]).catch((e) => {
             logger.error(e);
         });
         // @ts-ignore
@@ -663,10 +582,7 @@ export class DB {
      * @param {string} twitchname twitch username
      */
     async newDiscordConnection(user, twitchname) {
-        await this.db.query(
-            this.statements.newDiscordConnection,
-            [user.id, twitchname],
-        ).catch((e) => {
+        await this.db.query(this.statements.newDiscordConnection, [user.id, twitchname]).catch((e) => {
             logger.error(e);
         });
     }
@@ -674,10 +590,7 @@ export class DB {
      * @param  {import("discord.js").User} user
      */
     async deleteDiscordConnection(user) {
-        await this.db.query(
-            this.statements.deleteDiscordConnection,
-            [user.id],
-        ).catch((e) => {
+        await this.db.query(this.statements.deleteDiscordConnection, [user.id]).catch((e) => {
             logger.error(e);
         });
     }
@@ -693,10 +606,7 @@ export class DB {
                     const blacklists = this.clients.twitch.blacklist[channel];
                     for (const action in blacklists) {
                         const blacklist = blacklists[action];
-                        await client.query(
-                            this.statements.saveBlacklist,
-                            [channel, blacklist, action],
-                        ).catch((e) => {
+                        await client.query(this.statements.saveBlacklist, [channel, blacklist, action]).catch((e) => {
                             throw e;
                         });
                     }
@@ -712,9 +622,7 @@ export class DB {
         }
     }
     async loadBlacklist() {
-        const data = await this.db.query(
-            this.statements.loadBlacklist,
-        ).catch((e) => {
+        const data = await this.db.query(this.statements.loadBlacklist).catch((e) => {
             logger.error(e);
         });
         if (!data) return;

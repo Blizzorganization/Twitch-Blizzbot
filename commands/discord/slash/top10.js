@@ -1,13 +1,8 @@
+import { SlashCommandBuilder } from "@discordjs/builders";
 import { MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
 import { calcWatchtime } from "twitch-blizzbot/functions";
 
-
-export const data = {
-    name: "top10",
-    description: "Watchtime Ranking",
-    type: 1,
-    options: [],
-};
+export const data = new SlashCommandBuilder().setName("top10").setDescription("Watchtime Ranking").toJSON();
 /**
  * @param  {import("discord.js").CommandInteraction} interaction
  */
@@ -26,17 +21,9 @@ export async function execute(interaction) {
     for (const viewer in watchtime) {
         embed.addField(watchtime[viewer].viewer, calcWatchtime(watchtime[viewer].watchtime), false);
     }
-    const row = new MessageActionRow()
-        .addComponents(
-            new MessageButton()
-                .setCustomId("-")
-                .setLabel("Vorherige Seite")
-                .setStyle("PRIMARY")
-                .setDisabled(true),
-            new MessageButton()
-                .setCustomId("+")
-                .setLabel("Nächste Seite")
-                .setStyle("PRIMARY"),
-        );
+    const row = new MessageActionRow().addComponents(
+        new MessageButton().setCustomId("-").setLabel("Vorherige Seite").setStyle("PRIMARY").setDisabled(true),
+        new MessageButton().setCustomId("+").setLabel("Nächste Seite").setStyle("PRIMARY"),
+    );
     await interaction.reply({ embeds: [embed], components: [row] });
 }

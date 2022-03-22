@@ -4,8 +4,6 @@ export const help = false;
 export const perm = permissions.mod;
 export const alias = ["so"];
 /**
- * @name Shoutout
- * @namespace TwitchCommands
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  * @param {import("tmi.js").ChatUserstate} context
@@ -20,5 +18,8 @@ export async function run(client, target, context, msg, self, args) {
     }
     const user = args[0];
 
-    client.say(target, `Kleines Shoutout an ${user} schaut doch auch mal bei https://www.twitch.tv/${user.toLowerCase()} vorbei`);
+    client.say(
+        target,
+        `Kleines Shoutout an ${user} schaut doch auch mal bei https://www.twitch.tv/${user.toLowerCase()} vorbei`,
+    );
 }

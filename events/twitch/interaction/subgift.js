@@ -18,6 +18,8 @@ export function event(client, channel, username, streakMonths, recipient, method
     const ave = tierlist[tiers];
     // message for Action
     logger.info(`${username} gifted ${recipient} a subscription.`);
-    client.say(channel, `/me ${username} hat ${recipient} einen ${ave} Sub geschenkt, vielen dank für deine Unterstützung !`);
-
+    client.say(
+        channel,
+        `/me ${username} hat ${recipient} einen ${ave} Sub geschenkt, vielen dank für deine Unterstützung !`,
+    );
 }

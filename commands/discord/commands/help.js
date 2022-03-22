@@ -13,7 +13,10 @@ export function run(client, message) {
         .addField("!twitchname", "Zeigt den Twitchnamen an der eingespeichert wurde")
         .addField("!top10", "Gibt die aktuellen Top10 der Watchtime liste wieder")
         .addField("!watchtime [Twitch-Name]", "Gibt die aktuelle watchtime des angegebenen Nutzers wieder")
-        .addField("!link [Twitch-Name]", "Um deinen Twitchaccount mit Discord zu verbinden so das du nur noch !watchtime eingeben muss")
+        .addField(
+            "!link [Twitch-Name]",
+            "Um deinen Twitchaccount mit Discord zu verbinden so das du nur noch !watchtime eingeben muss",
+        )
         .addField("!unlink [Twitch-Name]", "Entfernt die Verbindung zu deinem Twitch Account");
 
     message.channel.send({ embeds: [embed] });
