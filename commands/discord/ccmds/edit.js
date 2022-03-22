@@ -13,7 +13,9 @@ export async function run(client, message, args) {
     if (!args || args.length == 0) return message.channel.send({ content: "Welchen Befehl möchtest du bearbeiten?" });
     const cmd = await client.clients.db.getCcmd(twchannel, args[0]);
     if (!cmd) return message.channel.send({ content: `Ich kenne keinen Befehl ${args[0]}.` });
-    if (cmd.permissions !== permissions.user) return message.reply({ content: `${args[0]} ist kein Nutzer Customcommand.` });
+    if (cmd.permissions !== permissions.user) {
+        return message.reply({ content: `${args[0]} ist kein Nutzer Customcommand.` });
+    }
     const newcmd = args.shift().toLowerCase();
     const res = args.join(" ");
     await client.clients.db.editCcmd(twchannel, newcmd, res);

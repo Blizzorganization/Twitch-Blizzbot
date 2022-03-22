@@ -3,9 +3,9 @@ import { logger } from "twitch-blizzbot/logger";
 
 export const help = false;
 export const perm = permissions.mod;
+/** @type {string[]} */
+export const alias = [];
 /**
- * @name editcounter
- * @namespace TwitchCommands
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  * @param {import("tmi.js").ChatUserstate} context
@@ -46,6 +46,9 @@ export async function run(client, target, context, msg, self, args) {
         client.say(target, `${user} der Zähler ${name} wurde bearbeitet.`);
         logger.log("command", `* Edited Counter ${name}`);
     } else {
-        client.say(target, "Du musst angeben, welchen Zähler du bearbeiten willst, ob du den Wert oder die Erhöhung ändern willst und auf welchen Wert du dies anpassen willst.");
+        client.say(
+            target,
+            "Du musst angeben, welchen Zähler du bearbeiten willst, ob du den Wert oder die Erhöhung ändern willst und auf welchen Wert du dies anpassen willst.",
+        );
     }
 }

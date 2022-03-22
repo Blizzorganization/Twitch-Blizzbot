@@ -35,12 +35,16 @@ export class TwitchClient extends Client {
         super(opts);
         this.config = opts;
         this.started = false;
-        this.commands = new Collection;
+        this.commands = new Collection();
         this.helplist = [];
         /** @type {string[]}*/
         this.channels = [];
-        this.permittedlinks = readFileSync("./configs/links.txt", "utf8").split(/\r\n|\n\r|\n|\r/).filter((link) => link !== "");
-        this.deletelinks = readFileSync("./configs/TLDs.txt", "utf8").split(/\r\n|\n\r|\n|\r/).filter((link) => link !== "");
+        this.permittedlinks = readFileSync("./configs/links.txt", "utf8")
+            .split(/\r\n|\n\r|\n|\r/)
+            .filter((link) => link !== "");
+        this.deletelinks = readFileSync("./configs/TLDs.txt", "utf8")
+            .split(/\r\n|\n\r|\n|\r/)
+            .filter((link) => link !== "");
         this.watchtime = undefined;
         this.automessage = undefined;
         /** @type {import("./clients").Clients}*/
@@ -53,7 +57,7 @@ export class TwitchClient extends Client {
             this.newChannellogs(opts.channels);
             for (const c of opts.channels) this.cooldowns.set(c.replace("#", ""), 0);
         });
-        this.cooldowns = new Map;
+        this.cooldowns = new Map();
         this.channellogs = [];
         scheduleJob("newchannellogs", "0 1 * * *", () => this.newChannellogs(opts.channels));
         loadCommands(this.commands, "commands/twitch/commands", this.helplist);
@@ -77,7 +81,9 @@ export class TwitchClient extends Client {
         for (let channel of channels) {
             channel = channel.replace("#", "");
             if (!existsSync(`./channellogs/${channel}`)) mkdirSync(`./channellogs/${channel}`);
-            this.channellogs[channel] = createWriteStream(`./channellogs/${channel}/${dateString}.chatlog.txt`, { flags: "a" });
+            this.channellogs[channel] = createWriteStream(`./channellogs/${channel}/${dateString}.chatlog.txt`, {
+                flags: "a",
+            });
         }
     }
     /**

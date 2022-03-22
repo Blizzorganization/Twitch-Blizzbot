@@ -5,13 +5,10 @@ import { time } from "twitch-blizzbot/functions";
 export const alias = ["twitchnamen", "twname"];
 export const adminOnly = false;
 /**
- * @name tname
- * @namespace DiscordCommands
  * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
  */
 export async function run(client, message) {
-
     const dcuser = message.mentions.users.first() || message.author;
     let dbuser = await client.clients.db.getDiscordConnection(dcuser);
     if (!dbuser) dbuser = "Du hast keinen Namen hinterlegt";

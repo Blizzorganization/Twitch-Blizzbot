@@ -3,9 +3,9 @@ import { logger } from "twitch-blizzbot/logger";
 
 export const help = false;
 export const perm = permissions.mod;
+/** @type {string[]} */
+export const alias = [];
 /**
- * @name Del
- * @namespace TwitchCommands
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  * @param {import("tmi.js").ChatUserstate} context

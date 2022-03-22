@@ -8,7 +8,6 @@ import { logger } from "twitch-blizzbot/logger";
  * @param {number} viewers
  */
 export function event(client, channel, username, viewers) {
-
     // message for Action
     logger.info(`${username} raid ${viewers} viewer!`);
     if (viewers < 10) return;

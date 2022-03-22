@@ -3,8 +3,6 @@ import { calcWatchtime } from "twitch-blizzbot/functions";
 
 export const adminOnly = false;
 /**
- * @name watchtimelb
- * @namespace DiscordCommands
  * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
  * @param {string[]} args
@@ -52,6 +50,9 @@ export async function run(client, message, args) {
         await outmsg.react(reaction.emoji.name);
     });
     coll.on("end", () => {
-        outmsg.edit({ content: "Die Zeit ist abgelaufen, wenn du erneut abfragen möchtest, so frage erneut an.", embeds: outmsg.embeds });
+        outmsg.edit({
+            content: "Die Zeit ist abgelaufen, wenn du erneut abfragen möchtest, so frage erneut an.",
+            embeds: outmsg.embeds,
+        });
     });
 }

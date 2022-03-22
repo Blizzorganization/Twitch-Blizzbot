@@ -1,14 +1,14 @@
-export const data = {
-    name: "link",
-    description: "Verknüpfe deinen Twitch Account mit deinem Discord Account",
-    type: 1,
-    options: [{
-        type: 3,
-        name: "name",
-        description: "Twitch Username",
-        required: true,
-    }],
-};
+import { SlashCommandBuilder } from "@discordjs/builders";
+
+export const data = new SlashCommandBuilder()
+    .setDescription("Verknüpfe deinen Twitch Account mit deinem Discord Account")
+    .setName("link")
+    .addStringOption((input) => input.setName("name").setRequired(true).setDescription("Twitch Userame"))
+    .toJSON();
+
+/**
+ * @param  {import("discord.js").CommandInteraction} interaction
+ */
 export async function execute(interaction) {
     /** @type {import("twitch-blizzbot/discordclient").DiscordClient}*/
     // @ts-ignore
@@ -16,5 +16,9 @@ export async function execute(interaction) {
     const name = interaction.options.getString("name").toLowerCase();
     const previous = await client.clients.db.getDiscordConnection(interaction.user);
     await client.clients.db.newDiscordConnection(interaction.user, name);
-    await interaction.reply(previous == null || previous == undefined ? `Der Name **${name.toLowerCase()}** wurde erfolgreich eingetragen` : `Du hast deinen Namen von **${previous}** auf **${name.toLowerCase()}** geändert.`);
+    await interaction.reply(
+        previous == null || previous == undefined
+            ? `Der Name **${name.toLowerCase()}** wurde erfolgreich eingetragen`
+            : `Du hast deinen Namen von **${previous}** auf **${name.toLowerCase()}** geändert.`,
+    );
 }

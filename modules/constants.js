@@ -1,3 +1,6 @@
+/**
+ * @enum {number}
+ */
 export const permissions = {
     user: 0,
     sub: 1,

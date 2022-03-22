@@ -17,7 +17,11 @@ export function event(client, message) {
                 } else {
                     channel = args.shift().toLowerCase();
                 }
-                if (!channel.startsWith("#")) return message.channel.send({ content: "Es wurde nicht angegeben, wo die Nachricht gesendet werden soll." });
+                if (!channel.startsWith("#")) {
+                    return message.channel.send({
+                        content: "Es wurde nicht angegeben, wo die Nachricht gesendet werden soll.",
+                    });
+                }
                 client.clients.twitch.say(channel, args.join(" "));
             }
             break;

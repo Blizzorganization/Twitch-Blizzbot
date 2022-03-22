@@ -5,10 +5,10 @@ import { logger } from "twitch-blizzbot/logger";
 
 export const help = false;
 export const perm = permissions.mod;
+/** @type {string[]} */
+export const alias = [];
 export const silent = true;
 /**
- * @name blacklist
- * @namespace TwitchCommands
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  * @param {import("tmi.js").ChatUserstate} context
@@ -19,13 +19,9 @@ export async function run(client, target, context) {
         content: `In der Blacklist für ${target} sind die Wörter \
         \`\`\`fix\n${getTable(client.blacklist[target.replace(/#+/g, "")])}\`\`\` enthalten.`,
         components: [
-            new MessageActionRow()
-                .setComponents(
-                    new MessageButton()
-                        .setCustomId("refresh-blacklist")
-                        .setEmoji("🔄")
-                        .setStyle("PRIMARY"),
-                ),
+            new MessageActionRow().setComponents(
+                new MessageButton().setCustomId("refresh-blacklist").setEmoji("🔄").setStyle("PRIMARY"),
+            ),
         ],
     });
     client.say(target, `${user} Blacklist wurde gesendet`);

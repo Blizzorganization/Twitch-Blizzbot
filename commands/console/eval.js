@@ -17,7 +17,7 @@ export function run(clients, args) {
  * @param  {string} line
  */
 export function completer(clients, line) {
-    const completions = Object.keys(global).filter(i => !i.startsWith("_"));
+    const completions = Object.keys(global).filter((i) => !i.startsWith("_"));
     const args = line.split(" ");
     // eslint-disable-next-line no-sparse-arrays
     if (args.length > 2) return [, line];

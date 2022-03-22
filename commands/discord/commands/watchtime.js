@@ -4,8 +4,6 @@ import { calcWatchtime } from "twitch-blizzbot/functions";
 export const alias = ["wt"];
 export const adminOnly = false;
 /**
- * @name uwtime
- * @namespace DiscordCommands
  * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
  * @param {string[]} args
@@ -27,7 +25,9 @@ export async function run(client, message, args) {
             user = args.shift().toLowerCase();
         }
     }
-    if (user == "") return message.channel.send("Du musst angeben, für welchen Account du die Watchtime abfragen möchtest.");
+    if (user == "") {
+        return message.channel.send("Du musst angeben, für welchen Account du die Watchtime abfragen möchtest.");
+    }
     const watchtime = await client.clients.db.getWatchtime(channel, user, "alltime");
     const maxWatchtime = await client.clients.db.getWatchtime(channel, client.clients.twitch.getUsername(), "alltime");
     if (!watchtime) return message.channel.send("Diesen Nutzer kenne ich nicht.");
@@ -37,7 +37,7 @@ export async function run(client, message, args) {
         .setTitle("**__Watchtime__**")
         .addField("Nutzername", user)
         .addField("Watchtime", `${calcWatchtime(watchtime)}`)
-        .addField("Von der registrierten Zeit", `${Math.round(1000 * watchtime / maxWatchtime) / 10}%`);
+        .addField("Von der registrierten Zeit", `${Math.round((1000 * watchtime) / maxWatchtime) / 10}%`);
 
     message.channel.send({ embeds: [embed] });
 }

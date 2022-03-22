@@ -5,8 +5,6 @@ export const help = false;
 export const perm = permissions.mod;
 export const alias = ["tf"];
 /**
- * @name transferCmd
- * @namespace TwitchCommands
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  * @param {import("tmi.js").ChatUserstate} context
@@ -19,12 +17,14 @@ export async function run(client, target, context, msg, self, args) {
         const cmd = args.shift().toLowerCase();
         const dbres = await client.clients.db.transferCmd(target, cmd);
         switch (dbres) {
-            case "no_such_command":
-            {
+            case "no_such_command": {
                 const resolvedAlias = await client.clients.db.resolveAlias(target, cmd);
                 if (resolvedAlias) {
                     logger.warn(`${cmd} is an alias so it's permissions didn't get changed.`);
-                    return client.say(target, `'${cmd}' ist ein Alias, wenn du wechseln möchtest nutze bitte den Befehl ${resolvedAlias.command}.`);
+                    return client.say(
+                        target,
+                        `'${cmd}' ist ein Alias, wenn du wechseln möchtest nutze bitte den Befehl ${resolvedAlias.command}.`,
+                    );
                 }
                 return client.say(target, `Der Befehl ${cmd} ist nicht vorhanden.`);
             }
@@ -38,6 +38,9 @@ export async function run(client, target, context, msg, self, args) {
                 break;
         }
     } else {
-        client.say(target, "Du musst angeben, welcher Befehl zwischen Nutzerbefehl und Moderationsbefehl gewechselt werden soll.");
+        client.say(
+            target,
+            "Du musst angeben, welcher Befehl zwischen Nutzerbefehl und Moderationsbefehl gewechselt werden soll.",
+        );
     }
 }

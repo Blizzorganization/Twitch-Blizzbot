@@ -5,8 +5,7 @@ export const help = true;
 export const perm = permissions.mod;
 export const alias = ["emotes"];
 /**
- * @name emotes
- * @namespace TwitchCommands
+ * @author Speed-r
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  * @param {import("tmi.js").ChatUserstate} context
@@ -30,11 +29,16 @@ export async function run(client, target, context, msg, self, args) {
                 if (subEmotes === "This channel does not have any subscriber emotes.") {
                     client.say(target, "Auf diesem Kanal sind keine Sub-Emotes verfügbar");
                 } else {
-                    client.say(target, `Auf dem Kanal ${target.slice(1)} sind zur Zeit folgende Subscriber-Emotes vorhanden: ${subEmotes}`);
+                    client.say(
+                        target,
+                        `Auf dem Kanal ${target.slice(
+                            1,
+                        )} sind zur Zeit folgende Subscriber-Emotes vorhanden: ${subEmotes}`,
+                    );
                 }
             }
             break;
-    // Bettertwitch Emotes
+        // Bettertwitch Emotes
         case "bttv":
         case "bettertwitchtv":
             {
@@ -43,7 +47,10 @@ export async function run(client, target, context, msg, self, args) {
                 if (bttvEmotes === `Unable to retrieve BetterTTV details for channel: ${target.slice(1)}`) {
                     client.say(target, "Auf diesem Kanal sind keine BTTV-Emotes verfügbar");
                 } else {
-                    client.say(target, `Auf dem Kanal ${target.slice(1)} sind folgende BTTV-Emotes vorhanden: ${bttvEmotes}`);
+                    client.say(
+                        target,
+                        `Auf dem Kanal ${target.slice(1)} sind folgende BTTV-Emotes vorhanden: ${bttvEmotes}`,
+                    );
                 }
             }
             break;

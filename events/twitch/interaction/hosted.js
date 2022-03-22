@@ -11,7 +11,6 @@ import { logger } from "twitch-blizzbot/logger";
  * @param {Boolean} autohost
  */
 export function event(client, channel, username, viewers, autohost) {
-
     // message for Action
     logger.info(`${username} hosted ${viewers} viewer!`);
     client.say(channel, `/me ${username} Hosted mit ${viewers} Zuschauer!`);

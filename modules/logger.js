@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync } from "fs";
 import { EOL } from "os";
-import { createLogger, format as _format, transports as _transports } from "winston";
+import { format as _format, transports as _transports, createLogger } from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
 
 if (!existsSync("./logs")) mkdirSync("./logs");
@@ -10,7 +10,6 @@ export const logger = createLogger({
         colorize: true,
     }),
     transports: [
-
         new DailyRotateFile({
             createSymlink: true,
             dirname: "logs/",

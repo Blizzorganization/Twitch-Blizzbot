@@ -3,9 +3,9 @@ import { calcWatchtime, currentMonth } from "twitch-blizzbot/functions";
 
 export const help = false;
 export const perm = permissions.mod;
+/** @type {string[]} */
+export const alias = [];
 /**
- * @name mtime
- * @namespace TwitchCommands
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  * @param {import("tmi.js").ChatUserstate} context
