@@ -5,7 +5,6 @@ export const help = true;
 export const perm = permissions.mod;
 export const alias = ["emotes"];
 /**
- * @author Speed-r
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  * @param {import("tmi.js").ChatUserstate} context
