@@ -5,6 +5,8 @@ import { time } from "twitch-blizzbot/functions";
 export const alias = ["twitchnamen", "twname"];
 export const adminOnly = false;
 /**
+ * @name twitchname
+ * @namespace DiscordCommands
  * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
  */

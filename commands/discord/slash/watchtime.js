@@ -14,6 +14,8 @@ export const data = new SlashCommandBuilder()
     .toJSON();
 
 /**
+ * @name watchtime
+ * @namespace DiscordCommands
  * @param  {import("discord.js").CommandInteraction} interaction
  */
 export async function execute(interaction) {

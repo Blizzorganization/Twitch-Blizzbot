@@ -1,5 +1,7 @@
 export const adminOnly = false;
 /**
+ * @name userlink
+ * @namespace DiscordCommands
  * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
  */

@@ -4,6 +4,8 @@ export const help = false;
 export const perm = permissions.mod;
 export const alias = ["ccmds"];
 /**
+ * @name help
+ * @namespace TwitchCommands
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  */

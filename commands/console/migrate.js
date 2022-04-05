@@ -4,7 +4,7 @@ import { existsSync, readdirSync } from "fs";
 import { logger } from "twitch-blizzbot/logger";
 
 /**
- * @name eval
+ * @name migrate
  * @namespace ConsoleCommands
  * @param {import("twitch-blizzbot/clients").Clients} clients
  * @param {string[]} args

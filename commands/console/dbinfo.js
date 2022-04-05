@@ -6,6 +6,8 @@ import Util from "util";
 global.util = Util;
 global.fs = fs;
 /**
+ * @name dbinfo
+ * @namespace ConsoleCommands
  * @param {import("twitch-blizzbot/clients").Clients} clients
  */
 export async function run(clients) {

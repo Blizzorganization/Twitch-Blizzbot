@@ -5,6 +5,8 @@ import Util from "util";
 global.util = Util;
 global.fs = fs;
 /**
+ * @name eval
+ * @namespace ConsoleCommands
  * @param {import("twitch-blizzbot/clients").Clients} clients
  * @param {string[]} args
  */

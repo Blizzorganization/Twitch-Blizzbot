@@ -5,6 +5,8 @@ const { find, findKey } = lodash;
 
 export const adminOnly = true;
 /**
+ * @name deleteblacklist
+ * @namespace DiscordCommands
  * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
  * @param {string[]} args

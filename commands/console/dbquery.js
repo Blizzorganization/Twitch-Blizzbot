@@ -2,6 +2,8 @@ import { getTable } from "twitch-blizzbot/functions";
 import { logger } from "twitch-blizzbot/logger";
 import { inspect } from "util";
 /**
+ * @name dbquery
+ * @namespace ConsoleCommands
  * @param {import("twitch-blizzbot/clients").Clients} clients
  * @param {string[]} args
  */

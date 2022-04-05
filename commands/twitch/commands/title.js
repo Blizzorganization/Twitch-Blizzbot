@@ -5,6 +5,8 @@ export const help = true;
 export const perm = permissions.user;
 export const alias = ["titel"];
 /**
+ * @name title
+ * @namespace TwitchCommands
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  */

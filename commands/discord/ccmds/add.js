@@ -3,6 +3,8 @@ import { logger } from "twitch-blizzbot/logger";
 
 export const adminOnly = true;
 /**
+ * @name addCcmd
+ * @namespace DiscordCommands
  * @param  {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param  {import("discord.js").Message} message
  * @param  {string[]} args

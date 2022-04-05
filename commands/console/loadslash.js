@@ -6,6 +6,8 @@ export function run(clients) {
     loadSlash(clients.discord, clients.discord.commandchannel.guild.id);
 }
 /**
+ * @name loadSlash
+ * @namespace ConsoleCommands
  * @param  {import("twitch-blizzbot/clients").Clients} clients
  * @param  {string} line
  */
