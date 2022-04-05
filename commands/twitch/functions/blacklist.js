@@ -9,6 +9,8 @@ export const perm = permissions.mod;
 export const alias = [];
 export const silent = true;
 /**
+ * @name blacklist
+ * @namespace TwitchCommands
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  * @param {import("tmi.js").ChatUserstate} context

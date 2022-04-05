@@ -3,6 +3,8 @@ import { getTable } from "twitch-blizzbot/functions";
 
 export const adminOnly = true;
 /**
+ * @name blacklist
+ * @namespace DiscordCommands
  * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  */
 export function run(client) {

@@ -6,6 +6,8 @@ export const help = true;
 export const perm = permissions.user;
 export const alias = ["alter"];
 /**
+ * @name accountage
+ * @namespace TwitchCommands
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  * @param {import("tmi.js").ChatUserstate} context

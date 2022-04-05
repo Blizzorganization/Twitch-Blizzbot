@@ -5,7 +5,8 @@ export const perm = permissions.vip;
 /** @type {string[]} */
 export const alias = [];
 /**
- * @name raid
+ * @author Speed-r
+ * @name Raidminutes
  * @namespace TwitchCommands
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target

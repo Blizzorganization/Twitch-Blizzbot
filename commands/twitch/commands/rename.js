@@ -5,6 +5,8 @@ export const perm = permissions.dev;
 /** @type {string[]} */
 export const alias = [];
 /**
+ * @name renameWatchtimeUser
+ * @namespace TwitchCommands
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  * @param {import("tmi.js").ChatUserstate} context

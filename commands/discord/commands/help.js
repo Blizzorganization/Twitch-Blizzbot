@@ -2,6 +2,8 @@ import { MessageEmbed } from "discord.js";
 export const alias = ["hilfe"];
 export const adminOnly = false;
 /**
+ * @name help
+ * @namespace DiscordCommands
  * @param  {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param  {import("discord.js").Message} message
  */

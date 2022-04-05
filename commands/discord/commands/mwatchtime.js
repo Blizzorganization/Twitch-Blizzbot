@@ -3,6 +3,8 @@ import { calcWatchtime, currentMonth } from "twitch-blizzbot/functions";
 
 export const adminOnly = true;
 /**
+ * @name watchtimechannel
+ * @namespace DiscordCommands
  * @description displays the watchtime of a user
  * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message

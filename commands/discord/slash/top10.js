@@ -4,6 +4,8 @@ import { calcWatchtime } from "twitch-blizzbot/functions";
 
 export const data = new SlashCommandBuilder().setName("top10").setDescription("Watchtime Ranking").toJSON();
 /**
+ * @name watchtimechannel
+ * @namespace DiscordCommands
  * @param  {import("discord.js").CommandInteraction} interaction
  */
 export async function execute(interaction) {
