@@ -8,10 +8,11 @@ import { logger } from "./logger.js";
  */
 /**
  * load commands
+ *
  * @param {Map} commandmap a Map to store commands for execution
  * @param {string} commanddir path to command directory relative to project root
  * @param {string[]} helplist
- * @throws {LoadError} missing command directory
+ * @throws {CustomError} missing command directory
  */
 export function loadCommands(commandmap, commanddir, helplist = []) {
     const readcommanddir = `./${commanddir}`;
@@ -40,7 +41,7 @@ export function loadCommands(commandmap, commanddir, helplist = []) {
  * @param {string} eventdir Event directory relative to project root
  * @param {import("./discordclient").DiscordClient | import("./twitchclient").TwitchClient} eventemitter an EventEmitter
  * @example loadEvents("events/twitch", client)
- * @throws {LoadError} missing command directory
+ * @throws {CustomError} missing command directory
  */
 export function loadEvents(eventdir, eventemitter) {
     const readeventdir = `./${eventdir}`;
@@ -75,19 +76,25 @@ export function calcWatchtime(watchtime) {
     timeDays /= 1440;
     return `${timeDays} Tag(en), ${timeHours} Stunde(n) und ${timeMinutes} Minute(n)`;
 }
+/**
+ * @template T
+ * @param {T[]} list
+ * @returns {T} a random array entry
+ * @throws {CustomError} list is not an array
+ */
 export function getRandom(list) {
-    if (!Array.isArray(list)) throw new CustomError("TypeError", "getRandom erfordert ein Array.");
+    if (!Array.isArray(list)) throw new CustomError("TypeError", "getRandom requires an Array.");
     const index = Math.floor(list.length * Math.random());
     return list[index];
 }
 /**
- * @returns {string}
+ * @returns {string} the current date in the format MM-YYYY
  * @example '08-2021'
  */
 export function currentMonth() {
     const date = new Date();
     const mon = date.getMonth() + 1;
-    const m = mon > 9 ? `${mon}` : `0${mon}`;
+    const m = `${mon}`.padStart(2, "0");
     const y = date.getFullYear();
     return `${m}-${y}`;
 }
@@ -99,7 +106,8 @@ const ts = new Transform({
 });
 const con = new Console({ stdout: ts });
 /**
- * @param  {any} data
+ * @param  {object | Array} data tabular Data
+ * @returns {string} the Data displayed as a table in text form
  */
 export function getTable(data) {
     con.table(data);
@@ -107,6 +115,7 @@ export function getTable(data) {
 }
 /**
  * @param  {string} str
+ * @returns {string} the translated time string
  */
 export function time(str) {
     return str

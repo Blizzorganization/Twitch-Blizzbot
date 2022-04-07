@@ -1,6 +1,12 @@
+/**
+ * a customizable error
+ *
+ * @class CustomError
+ */
 export class CustomError extends Error {
     /**
      * generates a custom Error
+     *
      * @param {string} type Errortype
      * @param {string} message default Error Message
      * @param {string} [stack] stacktrace

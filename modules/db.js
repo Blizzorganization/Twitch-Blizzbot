@@ -12,6 +12,11 @@ import { logger } from "./logger.js";
 
 const { Pool } = pg;
 
+/**
+ * The Database class
+ *
+ * @class DB
+ */
 export class DB {
     /**
      * @param {import("../typings/dbtypes").Config} config
@@ -113,12 +118,15 @@ export class DB {
     }
     /**
      * stops the database
+     *
+     * @returns {Promise<void>} the promise of the closing database
      */
     stop() {
         return this.db.end();
     }
     /**
      * add a new channel to the database
+     *
      * @param {string} channel
      */
     async newChannel(channel) {
@@ -139,6 +147,7 @@ export class DB {
     }
     /**
      * add a new channel to the database
+     *
      * @param {string} channel
      */
     async getChannel(channel) {
@@ -151,6 +160,7 @@ export class DB {
     // #region Aliases
     /**
      * adds an Alias to a custom command
+     *
      * @param {string} channel Channel where to add the Alias
      * @param {string} name name of the Alias
      * @param {string} command Command the alias refers to
@@ -179,8 +189,9 @@ export class DB {
     }
     /**
      * delete an alias
-     * @param {string} name Name of the Alias to delete
+     *
      * @param {string} channel
+     * @param {string} name Name of the Alias to delete
      */
     async deleteAlias(channel, name) {
         channel = channel.replace(/#+/g, "");
@@ -190,6 +201,7 @@ export class DB {
     }
     /**
      * Get all existing aliases
+     *
      * @param {string} channel
      * @returns {Promise<import("../typings/dbtypes").Alias[]>} List of all Aliases
      */
@@ -209,6 +221,7 @@ export class DB {
     // #region counters
     /**
      * creates a new counter
+     *
      * @param  {string} channel channel to create the counter for
      * @param  {string} name counter name
      * @param  {number} [inc = 1] the automatic increase
@@ -222,6 +235,7 @@ export class DB {
     }
     /**
      * read only, does NOT modify the value
+     *
      * @param {string} channel
      * @param {string} name
      * @returns {Promise<number?>} value if exists
@@ -239,7 +253,7 @@ export class DB {
     /**
      * @param  {string} channel
      * @param  {string} name
-     * @returns {Promise<number?>}
+     * @returns {Promise<number?>} the counter value
      */
     async getCounter(channel, name) {
         channel = channel.replace(/#+/g, "");
@@ -285,7 +299,7 @@ export class DB {
     }
     /**
      * @param  {string} channel
-     * @returns {Promise<import("../typings/dbtypes").Counter[]>}
+     * @returns {Promise<import("../typings/dbtypes").Counter[]>} a list of counters
      */
     async allCounters(channel) {
         channel = channel.replace(/#+/g, "");
@@ -303,6 +317,7 @@ export class DB {
     // #region Customcommands
     /**
      * get all customcommands
+     *
      * @returns {Promise<string[]>} list of customcommands
      * @param {string} channel
      * @param {number} permission
@@ -320,8 +335,9 @@ export class DB {
     }
     /**
      * get response of customcommand
-     * @param {string} commandname
+     *
      * @param {string} channel
+     * @param {string} commandname
      * @returns {Promise<?import("../typings/dbtypes").CustomCommand>} response
      */
     async getCcmd(channel, commandname) {
@@ -335,6 +351,7 @@ export class DB {
     }
     /**
      * Create new Customcommand/change its response
+     *
      * @param {string} channel
      * @param {string} commandname
      * @param {string} response
@@ -376,6 +393,7 @@ export class DB {
     }
     /**
      * Edit a Customcommand/change its response
+     *
      * @param {string} channel
      * @param {string} commandname
      * @param {string} response
@@ -388,6 +406,7 @@ export class DB {
     }
     /**
      * delete a Customcommand
+     *
      * @param {string} channel
      * @param {string} commandname
      */
@@ -399,6 +418,7 @@ export class DB {
     }
     /**
      * transfers a customcommande to another permission level
+     *
      * @param  {string} channel
      * @param  {string} commandname
      */
@@ -429,6 +449,7 @@ export class DB {
     // #region watchtime
     /**
      * Default Watchtime Increase (and creation for new users)
+     *
      * @param {string} channel Channel where to add Watchtime
      * @param {string[]} chatters List of Users to add Watchtime to
      */
@@ -480,6 +501,7 @@ export class DB {
     }
     /**
      * rename a watchtime user
+     *
      * @param {string} channel Channel where to rename the viewer
      * @param {string} oldName previous name of the viewer
      * @param {string} newName new name to change to
@@ -490,12 +512,14 @@ export class DB {
             logger.error(e);
         });
     }
-    /** @typedef old_watchtime
+    /**
+     * @typedef old_watchtime
      * @property {number} watchtime
      * @property {string} user
      */
     /**
      * Watchtime migration method (and creation for new users)
+     *
      * @param {string} channel Channel where to add Watchtime
      * @param {old_watchtime[]} chatters List of Users to add Watchtime to
      * @param {string} month The month to add the watchtime at
@@ -529,11 +553,12 @@ export class DB {
     }
     /**
      * get a top list of watchtime
+     *
      * @param {string} channel Twitch Channel Name
+     * @param {string | number} month
      * @param {number} max Amount of Viewers to fetch
      * @param {number} page
      * @returns {Promise<watchtimeuser[]>} Sorted Watchtime List
-     * @param {string | number} month
      */
     async watchtimeList(channel, month, max, page = 1) {
         channel = channel.replace(/#+/g, "");
@@ -550,6 +575,7 @@ export class DB {
     }
     /**
      * get Watchtime for User on Channel
+     *
      * @param {string} channel
      * @param {string} user
      * @param {string} [month]
@@ -566,6 +592,7 @@ export class DB {
     // #endregion watchtime
     /**
      * get linked twitch account if exists, otherwise returns null
+     *
      * @param {import("discord.js").User} user discord user
      * @returns {Promise<string | null>} twitch username
      */
@@ -578,6 +605,7 @@ export class DB {
     }
     /**
      * Set a twitch user to your discord user
+     *
      * @param {import("discord.js").User} user discord user
      * @param {string} twitchname twitch username
      */
@@ -595,6 +623,9 @@ export class DB {
         });
     }
     // #region blacklist
+    /**
+     * saves the current blacklist to the database
+     */
     async saveBlacklist() {
         const channels = this.clients.twitch.channels;
         const client = await this.db.connect();
@@ -621,6 +652,9 @@ export class DB {
             client.release();
         }
     }
+    /**
+     * loads the blacklist into the client
+     */
     async loadBlacklist() {
         const data = await this.db.query(this.statements.loadBlacklist).catch((e) => {
             logger.error(e);

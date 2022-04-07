@@ -8,7 +8,7 @@ import { logger } from "twitch-blizzbot/logger";
  * @param {string} channel
  * @param {string} username
  * @param {number} viewers
- * @param {Boolean} autohost
+ * @param {boolean} autohost
  */
 export function event(client, channel, username, viewers, autohost) {
     // message for Action

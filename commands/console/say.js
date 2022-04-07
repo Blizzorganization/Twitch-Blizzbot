@@ -14,13 +14,17 @@ export function run(clients, args) {
         channel = clients.twitch.config.channels[0];
     } else {
         channel = args.shift();
-        if (!channel.startsWith("#")) return logger.error("No channel supplied, message will not be sent.");
+        if (!channel.startsWith("#")) {
+            logger.error("No channel supplied, message will not be sent.");
+            return;
+        }
     }
     clients.twitch.say(channel, args.join(" "));
 }
 /**
  * @param  {import("twitch-blizzbot/clients").Clients} clients
  * @param  {string} line
+ * @returns {[string[], string]} the completion
  */
 export function completer(clients, line) {
     if (clients.twitch.config.channels.length == 1) return [, line];

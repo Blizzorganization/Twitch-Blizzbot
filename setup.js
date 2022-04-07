@@ -8,7 +8,8 @@ import { promisify } from "util";
 
 const { merge } = lodash;
 
-/** @typedef translations
+/**
+ * @typedef translations
  * @property {string} welcome
  * @property {string} existing
  * @property {string} confirm
@@ -179,7 +180,7 @@ export const createConfig = async () => {
     const protoQuestion = promisify(rl.question).bind(rl);
     /**
      * @param {string} q
-     * @returns {Promise<string>}
+     * @returns {Promise<string>} the answer
      */
     const question = (q) => protoQuestion(`${q}${EOL}`);
     console.log("Welcome to the Twitch Blizzbot configuration guide");
@@ -199,7 +200,7 @@ export const createConfig = async () => {
     /**
      * @param  {keyof translations} which which question to ask
      * @param  {(string | number | boolean)} [pre = undefined] previous value if exists
-     * @returns {Promise<string>}
+     * @returns {Promise<string>} the answer
      */
     async function request(which, pre) {
         let response;
@@ -286,7 +287,7 @@ const writeData = () => writeFileSync("./configs/config.json", JSON.stringify(ex
 
 /**
  * @param {string} response
- * @returns {boolean|null}
+ * @returns {boolean|null} the parsed boolean or null if not a boolean
  */
 function parseBoolean(response) {
     response = response.toLowerCase();

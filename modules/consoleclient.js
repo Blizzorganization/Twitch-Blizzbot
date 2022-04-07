@@ -5,12 +5,15 @@ import { loadCommands } from "./functions.js";
 import { logger } from "./logger.js";
 /**
  * ConsoleClient Class
+ *
  * @class
- * @property {Interface} rl readline Instance
- * @property {Clients} clients Access to the other clients
+ * @property {import("readline").Interface} rl readline Instance
+ * @property {import("twitch-blizzbot/clients").Clients} clients Access to the other clients
  * @property {Collection} commands
  */
 export class ConsoleClient extends EventEmitter {
+    /**
+     */
     constructor() {
         super();
         /** @type {import("./clients").Clients} */
@@ -21,6 +24,10 @@ export class ConsoleClient extends EventEmitter {
         loadCommands(this.commands, "commands/console");
         const commands = this.commands;
         const cc = this;
+        /**
+         * @param {string} line
+         * @returns {[string[], string]} the completion
+         */
         function completer(line) {
             const completions = commands.map((val, key) => key);
             const hits = completions.filter((c) => c.startsWith(line) || line.startsWith(c));
@@ -73,6 +80,7 @@ export class ConsoleClient extends EventEmitter {
     }
     /**
      * method for parsing a line from readline
+     *
      * @param {string} line
      */
     online(line) {

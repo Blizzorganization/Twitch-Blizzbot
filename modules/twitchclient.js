@@ -11,18 +11,23 @@ import { logger } from "./logger.js";
  * @property {string[]} devs
  * @property {number} Raidminutes
  * @property {string} clientId
- *
  * @typedef {configExtension & import("tmi.js").Options} config
  */
+
+/**
+ * @typedef {{[key: `${number}`]: string[]}} blacklist
+ */
+
 /**
  * TwitchClient
+ *
  * @class TwitchClient
- * @extends {Client}
+ * @augments {Client}
  * @property {import("fs").WriteStream[]} channellogs
  * @property {import("./clients").Clients} clients
  * @property {boolean} started
  * @property {Collection} commands
- * @property {{[key: string]: string[]}} blacklist
+ * @property {blacklist} blacklist
  * @property {any} watchtime
  * @property {any} automessage
  * @property {string[]} channels
@@ -49,7 +54,7 @@ export class TwitchClient extends Client {
         this.automessage = undefined;
         /** @type {import("./clients").Clients}*/
         this.clients = undefined;
-        /** @type {{[key: string]: {[key: string]: string[]}}}*/
+        /** @type {{[key: string]: blacklist}}*/
         // @ts-ignore
         this.blacklist = [];
         if (!existsSync("./channellogs")) mkdirSync("./channellogs");
@@ -70,6 +75,7 @@ export class TwitchClient extends Client {
     }
     /**
      * generates channellogs
+     *
      * @param {string[]} channels Channels to create channel logs for
      */
     newChannellogs(channels = this.channels) {
