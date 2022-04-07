@@ -2,12 +2,12 @@ import { Client, Collection, Intents, TextChannel } from "discord.js";
 import { loadCommands, loadEvents } from "./functions.js";
 import { logger } from "./logger.js";
 /**
- * @typedef {Object} config
+ * @typedef {object} config
  * @property {string} token
  * @property {string} prefix
  * @property {string} watchtimechannel
  * @property {string[]} evalUsers
- * @property {Object} channels
+ * @property {object} channels
  * @property {string} channels.blacklist
  * @property {string} channels.commands
  * @property {string} channels.relay
@@ -16,8 +16,9 @@ import { logger } from "./logger.js";
 
 /**
  * Discord Client
+ *
  * @class DiscordClient
- * @extends Client
+ * @augments Client
  * @property {config} config
  * @property {Collection} commands
  * @property {string[]} helplist
@@ -29,6 +30,7 @@ import { logger } from "./logger.js";
 export class DiscordClient extends Client {
     /**
      * https://github.com/Blizzor/Twitch-Blizzbot.wiki.git
+     *
      * @param {config} config discord part of the config file
      */
     constructor(config) {

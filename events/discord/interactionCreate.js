@@ -66,7 +66,10 @@ async function handleButton(i) {
  * @param {import("discord.js").Interaction} interaction
  */
 export function event(client, interaction) {
-    if (interaction.isButton()) return handleButton(interaction);
+    if (interaction.isButton()) {
+        handleButton(interaction);
+        return;
+    }
     if (!interaction.isCommand()) return;
     const commands = client.slashcommands;
     if (!commands.has(interaction.commandName)) return;
@@ -74,6 +77,7 @@ export function event(client, interaction) {
         commands.get(interaction.commandName).execute(interaction);
     } catch (e) {
         logger.error(e);
-        return interaction.reply({ content: "There was an error while executing this command!", ephemeral: true });
+        interaction.reply({ content: "There was an error while executing this command!", ephemeral: true });
+        return;
     }
 }

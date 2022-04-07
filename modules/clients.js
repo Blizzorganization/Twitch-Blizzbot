@@ -2,7 +2,15 @@ import { logger } from "twitch-blizzbot/logger";
 import { DB } from "./db.js";
 import slashsetup from "./slashsetup.js";
 
+/**
+ * a class containing all client objects
+ *
+ * @class Clients
+ */
 export class Clients {
+    /**
+     * @param  {import("../typings/config").config} config
+     */
     constructor(config) {
         this.loadSlash = slashsetup;
         this.config = config;

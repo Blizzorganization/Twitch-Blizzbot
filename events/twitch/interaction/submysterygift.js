@@ -7,6 +7,7 @@ import { logger } from "twitch-blizzbot/logger";
  * @param  {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param  {string} channel
  * @param  {string} username
+ * @param  {number} numbofSubs
  * @param  {string} recipient
  * @param  {import("tmi.js").SubMethod} methods
  * @param  {import("tmi.js").SubUserstate} userstate

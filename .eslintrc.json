@@ -3,11 +3,14 @@
         "es2021": true,
         "node": true
     },
-    "extends": ["eslint:recommended"],
+    "extends": ["eslint:recommended", "plugin:jsdoc/recommended"],
     "parserOptions": {
         "ecmaVersion": "latest",
         "sourceType": "module"
     },
+    "plugins": [
+        "jsdoc"
+    ],
     "rules": {
         "indent": [
             2,
@@ -43,6 +46,9 @@
             "property"
         ],
         "handle-callback-err": "off",
+        "jsdoc/require-param-description": "off",
+        "jsdoc/require-property-description": "off",
+        "jsdoc/valid-types": "off",
         "keyword-spacing": "error",
         "max-nested-callbacks": [
             "error",
@@ -84,6 +90,16 @@
         ],
         "no-var": "error",
         "prefer-const": "error",
+        "require-jsdoc": [
+            "error",
+            {
+                "require": {
+                    "FunctionDeclaration": true,
+                    "MethodDefinition": true,
+                    "ClassDeclaration": true
+                }
+            }
+        ],
         "semi": [
             "error",
             "always"
@@ -116,7 +132,13 @@
         "space-infix-ops": "error",
         "space-unary-ops": "error",
         "spaced-comment": "error",
+        "valid-jsdoc":"off",
         "yoda": "error",
         "prefer-template": "warn"
+    },
+    "settings": {
+        "jsdoc": {
+            "mode": "typescript"
+        }
     }
 }

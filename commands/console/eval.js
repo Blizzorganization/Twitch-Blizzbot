@@ -17,6 +17,7 @@ export function run(clients, args) {
 /**
  * @param  {import("twitch-blizzbot/clients").Clients} clients
  * @param  {string} line
+ * @returns {[string[], string]} the completion
  */
 export function completer(clients, line) {
     const completions = Object.keys(global).filter((i) => !i.startsWith("_"));

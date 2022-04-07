@@ -75,12 +75,12 @@ export async function event(client, target, context, msg, self) {
     }
 }
 /**
- * @async counters
+ * @async
  * @description resolves counters in customcommands
  * @param  {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param  {string} response
  * @param  {string} target
- * @returns {Promise<string>}
+ * @returns {Promise<string>} the response with resolved counters
  */
 async function counters(client, response, target) {
     const possibleCounters = response.match(counterTest);
@@ -104,9 +104,12 @@ async function counters(client, response, target) {
 function checkModAction(client, msg, ctx, target, args) {
     if (hasPerm(client, ctx)) return;
     const message = msg.toLowerCase();
-    const delbl = client.blacklist[target.replace(/#+/g, "")].delete;
+    const delbl = client.blacklist[target.replace(/#+/g, "")]["0"];
     const checkmsg = ` ${message} `;
-    if (delbl.some((a) => checkmsg.includes(` ${a} `))) return client.deletemessage(target, ctx.id);
+    if (delbl.some((a) => checkmsg.includes(` ${a} `))) {
+        client.deletemessage(target, ctx.id);
+        return;
+    }
     if (checkmsg.includes(" www.") || client.deletelinks.some((tld) => checkmsg.includes(tld))) {
         const links = args.filter(
             (a) => a.toLowerCase().includes("www") || client.deletelinks.some((tld) => a.includes(tld)),
@@ -114,19 +117,28 @@ function checkModAction(client, msg, ctx, target, args) {
         const forbiddenlinks = links.filter(
             (l) => !client.permittedlinks.some((purl) => l.toLowerCase().includes(purl)),
         );
-        if (forbiddenlinks.length > 0) return client.deletemessage(target, ctx.id);
+        if (forbiddenlinks.length > 0) {
+            client.deletemessage(target, ctx.id);
+            return;
+        }
     }
-    if (ctx["message-type"] == "action") return client.deletemessage(target, ctx.id);
+    if (ctx["message-type"] == "action") {
+        client.deletemessage(target, ctx.id);
+        return;
+    }
     if (ctx.badges) if (ctx.badges["vip"]) return;
     const urls = message.match(linkTest);
     if (!urls) return;
     if (urls.length == 0) return;
-    if (urls.some((url) => !permittedlink(client, url))) return client.deletemessage(target, ctx.id);
+    if (urls.some((url) => !permittedlink(client, url))) {
+        client.deletemessage(target, ctx.id);
+        return;
+    }
 }
 /**
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {import("tmi.js").ChatUserstate} ctx
- * @returns {number}
+ * @returns {permissions} a permission
  */
 function hasPerm(client, ctx) {
     if (client.config.devs.includes(ctx.username)) return permissions.dev;
@@ -141,6 +153,7 @@ function hasPerm(client, ctx) {
 /**
  * @param {{ permittedlinks: string[]; }} client
  * @param {string} url
+ * @returns {boolean} whether the link is allowed to be sent
  */
 function permittedlink(client, url) {
     return client.permittedlinks.some((purl) => {
