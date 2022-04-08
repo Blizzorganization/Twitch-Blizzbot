@@ -19,7 +19,7 @@ export async function run(client, message, args) {
         return message.reply({ content: `${args[0]} ist kein Nutzer Customcommand.` });
     }
     const newcmd = args.shift().toLowerCase();
-    const res = args.join(" ");
+    const res = args.map((arg) => (arg.startsWith("<:") ? arg.split(":")[1] : arg)).join(" ");
     await client.clients.db.editCcmd(twchannel, newcmd, res);
     message.reply({ content: `Der Befehl ${newcmd} wurde bearbeitet.` });
     logger.log("command", `* Edited Customcommand ${newcmd}`);
