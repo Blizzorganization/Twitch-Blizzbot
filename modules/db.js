@@ -104,9 +104,12 @@ export class DB {
                     "blacklist",
                     `CREATE TABLE blacklist  
                     (
-                        channel VARCHAR(25) REFERENCES streamer(name) ON DELETE CASCADE ON UPDATE CASCADE,
+                        channel VARCHAR(25)
+                            REFERENCES streamer(name)
+                            ON DELETE CASCADE
+                            ON UPDATE CASCADE,
                         blwords TEXT [],
-                        action SMALLINT NOT NULL DEFAULT 0;
+                        action SMALLINT NOT NULL DEFAULT 0,
                         UNIQUE(channel, action)
                     );`,
                 ],
@@ -140,6 +143,7 @@ export class DB {
     }
     /**
      * stops the database
+     * @returns {Promise<void>}
      */
     stop() {
         return this.db.end();
@@ -173,6 +177,7 @@ export class DB {
     /**
      * add a new channel to the database
      * @param {string} channel
+     * @returns {Promise<import("../typings/dbtypes").streamer>}
      */
     async getChannel(channel) {
         const data = await this.db.query(
