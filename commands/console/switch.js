@@ -2,6 +2,7 @@
 import { logger } from "twitch-blizzbot/logger";
 
 /**
+ * @name switch
  * @namespace ConsoleCommands
  * @param {import("twitch-blizzbot/clients").Clients} clients
  * @param {string[]} args
