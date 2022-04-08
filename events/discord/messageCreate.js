@@ -23,6 +23,11 @@ export function event(client, message) {
                     });
                     return;
                 }
+                args.forEach((arg, i) => {
+                    if (arg.startsWith("<:")) {
+                        args[i] = arg.split(":")[1];
+                    }
+                });
                 client.clients.twitch.say(channel, args.join(" "));
             }
             break;
