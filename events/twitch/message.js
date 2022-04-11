@@ -70,8 +70,53 @@ function checkModAction(client, msg, ctx, target, args) {
     const message = msg.toLowerCase();
     const delbl = client.blacklist[target.replace(/#+/g, "")];
     const checkmsg = ` ${message} `;
-    if (delbl.some((a) => checkmsg.includes(` ${a.blword} `))) {
-        client.deletemessage(target, ctx.id);
+    const blacklistMatches = delbl.filter((a) => checkmsg.includes(` ${a.blword} `));
+    if (blacklistMatches.length > 0) {
+        const action = Math.max(...blacklistMatches.map((a) => a.action));
+        switch (action) {
+            case 0:
+                client.deletemessage(target, ctx.id);
+                break;
+            case 1:
+                client.timeout(target, ctx.username, 10, "Blacklisted word"); // 10s
+                break;
+            case 2:
+                client.timeout(target, ctx.username, 30, "Blacklisted word"); // 30s
+                break;
+            case 3:
+                client.timeout(target, ctx.username, 42, "Blacklisted word"); // 42s
+                break;
+            case 4:
+                client.timeout(target, ctx.username, 60, "Blacklisted word"); // 1m
+                break;
+            case 5:
+                client.timeout(target, ctx.username, 300, "Blacklisted word"); // 5m
+                break;
+            case 6:
+                client.timeout(target, ctx.username, 600, "Blacklisted word"); // 10m
+                break;
+            case 7:
+                client.timeout(target, ctx.username, 1200, "Blacklisted word"); // 20m
+                break;
+            case 8:
+                client.timeout(target, ctx.username, 1800, "Blacklisted word"); // 30m
+                break;
+            case 9:
+                client.timeout(target, ctx.username, 3600, "Blacklisted word"); // 1h
+                break;
+            case 10:
+                client.ban(
+                    target,
+                    ctx.id,
+                    `Blacklisted word: ${blacklistMatches.find((match) => match.action === action).blword}`,
+                );
+                break;
+            default:
+                logger.warn(
+                    `Unknown action ${action} for ${blacklistMatches.find((match) => match.action === action).blword}`,
+                );
+                break;
+        }
         return;
     }
     if (checkmsg.includes(" www.") || client.deletelinks.some((tld) => checkmsg.includes(tld))) {
