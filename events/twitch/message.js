@@ -33,7 +33,7 @@ export async function event(client, target, context, msg, self) {
     // Ignore messages from the bot
     if (self) return;
     const args = msg.trim().split(" ");
-    checkModAction(client, msg, context, target, args);
+    if (checkModAction(client, msg, context, target, args)) return;
     if (msg.startsWith("!")) {
         handleCommand(client, target, context, msg, self, args);
     }
@@ -64,9 +64,10 @@ async function counters(client, response, target) {
  * @param {import("tmi.js").ChatUserstate} ctx
  * @param {string} target
  * @param {string[]} args
+ * @returns {boolean} whether the message forced a mod action
  */
 function checkModAction(client, msg, ctx, target, args) {
-    if (hasPerm(client, ctx)) return;
+    if (hasPerm(client, ctx)) return false;
     const message = msg.toLowerCase();
     const delbl = client.blacklist[target.replace(/#+/g, "")];
     const checkmsg = ` ${message} `;
@@ -117,7 +118,7 @@ function checkModAction(client, msg, ctx, target, args) {
                 );
                 break;
         }
-        return;
+        return true;
     }
     if (checkmsg.includes(" www.") || client.deletelinks.some((tld) => checkmsg.includes(tld))) {
         const links = args.filter(
@@ -128,21 +129,22 @@ function checkModAction(client, msg, ctx, target, args) {
         );
         if (forbiddenlinks.length > 0) {
             client.deletemessage(target, ctx.id);
-            return;
+            return true;
         }
     }
     if (ctx["message-type"] == "action") {
         client.deletemessage(target, ctx.id);
-        return;
+        return true;
     }
-    if (ctx.badges) if (ctx.badges["vip"]) return;
+    if (ctx.badges) if (ctx.badges["vip"]) return false;
     const urls = message.match(linkTest);
-    if (!urls) return;
-    if (urls.length == 0) return;
+    if (!urls) return false;
+    if (urls.length == 0) return false;
     if (urls.some((url) => !permittedlink(client, url))) {
         client.deletemessage(target, ctx.id);
-        return;
+        return true;
     }
+    return false;
 }
 /**
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
@@ -160,7 +162,7 @@ function hasPerm(client, ctx) {
     return permissions.user;
 }
 /**
- * @param {{ permittedlinks: string[]; }} client
+ * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} url
  * @returns {boolean} whether the link is allowed to be sent
  */
