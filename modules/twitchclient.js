@@ -23,7 +23,7 @@ import { logger } from "./logger.js";
  *
  * @class TwitchClient
  * @augments {Client}
- * @property {import("fs").WriteStream[]} channellogs
+ * @property {{[key: string]: import("fs").WriteStream}} channellogs
  * @property {import("./clients").Clients} clients
  * @property {boolean} started
  * @property {Collection} commands
@@ -54,16 +54,16 @@ export class TwitchClient extends Client {
         this.automessage = undefined;
         /** @type {import("./clients").Clients}*/
         this.clients = undefined;
-        /** @type {{[key: string]: blacklist}}*/
-        // @ts-ignore
-        this.blacklist = [];
+        /** @type {{[key: string]: {[key: string]: string[]}}}*/
+        this.blacklist = {};
         if (!existsSync("./channellogs")) mkdirSync("./channellogs");
         this.once("connected", () => {
             this.newChannellogs(opts.channels);
             for (const c of opts.channels) this.cooldowns.set(c.replace("#", ""), 0);
         });
         this.cooldowns = new Map();
-        this.channellogs = [];
+        /** @type {{[key: string]: import("fs").WriteStream}} */
+        this.channellogs = {};
         scheduleJob("newchannellogs", "0 1 * * *", () => this.newChannellogs(opts.channels));
         loadCommands(this.commands, "commands/twitch/commands", this.helplist);
         loadCommands(this.commands, "commands/twitch/ccmds", this.helplist);
