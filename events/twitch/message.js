@@ -68,9 +68,9 @@ async function counters(client, response, target) {
 function checkModAction(client, msg, ctx, target, args) {
     if (hasPerm(client, ctx)) return;
     const message = msg.toLowerCase();
-    const delbl = client.blacklist[target.replace(/#+/g, "")]["0"];
+    const delbl = client.blacklist[target.replace(/#+/g, "")];
     const checkmsg = ` ${message} `;
-    if (delbl.some((a) => checkmsg.includes(` ${a} `))) {
+    if (delbl.some((a) => checkmsg.includes(` ${a.blword} `))) {
         client.deletemessage(target, ctx.id);
         return;
     }

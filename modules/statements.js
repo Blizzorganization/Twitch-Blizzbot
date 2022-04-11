@@ -225,19 +225,17 @@ export const statements = {
         `,
     },
     blacklist: {
-        newBlacklist:
-        `
-            INSERT INTO blacklist(channel, blwords)
-            VALUES ($1, array[]::text[])
+        newBlacklistEntry: `
+            INSERT INTO blacklist(channel, blword, action)
+            VALUES ($1, $2, $3)
             ON CONFLICT
             DO NOTHING;
         `,
-        saveBlacklist:
-        `
+        saveBlacklist: `
             UPDATE blacklist
-            SET blwords = $2
+            SET action = $3
             WHERE channel = $1
-            AND action = $3;
+            AND blword = $2;
         `,
         loadBlacklist:
         `

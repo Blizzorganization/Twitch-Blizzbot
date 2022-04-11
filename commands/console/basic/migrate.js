@@ -20,7 +20,7 @@ export async function run(clients, args) {
         const em = new Enmap({ name: "blacklist" });
         const bldata = em.get("delmsg");
         clients.twitch.blacklist[channel] = bldata;
-        await clients.db.saveBlacklist();
+        await clients.db.newBlacklistWords(channel, bldata, 0);
         logger.info("Blacklist Migration erfolgreich.");
         return;
     }

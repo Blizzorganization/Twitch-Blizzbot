@@ -1,3 +1,4 @@
+import _ from "lodash";
 import pg from "pg";
 import { permissions } from "./constants.js";
 import { currentMonth } from "./functions.js";
@@ -111,15 +112,15 @@ export class DB {
                 ],
                 [
                     "blacklist",
-                    `CREATE TABLE blacklist  
+                    `CREATE TABLE blacklist 
                     (
                         channel VARCHAR(25)
                             REFERENCES streamer(name)
                             ON DELETE CASCADE
                             ON UPDATE CASCADE,
-                        blwords TEXT [],
+                        blword TEXT,
                         action SMALLINT NOT NULL DEFAULT 0,
-                        UNIQUE(channel, action)
+                        UNIQUE(channel, blword)
                     );`,
                 ],
                 [
@@ -170,12 +171,6 @@ export class DB {
             await client.query(
                 statements.channels.newChannel,
                 [channel, true],
-            ).catch((e) => {
-                throw e;
-            });
-            await client.query(
-                statements.blacklist.newBlacklist,
-                [channel],
             ).catch((e) => {
                 throw e;
             });
@@ -753,36 +748,36 @@ export class DB {
     }
     // #region blacklist
     /**
-     * saves the current blacklist to the database
+     * @param {string} channel
+     * @param {string} word
+     * @param {number} action
      */
-    async saveBlacklist() {
-        const channels = this.clients.twitch.channels;
-        const client = await this.db.connect();
-        try {
-            (async () => {
-                await client.query("BEGIN");
-                for (let channel of channels) {
-                    channel = channel.replace(/#+/, "");
-                    const blacklists = this.clients.twitch.blacklist[channel];
-                    for (const action in blacklists) {
-                        const blacklist = blacklists[action];
-                        await client.query(
-                            statements.blacklist.saveBlacklist,
-                            [channel, blacklist, action],
-                        ).catch((e) => {
-                            throw e;
-                        });
-                    }
-                }
-                return await client.query("COMMIT").catch((e) => {
-                    throw e;
-                });
-            })();
-        } catch (e) {
+    async newBlacklistWord(channel, word, action) {
+        channel = channel.replace(/#+/g, "");
+        await this.db.query(statements.blacklist.newBlacklistEntry, [channel, word, action]).catch((e) => {
             logger.error(e);
-        } finally {
-            client.release();
-        }
+        });
+    }
+    /**
+     * @param  {string} channel
+     * @param  {string[]} words
+     * @param  {number} action
+     */
+    async newBlacklistWords(channel, words, action) {
+        channel = channel.replace(/#+/g, "");
+        await this.db.query(statements.blacklist.newBlacklistEntries, [channel, words, action]).catch((e) => {
+            logger.error(e);
+        });
+    }
+    /**
+     * @param  {string} channel
+     * @param  {string} word
+     */
+    async removeBlacklistWord(channel, word) {
+        channel = channel.replace(/#+/g, "");
+        await this.db.query(statements.blacklist.removeBlacklistEntry, [channel, word]).catch((e) => {
+            logger.error(e);
+        });
     }
     /**
      * loads the blacklist into the client
@@ -794,10 +789,7 @@ export class DB {
             logger.error(e);
         });
         if (!data) return;
-        data.rows.forEach((b) => {
-            if (!this.clients.twitch.blacklist[b.channel]) this.clients.twitch.blacklist[b.channel] = {};
-            this.clients.twitch.blacklist[b.channel][b.action] = b.blwords;
-        });
+        this.clients.twitch.blacklist = _.groupBy(data.rows, "channel");
     }
     // #endregion
     // #region commands

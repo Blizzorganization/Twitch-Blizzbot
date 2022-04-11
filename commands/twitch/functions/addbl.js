@@ -19,10 +19,11 @@ export async function run(client, target, context, msg, self, args) {
     if (!args || args.length < 2) {
         return client.say(target, "Du musst angeben, welches Wort du mit welcher Aktion versehen willst!");
     }
-    const action = args.shift();
+    let action = parseInt(args.shift(), 10);
+    if (isNaN(action)) action = 0;
     const blword = args.join(" ").toLowerCase();
-    client.blacklist[target.replace(/#+/g, "")][action].push(blword);
-    await client.clients.db.saveBlacklist();
+    client.blacklist[target.replace(/#+/g, "")].push({ blword, action, channel: target.replace(/#+/g, "") });
+    await client.clients.db.newBlacklistWord(target, blword, action);
     client.say(target, `"${blword}" wurde in die Blacklist eingetragen TPFufun`);
     logger.info(`* Added "${blword}" to the "${action}" Blacklist of ${target.replace(/#+/g, "")}`);
 }

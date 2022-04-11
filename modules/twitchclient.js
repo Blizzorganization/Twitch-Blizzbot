@@ -54,8 +54,8 @@ export class TwitchClient extends Client {
         this.automessage = undefined;
         /** @type {import("./clients").Clients}*/
         this.clients = undefined;
-        /** @type {{[key: string]: {[key: string]: string[]}}}*/
-        this.blacklist = {};
+        /** @type {{[key: string]: import("../typings/dbtypes").Blacklist[]}}*/
+        this.blacklist = undefined;
         if (!existsSync("./channellogs")) mkdirSync("./channellogs");
         this.once("connected", () => {
             this.newChannellogs(opts.channels);
