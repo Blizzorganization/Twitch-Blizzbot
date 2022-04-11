@@ -1,7 +1,4 @@
-import lodash from "lodash";
 import { logger } from "twitch-blizzbot/logger";
-
-const { find, findKey } = lodash;
 
 export const adminOnly = true;
 /**
@@ -16,18 +13,15 @@ export async function run(client, message, args) {
         return message.channel.send("Du musst angeben, was du von der Blacklist entfernen willst!");
     }
     const blremove = args.join(" ").toLowerCase();
-    const blacklists = client.clients.twitch.blacklist[client.config.watchtimechannel];
-    const blacklist = find(blacklists, (bl) => bl.includes(blremove));
-    const blacklistName = findKey(blacklists, (bl) => bl.includes(blremove));
+    const blacklist = client.clients.twitch.blacklist[client.config.watchtimechannel];
+    const blacklistEntry = blacklist.find((entry) => entry.blword == blremove);
     if (!blacklist) {
         return message.channel.send({
             content: `"${blremove}" ist in keiner Blacklist vorhanden, kann also auch nicht aus der Blacklist entfernt werden.`,
         });
     }
-    client.clients.twitch.blacklist[client.config.watchtimechannel][blacklistName] = blacklist.filter(
-        (b) => b !== blremove,
-    );
-    await client.clients.db.saveBlacklist();
+    client.clients.twitch.blacklist[client.config.watchtimechannel] = blacklist.filter((b) => b !== blacklistEntry);
+    await client.clients.db.removeBlacklistWord(client.config.watchtimechannel, blremove);
     message.channel.send(
         `"${blremove}" wurde von der Blacklist vom Channel ${client.config.watchtimechannel} entfernt`,
     );

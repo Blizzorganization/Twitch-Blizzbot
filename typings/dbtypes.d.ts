@@ -37,7 +37,7 @@ export interface Userlink {
 }
 export interface Blacklist {
     channel: string
-    blwords: string[]
+    blword: string
     action: number
 }
 export interface Config extends PoolConfig {}

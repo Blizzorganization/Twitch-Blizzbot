@@ -12,12 +12,17 @@ export async function run(client, message, args) {
     if (!args || args.length == 0) {
         return message.channel.send({ content: "Du musst angeben, was du blockieren willst!" });
     }
-    const action = args.shift();
+    let action = parseInt(args.shift());
+    if (isNaN(action)) action = 0;
     const blword = args.join(" ").toLowerCase();
-    client.clients.twitch.blacklist[client.config.watchtimechannel][action].push(blword);
-    await client.clients.db.saveBlacklist();
+    client.clients.twitch.blacklist[client.config.watchtimechannel].push({
+        blword,
+        action,
+        channel: client.config.watchtimechannel,
+    });
+    await client.clients.db.newBlacklistWord(client.config.watchtimechannel, blword, action);
     message.channel.send(
-        `"${blword}" wurde in die "${action}" Blacklist von ${client.config.watchtimechannel} eingetragen ;3`,
+        `"${blword}" wurde in die "${action}" Blacklist von ${client.config.watchtimechannel} eingetragen.`,
     );
     logger.info(`* Added "${blword}" to the ${action} Blacklist of ${client.config.watchtimechannel}`);
 }

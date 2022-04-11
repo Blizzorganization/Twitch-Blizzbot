@@ -12,10 +12,10 @@ import { createConfig } from "./setup.js";
     }
     if (!existsSync("./configs/config.json")) await createConfig();
     const config = JSON.parse(readFileSync("./configs/config.json").toString());
-    // making sure a links.txt exists
+    // making sure a links.txt and TLDs.txt exists
     appendFileSync("configs/links.txt", "");
-    // making sure a TLDs.txt exists
     appendFileSync("configs/TLDs.txt", "");
+    // starting bot
     logger.debug("starting bot");
     const clients = new Clients(config);
     let discordClient;

@@ -195,17 +195,29 @@ export const statements = {
         `,
     },
     blacklist: {
-        newBlacklist: `
-            INSERT INTO blacklist(channel, blwords)
-            VALUES ($1, array[]::text[])
+        newBlacklistEntry: `
+            INSERT INTO blacklist(channel, blword, action)
+            VALUES ($1, $2, $3)
             ON CONFLICT
             DO NOTHING;
         `,
-        saveBlacklist: `
-            UPDATE blacklist
-            SET blwords = $2
+        newBlacklistEntries: `
+            INSERT INTO blacklist(channel, blword, action)
+            VALUES ($1, unnest($2), $3)
+            ON CONFLICT
+            DO NOTHING
+            RETURNING *;
+            `,
+        removeBlacklistEntry: `
+            DELETE FROM blacklist
             WHERE channel = $1
-            AND action = $3;
+            AND blword = $2;
+        `,
+        updateBlacklistEntry: `
+            UPDATE blacklist
+            SET action = $3
+            WHERE channel = $1
+            AND blword = $2;
         `,
         loadBlacklist: `
             SELECT *
