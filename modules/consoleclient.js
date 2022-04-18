@@ -5,22 +5,30 @@ import { loadCommands } from "./functions.js";
 import { logger } from "./logger.js";
 /**
  * ConsoleClient Class
+ *
  * @class
- * @property {Interface} rl readline Instance
- * @property {Clients} clients Access to the other clients
+ * @property {import("readline").Interface} rl readline Instance
+ * @property {import("twitch-blizzbot/clients").Clients} clients Access to the other clients
  * @property {Collection} commands
  */
 export class ConsoleClient extends EventEmitter {
+    /**
+     */
     constructor() {
         super();
         /** @type {import("./clients").Clients} */
         this.clients = undefined;
         this.stopping = false;
-        this.commands = new Collection;
+        this.commands = new Collection();
         this.processStats = undefined;
-        loadCommands(this.commands, "commands/console");
+        loadCommands(this.commands, "commands/console/basic");
+        loadCommands(this.commands, "commands/console/ccmd");
         const commands = this.commands;
         const cc = this;
+        /**
+         * @param {string} line
+         * @returns {[string[], string]} the completion
+         */
         function completer(line) {
             const completions = commands.map((val, key) => key);
             const hits = completions.filter((c) => c.startsWith(line) || line.startsWith(c));
@@ -30,18 +38,36 @@ export class ConsoleClient extends EventEmitter {
             // Show all completions if none found
             return [hits.length ? hits : completions, line];
         }
+        // @ts-expect-error
         this.rl = createInterface({ input: process.stdin, output: process.stdout, prompt: "", completer });
         logger.log("verbose", "Listening to Console Commands");
         this.rl.on("line", (line) => this.online(line));
-        this.rl.on("SIGINT", () => this.stopping ? null : this.clients.stop());
-        this.rl.on("SIGCONT", () => this.stopping ? null : this.clients.stop());
-        this.rl.on("SIGTSTP", () => this.stopping ? null : this.clients.stop());
-        this.rl.on("close", () => this.stopping ? null : this.clients.stop());
+        this.rl.on("SIGINT", () => (this.stopping ? null : this.clients.stop()));
+        this.rl.on("SIGCONT", () => (this.stopping ? null : this.clients.stop()));
+        this.rl.on("SIGTSTP", () => (this.stopping ? null : this.clients.stop()));
+        this.rl.on("close", () => (this.stopping ? null : this.clients.stop()));
 
         try {
             const pidu = require("pidusage");
-            this.processStats = setInterval(() => pidu(process.pid, (err, data) => logger.verbose(`cpu: ${Math.round(data.cpu * 100) / 100}%; memory: ${Math.round(data.memory / 1024 / 1024 * 100) / 100}MB`)), 10000);
-            pidu(process.pid, (err, data) => logger.log("verbose", `cpu: ${Math.round(data.cpu * 100) / 100}%; memory: ${Math.round(data.memory / 1024 / 1024 * 100) / 100}MB`));
+            this.processStats = setInterval(
+                () =>
+                    pidu(process.pid, (err, data) =>
+                        logger.verbose(
+                            `cpu: ${Math.round(data.cpu * 100) / 100}%; memory: ${
+                                Math.round((data.memory / 1024 / 1024) * 100) / 100
+                            }MB`,
+                        ),
+                    ),
+                10000,
+            );
+            pidu(process.pid, (err, data) =>
+                logger.log(
+                    "verbose",
+                    `cpu: ${Math.round(data.cpu * 100) / 100}%; memory: ${
+                        Math.round((data.memory / 1024 / 1024) * 100) / 100
+                    }MB`,
+                ),
+            );
         } catch (e) {
             logger.silly("Process metrics are not collected.");
         }
@@ -56,6 +82,7 @@ export class ConsoleClient extends EventEmitter {
     }
     /**
      * method for parsing a line from readline
+     *
      * @param {string} line
      */
     online(line) {
