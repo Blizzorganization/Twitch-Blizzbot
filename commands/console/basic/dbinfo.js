@@ -6,8 +6,6 @@ import Util from "util";
 global.util = Util;
 global.fs = fs;
 /**
- * @name dbinfo
- * @namespace ConsoleCommands
  * @param {import("twitch-blizzbot/clients").Clients} clients
  */
 export async function run(clients) {
@@ -30,16 +28,13 @@ export async function run(clients) {
     const size = (await clients.db.db.query(query_size)).rows[0];
     const lines = [];
     const lines_data = (await clients.db.db.query(query_lines)).rows;
-    lines_data.forEach((line) => {
-        lines[line["?column?"]] = line.count;
-    });
+    lines_data.forEach(line => { lines[line["?column?"]] = line.count; });
     lines["total"] = `${lines_data.reduce((a, b) => parseInt(a) + parseInt(b.count), 0)}`;
     logger.info(`\n${getTable({ size, lines })}`);
 }
 /**
- * @param  {import("twitch-blizzbot/clients").Clients} clients
+ * @param  {import("../../../modules/clients").Clients} clients
  * @param  {string} line
- * @returns {[string[], string]} the completion
  */
 export function completer(clients, line) {
     // eslint-disable-next-line no-sparse-arrays

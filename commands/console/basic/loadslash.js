@@ -1,7 +1,5 @@
 import loadSlash from "twitch-blizzbot/slashsetup";
 /**
- * @name loadSlash
- * @namespace ConsoleCommands
  * @param  {import("twitch-blizzbot/clients").Clients} clients
  */
 export function run(clients) {
@@ -10,7 +8,6 @@ export function run(clients) {
 /**
  * @param  {import("twitch-blizzbot/clients").Clients} clients
  * @param  {string} line
- * @returns {[string[], string]} the completion
  */
 export function completer(clients, line) {
     return [["loadslash"], line];
