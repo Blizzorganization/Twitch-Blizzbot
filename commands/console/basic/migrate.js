@@ -4,21 +4,15 @@ import { existsSync, readdirSync } from "fs";
 import { logger } from "twitch-blizzbot/logger";
 
 /**
- * @name migrate
+ * @name eval
  * @namespace ConsoleCommands
  * @param {import("twitch-blizzbot/clients").Clients} clients
  * @param {string[]} args
  */
 export async function run(clients, args) {
     const modes = ["watchtime", "customcommands", "blacklist"];
-    if (!args || (args.length !== 4 && args.length !== 2)) {
-        return logger.error(
-            "Du musst den Modus (watchtime/customcommands/blacklist), die Datenbank (muss im data Verzeichnis liegen), den zugehörigen Kanal und bei customcommands die Berechtigung (user/mod) sowie bei watchtime den Zeitraum ('alltime' oder MM-YYYY)",
-        );
-    }
-    if (!modes.includes(args[0].toLowerCase())) {
-        return logger.error("Mögliche Optionen sind watchtime , blacklist und customcommands");
-    }
+    if (!args || (args.length !== 4 && args.length !== 2)) return logger.error("Du musst den Modus (watchtime/customcommands/blacklist), die Datenbank (muss im data Verzeichnis liegen), den zugehörigen Kanal und bei customcommands die Berechtigung (user/mod) sowie bei watchtime den Zeitraum ('alltime' oder MM-YYYY)");
+    if (!modes.includes(args[0].toLowerCase())) return logger.error("Mögliche Optionen sind watchtime , blacklist und customcommands");
     if (args[0] === "blacklist") {
         const channel = args[1].toLowerCase();
         if (!(await clients.db.getChannel(channel))) return logger.error("Diesen Kanal kenne ich nicht.");
@@ -26,7 +20,7 @@ export async function run(clients, args) {
         const em = new Enmap({ name: "blacklist" });
         const bldata = em.get("delmsg");
         clients.twitch.blacklist[channel] = bldata;
-        await clients.db.newBlacklistWords(channel, bldata, 0);
+        await clients.db.saveBlacklist();
         logger.info("Blacklist Migration erfolgreich.");
         return;
     }
@@ -49,9 +43,7 @@ export async function run(clients, args) {
             case "customcommands":
                 {
                     const cmdtype = args[3]?.toLowerCase();
-                    if (cmdtype !== "mod" && cmdtype !== "user") {
-                        return logger.error("Du musst angeben ob du die USER oder MOD commands migrieren möchtest.");
-                    }
+                    if (cmdtype !== "mod" && cmdtype !== "user") return logger.error("Du musst angeben ob du die USER oder MOD commands migrieren möchtest.");
                     const tblname = cmdtype === "mod" ? "coms" : "ccmds";
                     const commandData = db.prepare(`SELECT * FROM ${tblname};`).all();
                     await clients.db.migrateCustomcommands(commandData, channel, cmdtype);
@@ -62,15 +54,11 @@ export async function run(clients, args) {
                 logger.error("wtf");
                 break;
         }
-    } finally {
-        db.close();
-    }
+    } finally { db.close(); }
 }
-
 /**
  * @param  {import("twitch-blizzbot/clients").Clients} clients
  * @param  {string} line
- * @returns {[string[], string]} the completion
  */
 export function completer(clients, line) {
     const modes = ["watchtime", "customcommands", "blacklist"];

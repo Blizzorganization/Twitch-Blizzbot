@@ -5,8 +5,6 @@ import Util from "util";
 global.util = Util;
 global.fs = fs;
 /**
- * @name eval
- * @namespace ConsoleCommands
  * @param {import("twitch-blizzbot/clients").Clients} clients
  * @param {string[]} args
  */
@@ -17,10 +15,9 @@ export function run(clients, args) {
 /**
  * @param  {import("twitch-blizzbot/clients").Clients} clients
  * @param  {string} line
- * @returns {[string[], string]} the completion
  */
 export function completer(clients, line) {
-    const completions = Object.keys(global).filter((i) => !i.startsWith("_"));
+    const completions = Object.keys(global).filter(i => !i.startsWith("_"));
     const args = line.split(" ");
     // eslint-disable-next-line no-sparse-arrays
     if (args.length > 2) return [, line];
