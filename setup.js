@@ -16,6 +16,7 @@ const { merge } = lodash;
  * @property {string} twitchusername
  * @property {string} twitchpass
  * @property {string} twitchchannels
+ * @property {string} permits
  * @property {string} raidduration
  * @property {string} twitchcooldown
  * @property {string} automessagedelay
@@ -62,6 +63,7 @@ const initStrings = {
         twitchusername: "Der Nutzername vom Twitch Bot:",
         twitchpass: "Der OAuth Token vom Twitch Bot:",
         twitchchannels: "Die Twitch Kanäle auf die der Bot reagieren soll (getrennt mit Leerzeichen):",
+        permits: "Hier kannst du angeben wie der Bot mit Moderatoren umgehen soll",
         raidduration: "Die Zeit in Minuten, in denen der Follow-Only Modus nach einem Raid deaktiviert wird:",
         twitchcooldown: "Die Zeit in Minuten, wie lange zwischen Befehlen gewartet werden muss:",
         automessagedelay: "Die Zeit in Minuten, wie lange der Bot zwischen automatischen Nachrichten warten soll:",
@@ -97,6 +99,7 @@ const initStrings = {
         twitchusername: "The username of the twitch bot",
         twitchpass: "the twitch bot oauth token (get it at https://twitchapps.com/tmi/)",
         twitchchannels: "a space separated list of channels the bot should listen to",
+        permits: "Here you can specify how the bot should deal with moderators",
         raidduration: "the time a raid removes the follow only mode for",
         twitchcooldown: "the cooldown for chat commands in minutes",
         automessagedelay: "the delay between two automatic messages in minutes",
@@ -129,6 +132,7 @@ let existingconfig = {
             username: undefined,
         },
         Cooldown: undefined,
+        permit: undefined,
         Raidminutes: undefined,
         automessagedelay: undefined,
         channels: undefined,
@@ -168,6 +172,7 @@ if (existsSync("./configs/config.json")) {
 export const createConfig = async () => {
     const rl = createInterface({
         input: process.stdin,
+        // @ts-ignore
         output: process.stdout,
         prompt: "> ",
         terminal: true,
@@ -231,9 +236,8 @@ export const createConfig = async () => {
     existingconfig.db.keepAlive = true;
     existingconfig.twitch.identity.username = await request("twitchusername", existingconfig.twitch.identity.username);
     existingconfig.twitch.identity.password = await request("twitchpass", existingconfig.twitch.identity.password);
-    existingconfig.twitch.channels = (await request("twitchchannels", existingconfig.twitch.channels?.join(" "))).split(
-        / +/g,
-    );
+    existingconfig.twitch.channels = (await request("twitchchannels", existingconfig.twitch.channels?.join(" "))).split(/ +/g);
+    existingconfig.twitch.permit = parseBoolean(await request("permits", typeof existingconfig.twitch.permit === "boolean" ? (existingconfig.twitch.permit ? initStrings[language].yes : initStrings[language].no) : undefined));
     existingconfig.twitch.Raidminutes = parseFloat(await request("raidduration", existingconfig.twitch.Raidminutes));
     existingconfig.twitch.Cooldown = parseInt(await request("twitchcooldown", existingconfig.twitch.Cooldown));
     existingconfig.twitch.automessagedelay = parseInt(await request("automessagedelay"));

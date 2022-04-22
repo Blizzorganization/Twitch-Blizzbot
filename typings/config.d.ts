@@ -11,6 +11,7 @@ export type config = {
             secure: boolean //whether to use a secure connection for the twitch bot
         }
         channels: string[] //the channels the twitch bot should listen to
+        permit: boolean //moderatorsaction
         Raidminutes: number //how many minutes of follow-only off a raid should grant
         Cooldown: number //how much time users have to wait between commands
         automessagedelay: number //the frequency of posted automessages

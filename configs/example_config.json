@@ -11,6 +11,7 @@
         "channels": [
             "twitchchannel"
         ],
+        "permit": false,
         "Raidminutes": 0,
         "Cooldown": 0,
         "automessagedelay": 0,
