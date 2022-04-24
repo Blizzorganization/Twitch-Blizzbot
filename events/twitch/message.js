@@ -149,7 +149,10 @@ async function handleCommand(client, target, context, msg, self, args) {
             if (!cmd.silent) client.say(target, "Du hast keine Rechte");
             return;
         }
-        if (Date.now() - client.cooldowns.get(target.replace("#", "")) > 1000 * client.config.Cooldown) {
+        if (
+            userpermission >= permissions.mod ||
+            Date.now() - client.cooldowns.get(target.replace("#", "")) > 1000 * client.config.Cooldown
+        ) {
             cmd.run(client, target, context, msg, self, args);
             logger.log("command", `* Executed ${commandName} command`);
             client.cooldowns.set(target.replace("#", ""), Date.now());
@@ -160,7 +163,10 @@ async function handleCommand(client, target, context, msg, self, args) {
     let response;
     if (ccmd) {
         if (ccmd.permissions > userpermission) return client.say(target, "Du hast keine Rechte für diesen Command");
-        if (Date.now() - client.cooldowns.get(target.replace("#", "")) > 1000 * client.config.Cooldown) {
+        if (
+            userpermission >= permissions.mod ||
+            Date.now() - client.cooldowns.get(target.replace("#", "")) > 1000 * client.config.Cooldown
+        ) {
             response = await counters(client, ccmd.response, target);
             client.say(target, response);
             logger.log("command", `* Executed ${commandName} Customcommand`);
@@ -170,7 +176,10 @@ async function handleCommand(client, target, context, msg, self, args) {
     const alias = await client.clients.db.resolveAlias(target, `!${commandName}`);
     if (alias) {
         if (alias.permissions > userpermission) return client.say(target, "Du hast keine Rechte");
-        if (Date.now() - client.cooldowns.get(target.replace("#", "")) > 1000 * client.config.Cooldown) {
+        if (
+            userpermission >= permissions.mod ||
+            Date.now() - client.cooldowns.get(target.replace("#", "")) > 1000 * client.config.Cooldown
+        ) {
             response = await counters(client, alias.response, target);
             client.say(target, response);
             logger.log("command", `* Executed ${alias.command} caused by alias ${alias.alias}`);
