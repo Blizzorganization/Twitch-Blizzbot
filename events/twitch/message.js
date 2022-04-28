@@ -33,7 +33,7 @@ export async function event(client, target, context, msg, self) {
     // Ignore messages from the bot
     if (self) return;
     const args = msg.trim().split(" ");
-    checkModAction(client, msg, context, target, args);
+    if (checkModAction(client, msg, context, target, args)) return;
     if (msg.startsWith("!")) {
         handleCommand(client, target, context, msg, self, args);
     }
@@ -64,15 +64,61 @@ async function counters(client, response, target) {
  * @param {import("tmi.js").ChatUserstate} ctx
  * @param {string} target
  * @param {string[]} args
+ * @returns {boolean} whether the message forced a mod action
  */
 function checkModAction(client, msg, ctx, target, args) {
-    if (hasPerm(client, ctx)) return;
+    if (hasPerm(client, ctx)) return false;
     const message = msg.toLowerCase();
-    const delbl = client.blacklist[target.replace(/#+/g, "")]["0"];
+    const delbl = client.blacklist[target.replace(/#+/g, "")];
     const checkmsg = ` ${message} `;
-    if (delbl.some((a) => checkmsg.includes(` ${a} `))) {
-        client.deletemessage(target, ctx.id);
-        return;
+    const blacklistMatches = delbl.filter((a) => checkmsg.includes(` ${a.blword} `));
+    if (blacklistMatches.length > 0) {
+        const action = Math.max(...blacklistMatches.map((a) => a.action));
+        switch (action) {
+            case 0:
+                client.deletemessage(target, ctx.id);
+                break;
+            case 1:
+                client.timeout(target, ctx.username, 10, "Blacklisted word"); // 10s
+                break;
+            case 2:
+                client.timeout(target, ctx.username, 30, "Blacklisted word"); // 30s
+                break;
+            case 3:
+                client.timeout(target, ctx.username, 42, "Blacklisted word"); // 42s
+                break;
+            case 4:
+                client.timeout(target, ctx.username, 60, "Blacklisted word"); // 1m
+                break;
+            case 5:
+                client.timeout(target, ctx.username, 300, "Blacklisted word"); // 5m
+                break;
+            case 6:
+                client.timeout(target, ctx.username, 600, "Blacklisted word"); // 10m
+                break;
+            case 7:
+                client.timeout(target, ctx.username, 1200, "Blacklisted word"); // 20m
+                break;
+            case 8:
+                client.timeout(target, ctx.username, 1800, "Blacklisted word"); // 30m
+                break;
+            case 9:
+                client.timeout(target, ctx.username, 3600, "Blacklisted word"); // 1h
+                break;
+            case 10:
+                client.ban(
+                    target,
+                    ctx.id,
+                    `Blacklisted word: ${blacklistMatches.find((match) => match.action === action).blword}`,
+                );
+                break;
+            default:
+                logger.warn(
+                    `Unknown action ${action} for ${blacklistMatches.find((match) => match.action === action).blword}`,
+                );
+                break;
+        }
+        return true;
     }
     if (checkmsg.includes(" www.") || client.deletelinks.some((tld) => checkmsg.includes(tld))) {
         const links = args.filter(
@@ -83,21 +129,22 @@ function checkModAction(client, msg, ctx, target, args) {
         );
         if (forbiddenlinks.length > 0) {
             client.deletemessage(target, ctx.id);
-            return;
+            return true;
         }
     }
     if (ctx["message-type"] == "action") {
         client.deletemessage(target, ctx.id);
-        return;
+        return true;
     }
-    if (ctx.badges) if (ctx.badges["vip"]) return;
+    if (ctx.badges) if (ctx.badges["vip"]) return false;
     const urls = message.match(linkTest);
-    if (!urls) return;
-    if (urls.length == 0) return;
+    if (!urls) return false;
+    if (urls.length == 0) return false;
     if (urls.some((url) => !permittedlink(client, url))) {
         client.deletemessage(target, ctx.id);
-        return;
+        return true;
     }
+    return false;
 }
 /**
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
@@ -115,7 +162,7 @@ function hasPerm(client, ctx) {
     return permissions.user;
 }
 /**
- * @param {{ permittedlinks: string[]; }} client
+ * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} url
  * @returns {boolean} whether the link is allowed to be sent
  */
