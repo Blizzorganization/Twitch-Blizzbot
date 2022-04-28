@@ -1,4 +1,4 @@
-import loadSlash from "../../modules/slashsetup.js";
+import loadSlash from "twitch-blizzbot/slashsetup";
 /**
  * @name loadSlash
  * @namespace ConsoleCommands

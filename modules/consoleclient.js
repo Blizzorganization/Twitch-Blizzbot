@@ -21,7 +21,8 @@ export class ConsoleClient extends EventEmitter {
         this.stopping = false;
         this.commands = new Collection();
         this.processStats = undefined;
-        loadCommands(this.commands, "commands/console");
+        loadCommands(this.commands, "commands/console/basic");
+        loadCommands(this.commands, "commands/console/ccmd");
         const commands = this.commands;
         const cc = this;
         /**
@@ -37,6 +38,7 @@ export class ConsoleClient extends EventEmitter {
             // Show all completions if none found
             return [hits.length ? hits : completions, line];
         }
+        // @ts-expect-error
         this.rl = createInterface({ input: process.stdin, output: process.stdout, prompt: "", completer });
         logger.log("verbose", "Listening to Console Commands");
         this.rl.on("line", (line) => this.online(line));

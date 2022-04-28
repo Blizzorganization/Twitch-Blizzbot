@@ -29,6 +29,9 @@
             "twitch-blizzbot/CustomError": [
                 "./modules/CustomError.js"
             ],
+            "twitch-blizzbot/slashsetup": [
+                "./modules/slashsetup.js"
+            ],
         },
         "checkJs": true,
         "allowJs": true
