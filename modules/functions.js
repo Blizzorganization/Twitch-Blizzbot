@@ -104,6 +104,7 @@ const ts = new Transform({
         cb(null, chunk);
     },
 });
+// @ts-ignore
 const con = new Console({ stdout: ts });
 /**
  * @param  {object | Array} data tabular Data
