@@ -34,7 +34,7 @@ sudo apt-get -y install postgresql
 # Installation
 You can install the bot using
 ```sh
-npm install
+yarn install
 ```
 To start the bot use
 ```sh
