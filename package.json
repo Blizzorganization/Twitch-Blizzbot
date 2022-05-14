@@ -67,8 +67,8 @@
     "prettify:check": "prettier -c .",
     "test": "mocha",
     "validate": "npm-run-all --parallel test lint prettify:check",
-    "precommit": "npm run validate",
-    "prepush": "npm run validate",
+    "precommit": "yarn validate",
+    "prepush": "yarn validate",
     "prepare": "husky install",
     "docs": "jsdoc -c jsdoc.json"
   },

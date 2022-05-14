@@ -27,14 +27,14 @@ jobs:
         id: cache
         with:
           path: node_modules
-          key: ${{ runner.os }}-16-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-16-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install Dependencies
         if: ${{ !steps.cache.outputs.cache-hit }}
-        run: npm ci
+        run: yarn --frozen-lockfile
 
       - name: Run ESLint
-        run: npx eslint src --ext ts
+        run: yarn lint
 
       - name: Run Prettier
-        run: npx prettier --check .
+        run: yarn prettify:check
