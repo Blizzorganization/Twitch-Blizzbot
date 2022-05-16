@@ -16,7 +16,8 @@ export const alias = ["folgezeit", "followage"];
  * @param {string[]} args
  */
 export async function run(client, target, context, msg, self, args) {
-    let user = args[0].replace("@", "");
+    let user;
+    user = args[0]?.toLowerCase().replace("@", "");
     if (!user || user == "") user = context["display-name"];
     const resp = await fetch(
         `https://2g.be/twitch/following.php?user=${user}&channel=${target.slice(1)}&format=mwdhms`,
