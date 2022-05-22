@@ -16,7 +16,7 @@ export const alias = ["alter"];
  * @param {string[]} args
  */
 export async function run(client, target, context, msg, self, args) {
-    let user; 
+    let user;
     user = args[0]?.toLowerCase().replace("@", "");
     if (!user || user == "") user = context["display-name"];
     const resp = await fetch(`https://decapi.me/twitch/accountage/${user}`);

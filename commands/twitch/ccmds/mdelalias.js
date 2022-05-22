@@ -19,6 +19,6 @@ export async function run(client, target, context, msg, self, args) {
     const user = context["display-name"];
     if (args.length == 0) return;
     await client.clients.db.deleteAlias(target.replace(/#+/g, ""), args[0]);
-    client.say(target, `${user} der Alias für den Moderatoren Command ${args[0]} wurde entfernt.`);
+    client.say(target, `${user}, der Alias für den Moderatoren Command ${args[0]} wurde entfernt.`);
     logger.log("command", `* Deleted alias ${args[0]}`);
 }
