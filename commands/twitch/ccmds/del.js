@@ -22,6 +22,6 @@ export async function run(client, target, context, msg, self, args) {
     if (!cmd) return client.say(target, `Ich kenne keinen Befehl ${args[0]}.`);
     if (cmd.permissions !== permissions.user) return client.say(target, `${args[0]} ist kein Nutzer Customcommand.`);
     await client.clients.db.delCcmd(target.replace(/#+/g, ""), args[0]);
-    client.say(target, `${user} der Befehl ${args[0]} wurde gelöscht.`);
+    client.say(target, `${user}, der Command ${args[0]} wurde entfernt.`);
     logger.log("command", `* Deleted Customcommand ${args[0]}`);
 }

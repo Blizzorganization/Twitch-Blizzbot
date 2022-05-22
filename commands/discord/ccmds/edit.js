@@ -21,6 +21,6 @@ export async function run(client, message, args) {
     const newcmd = args.shift().toLowerCase();
     const res = args.map((arg) => (arg.startsWith("<:") ? arg.split(":")[1] : arg)).join(" ");
     await client.clients.db.editCcmd(twchannel, newcmd, res);
-    message.reply({ content: `Der Befehl ${newcmd} wurde bearbeitet.` });
+    message.reply({ content: `Der Command ${newcmd} wurde editiert.` });
     logger.log("command", `* Edited Customcommand ${newcmd}`);
 }

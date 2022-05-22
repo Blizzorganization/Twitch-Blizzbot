@@ -19,6 +19,6 @@ export async function run(client, message, args) {
         return message.reply({ content: `${args[0]} ist kein Nutzer Customcommand.` });
     }
     await client.clients.db.delCcmd(twchannel, args[0]);
-    message.reply({ content: `Der Befehl ${args[0]} wurde gelöscht.` });
+    message.reply({ content: `Der Command ${args[0]} wurde entfernt.` });
     logger.log("command", `* Deleted Customcommand ${args[0]}`);
 }

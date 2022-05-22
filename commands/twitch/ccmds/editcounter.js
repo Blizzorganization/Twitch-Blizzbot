@@ -45,7 +45,7 @@ export async function run(client, target, context, msg, self, args) {
                 client.say(target, "Mögliche Aktionen sind `val` und `inc`.");
                 return;
         }
-        client.say(target, `${user} der Zähler ${name} wurde bearbeitet.`);
+        client.say(target, `${user}, der Zähler ${name} wurde editiert.`);
         logger.log("command", `* Edited Counter ${name}`);
     } else {
         client.say(
