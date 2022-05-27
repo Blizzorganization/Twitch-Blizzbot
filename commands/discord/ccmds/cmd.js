@@ -33,6 +33,6 @@ export async function run(client, message) {
         .setTitle("**__Bot_Commands:__**")
         .addField("Der Bot kann folgende Commands:", ccmds)
         .addField("Mod-Commands", coms);
-    if (alias.length > 0) embed.addField("Aliase:", mappedStrings.join(", "));
+    if (alias.length > 0) embed.addField("Aliase:", mappedStrings.join(" | "));
     message.channel.send({ embeds: [embed] });
 }
