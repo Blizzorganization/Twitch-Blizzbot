@@ -789,7 +789,7 @@
   "resolved" "https://registry.npmjs.org/eslint-visitor-keys/-/eslint-visitor-keys-3.3.0.tgz"
   "version" "3.3.0"
 
-"eslint@^7.0.0 || ^8.0.0", "eslint@^8.11.0", "eslint@>=5":
+"eslint@^7.0.0 || ^8.0.0", "eslint@^8.16.0", "eslint@>=5":
   "integrity" "sha512-MBndsoXY/PeVTDJeWsYj7kLZ5hQpJOfMYLsF6LicLHQWbRDG19lK5jOix4DPl8yY4SUFcE3txy86OzFLWT+yoA=="
   "resolved" "https://registry.npmjs.org/eslint/-/eslint-8.16.0.tgz"
   "version" "8.16.0"
@@ -1658,10 +1658,10 @@
   dependencies:
     "whatwg-url" "^5.0.0"
 
-"node-fetch@^3.2.3":
-  "integrity" "sha512-WvYJRN7mMyOLurFR2YpysQGuwYrJN+qrrpHjJDuKMcSPdfFccRUla/kng2mz6HWSBxJcqPbvatS6Gb4RhOzCJw=="
-  "resolved" "https://registry.npmjs.org/node-fetch/-/node-fetch-3.2.4.tgz"
-  "version" "3.2.4"
+"node-fetch@^3.2.5":
+  "integrity" "sha512-u7zCHdJp8JXBwF09mMfo2CL6kp37TslDl1KP3hRGTlCInBtag+UO3LGVy+NF0VzvnL3PVMpA2hXh1EtECFnyhQ=="
+  "resolved" "https://registry.npmjs.org/node-fetch/-/node-fetch-3.2.5.tgz"
+  "version" "3.2.5"
   dependencies:
     "data-uri-to-buffer" "^4.0.0"
     "fetch-blob" "^3.1.4"
@@ -2553,10 +2553,10 @@
   dependencies:
     "string-width" "^1.0.2 || 2 || 3 || 4"
 
-"winston-daily-rotate-file@^4.6.1":
-  "integrity" "sha512-Ycch4LZmTycbhgiI2eQXBKI1pKcEQgAqmBjyq7/dC6Dk77nasdxvhLKraqTdCw7wNDSs8/M0jXaLATHquG7xYg=="
-  "resolved" "https://registry.npmjs.org/winston-daily-rotate-file/-/winston-daily-rotate-file-4.6.1.tgz"
-  "version" "4.6.1"
+"winston-daily-rotate-file@^4.7.1":
+  "integrity" "sha512-7LGPiYGBPNyGHLn9z33i96zx/bd71pjBn9tqQzO3I4Tayv94WPmBNwKC7CO1wPHdP9uvu+Md/1nr6VSH9h0iaA=="
+  "resolved" "https://registry.npmjs.org/winston-daily-rotate-file/-/winston-daily-rotate-file-4.7.1.tgz"
+  "version" "4.7.1"
   dependencies:
     "file-stream-rotator" "^0.6.1"
     "object-hash" "^2.0.1"
