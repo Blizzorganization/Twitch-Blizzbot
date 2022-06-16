@@ -18,19 +18,19 @@ async function blacklistUpdate(client, interaction) {
 }
 
 /**
- * @param {import("discord.js").ButtonInteraction} i
+ * @param {import("discord.js").ButtonInteraction} button
  */
-async function handleButton(i) {
+async function handleButton(button) {
     /** @type {import("twitch-blizzbot/discordclient").DiscordClient} */
     // @ts-ignore
-    const client = i.client;
-    if (i.customId === "refresh-blacklist") return blacklistUpdate(client, i);
-    const message = i.message;
-    if (message.embeds[0]?.title !== "Watchtime") return;
+    const client = button.client;
+    if (button.customId === "refresh-blacklist") return blacklistUpdate(client, button);
+    const message = button.message;
+    if (!["Watchtime", "**__Watchtime:__**"].includes(message.embeds[0]?.title)) return;
     const channel = message.embeds[0]?.description;
     if (!channel) return logger.error("Tried to read data from a nonexistent embed in the top10 slash command");
     let page = parseInt(message.embeds[0].footer?.text.replace("Seite", ""));
-    switch (i.customId) {
+    switch (button.customId) {
         case "-":
             page--;
             break;
@@ -57,7 +57,7 @@ async function handleButton(i) {
     for (const viewer in updateWatchtime) {
         editEmbed.addField(updateWatchtime[viewer].viewer, calcWatchtime(updateWatchtime[viewer].watchtime), false);
     }
-    await i.update({ embeds: [editEmbed], components: [updateRow] });
+    await button.update({ embeds: [editEmbed], components: [updateRow] });
 }
 
 /**
