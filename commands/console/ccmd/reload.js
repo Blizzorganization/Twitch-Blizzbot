@@ -11,7 +11,8 @@ export async function run(clients) {
     clients.twitch.permittedlinks = readFileSync("./configs/links.txt", "utf8")
         .split(/\r\n|\n\r|\n|\r/).filter((link) => link !== "");
     clients.twitch.deletelinks = readFileSync("./configs/TLDs.txt", "utf8")
-        .split(/\r\n|\n\r|\n|\r/).filter((link) => link !== "");
+        .split(/\r\n|\n\r|\n|\r/)
+        .filter((link) => link !== "");
     logger.debug(`Folgende Links sind jetzt erlaubt: ${clients.twitch.permittedlinks.join("\t")}`);
     logger.info("Alle Datein wurden erfolgreich neu eingelesen.");
 }

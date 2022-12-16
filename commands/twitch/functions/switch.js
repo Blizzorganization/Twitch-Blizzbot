@@ -26,9 +26,9 @@ export async function run(client, target, context, msg, self, args) {
     const dbCmd = await client.clients.db.resolveCommand(target, cmdName);
     if (dbCmd) {
         client.clients.db.updateCommandEnabled(target, cmdName, !dbCmd.enabled);
-        client.say(target, `Der Befehl ${cmdName} ist jetzt ${dbCmd.enabled ? "ausgeschaltet" : "eingeschaltet"}.`);
+        client.say(target, `Der Befehl !${cmdName} ist jetzt ${dbCmd.enabled ? "ausgeschaltet" : "eingeschaltet"}.`);
         return;
     }
     client.clients.db.newCommand(target, cmdName, false, -1);
-    client.say(target, `Der Befehl ${cmdName} ist jetzt deaktiviert.`);
+    client.say(target, `Der Befehl !${cmdName} ist jetzt deaktiviert.`);
 }

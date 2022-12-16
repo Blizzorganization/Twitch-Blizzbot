@@ -9,10 +9,12 @@ export const adminOnly = true;
  */
 export function run(client) {
     client.blchannel.send({
-        content: `\`\`\`fix\n${getTable(client.clients.twitch.blacklist[client.config.watchtimechannel]).slice(
-            0,
-            1990,
-        )}\`\`\``,
+        content: `\`\`\`fix\n${getTable(
+            client.clients.twitch.blacklist[client.config.watchtimechannel].map((blEntry) => ({
+                word: blEntry.blword,
+                action: blEntry.action,
+            })),
+        ).slice(0, 1990)}\`\`\``,
         components: [
             new MessageActionRow().setComponents(
                 new MessageButton().setCustomId("refresh-blacklist").setEmoji("🔄").setStyle("PRIMARY"),

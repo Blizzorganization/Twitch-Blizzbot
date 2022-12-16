@@ -1,14 +1,24 @@
 import { MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
 import { calcWatchtime, getTable } from "twitch-blizzbot/functions";
 import { logger } from "twitch-blizzbot/logger";
+import _ from "lodash";
 /**
  * @param  {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param  {import("discord.js").ButtonInteraction} interaction
  */
 async function blacklistUpdate(client, interaction) {
+    const table = getTable(
+        _.sortBy(
+            client.clients.twitch.blacklist[client.config.watchtimechannel].map((blEntry) => ({
+                word: blEntry.blword,
+                action: blEntry.action,
+            })),
+            "word",
+        ),
+    );
     await interaction.update({
         content: `In der Blacklist für ${client.config.watchtimechannel} sind die Wörter \
-        \`\`\`fix\n${getTable(client.clients.twitch.blacklist[client.config.watchtimechannel])}\`\`\` enthalten.`,
+        \`\`\`fix\n${table.slice(0, 1900)}\`\`\` enthalten.`,
         components: [
             new MessageActionRow().setComponents(
                 new MessageButton().setCustomId("refresh-blacklist").setEmoji("🔄").setStyle("PRIMARY"),
@@ -55,7 +65,11 @@ async function handleButton(button) {
         .setDescription(channel);
     const updateWatchtime = await client.clients.db.watchtimeList(channel, "alltime", 10, page);
     for (const viewer in updateWatchtime) {
-        editEmbed.addField(updateWatchtime[viewer].viewer, calcWatchtime(updateWatchtime[viewer].watchtime), false);
+        editEmbed.addFields({
+            name: updateWatchtime[viewer].viewer,
+            value: calcWatchtime(updateWatchtime[viewer].watchtime),
+            inline: false,
+        });
     }
     await button.update({ embeds: [editEmbed], components: [updateRow] });
 }

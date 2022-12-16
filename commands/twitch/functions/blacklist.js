@@ -17,9 +17,15 @@ export const silent = true;
  */
 export async function run(client, target, context) {
     const user = context["display-name"];
+    const table = getTable(
+        client.blacklist[target.replace(/#+/g, "")].map((blEntry) => ({
+            word: blEntry.blword,
+            action: blEntry.action,
+        })),
+    );
     client.clients.discord.blchannel.send({
         content: `In der Blacklist für ${target} sind die Wörter \
-        \`\`\`fix\n${getTable(client.blacklist[target.replace(/#+/g, "")])}\`\`\` enthalten.`,
+        \`\`\`fix\n${table.slice(0, 1990)}\`\`\` enthalten.`,
         components: [
             new MessageActionRow().setComponents(
                 new MessageButton().setCustomId("refresh-blacklist").setEmoji("🔄").setStyle("PRIMARY"),
