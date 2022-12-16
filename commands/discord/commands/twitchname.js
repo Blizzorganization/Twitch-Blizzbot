@@ -25,10 +25,12 @@ export async function run(client, message) {
         .setColor(0xedbc5d)
         .setThumbnail(dcuser.avatarURL())
         .setTitle("**__Linkinginfo__**")
-        .addField("__Discord-name__", dcuser.username)
-        .addField("__Twitch-name__", dbuser)
-        .addField("__Der Twitchaccount wurde erstellt vor__", age)
-        .addField("__Folgt schon__", fage);
+        .addFields(
+            { name: "__Discord-Name__", value: dcuser.username },
+            { name: "__Twitch-name__", value: dbuser },
+            { name: "__Der Twitchaccount wurde erstellt vor__", value: age },
+            { name: "__Folgt schon__", value: fage },
+        );
 
     message.channel.send({ embeds: [embed] });
 }

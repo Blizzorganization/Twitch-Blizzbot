@@ -21,7 +21,11 @@ export async function execute(interaction) {
         .setFooter({ text: `Seite ${page}` });
     const watchtime = await client.clients.db.watchtimeList(channel, "alltime", 10, page);
     for (const viewer in watchtime) {
-        embed.addField(watchtime[viewer].viewer, calcWatchtime(watchtime[viewer].watchtime), false);
+        embed.addFields({
+            name: watchtime[viewer].viewer,
+            value: calcWatchtime(watchtime[viewer].watchtime),
+            inline: false,
+        });
     }
     const row = new MessageActionRow().addComponents(
         new MessageButton().setCustomId("-").setLabel("Vorherige Seite").setStyle("PRIMARY").setDisabled(true),

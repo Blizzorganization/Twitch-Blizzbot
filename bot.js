@@ -13,8 +13,8 @@ import { createConfig } from "./setup.js";
     if (!existsSync("./configs/config.json")) await createConfig();
     const config = JSON.parse(readFileSync("./configs/config.json").toString());
 
-    // making sure a links.txt and TLDs.txt exists
-    ["links", "TLDs"].forEach((txtFile) => appendFileSync(`configs/${txtFile}.txt`, ""));
+    // making sure a links.txt, TLDs.txt and mods.txt exists
+    ["links", "TLDs", "mods"].forEach((txtFile) => appendFileSync(`configs/${txtFile}.txt`, ""));
 
     // starting bot
     logger.debug("starting bot");

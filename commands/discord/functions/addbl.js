@@ -15,7 +15,7 @@ export async function run(client, message, args) {
     let action = parseInt(args.shift());
     if (isNaN(action)) action = 0;
     const blword = args.join(" ").toLowerCase();
-    client.clients.twitch.blacklist[client.config.watchtimechannel].push({
+    client.clients.twitch.blacklist[client.config.watchtimechannel]?.push({
         blword,
         action,
         channel: client.config.watchtimechannel,

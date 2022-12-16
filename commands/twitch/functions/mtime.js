@@ -16,12 +16,15 @@ export const alias = [];
  * @param {string[]} args
  */
 export async function run(client, target, context, msg, self, args) {
-    if (!args || args.length == 0) {
-        client.say(target, "Du musst einen Nutzer angeben.");
-        return;
+    let user, watchtime;
+    user = args[0]?.toLowerCase().replace("@", "");
+    if (user) {
+        watchtime = await client.clients.db.getWatchtime(target, user, currentMonth());
+        if (!watchtime) return client.say(target, "Diesen Nutzer kenne ich nicht.");
+    } else {
+        user = context["username"];
+        watchtime = await client.clients.db.getWatchtime(target, context["username"], currentMonth());
+        if (!watchtime) watchtime = 1;
     }
-    const user = args[0].toLowerCase().replace("@", "");
-    const watchtime = await client.clients.db.getWatchtime(target, user, currentMonth());
-    if (!watchtime) return client.say(target, "Diesen Nutzer kenne ich nicht.");
-    client.say(target, `${user} schaut ${target.slice(1)} schon diesen Monat seit ${calcWatchtime(watchtime)}`);
+    client.say(target, `${user} schaut ${target.slice(1)} diesen Monat schon seit ${calcWatchtime(watchtime)}`);
 }

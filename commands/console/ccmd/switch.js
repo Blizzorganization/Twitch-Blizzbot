@@ -20,11 +20,11 @@ export async function run(clients, args) {
     const dbCmd = await clients.db.resolveCommand(channel, cmdName);
     if (dbCmd) {
         clients.db.updateCommandEnabled(channel, cmdName, !dbCmd.enabled);
-        logger.info(`Der Befehl ${cmdName} ist jetzt ${dbCmd.enabled ? "ausgeschaltet" : "eingeschaltet"}.`);
+        logger.info(`Der Befehl !${cmdName} ist jetzt ${dbCmd.enabled ? "ausgeschaltet" : "eingeschaltet"}.`);
         return;
     }
     clients.db.newCommand(channel, cmdName, false, -1);
-    logger.info(`Der Befehl ${cmdName} ist jetzt deaktiviert.`);
+    logger.info(`Der Befehl !${cmdName} ist jetzt deaktiviert.`);
 }
 /**
  * @param  {import("twitch-blizzbot/clients").Clients} clients

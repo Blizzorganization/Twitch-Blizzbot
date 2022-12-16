@@ -37,9 +37,11 @@ export async function run(client, message, args) {
         .setColor(0xedbc5d)
         .setThumbnail(client.user.avatarURL({ format: "png" }))
         .setTitle("**__Watchtime__**")
-        .addField("Nutzername", user)
-        .addField("Watchtime", `${calcWatchtime(watchtime)}`)
-        .addField("Von der registrierten Zeit", `${Math.round((1000 * watchtime) / maxWatchtime) / 10}%`);
+        .addFields(
+            { name: "Nutzername", value: user },
+            { name: "Watchtime", value: `${calcWatchtime(watchtime)}` },
+            { name: "Von der registrierten Zeit", value: `${Math.round((1000 * watchtime) / maxWatchtime) / 10}%` },
+        );
 
     message.channel.send({ embeds: [embed] });
 }

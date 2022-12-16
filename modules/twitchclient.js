@@ -11,6 +11,7 @@ import { logger } from "./logger.js";
  * @property {string[]} devs
  * @property {number} Raidminutes
  * @property {string} clientId
+ * @property {boolean} permit
  * @typedef {configExtension & import("tmi.js").Options} config
  */
 
@@ -50,6 +51,9 @@ export class TwitchClient extends Client {
         this.deletelinks = readFileSync("./configs/TLDs.txt", "utf8")
             .split(/\r\n|\n\r|\n|\r/)
             .filter((link) => link !== "");
+        this.permitList = readFileSync("./configs/mods.txt", "utf8")
+            .split(/\r\n|\n\r|\n|\r/)
+            .filter((usr) => usr !== "");
         this.watchtime = undefined;
         this.automessage = undefined;
         /** @type {import("./clients").Clients}*/

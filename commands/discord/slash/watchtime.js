@@ -35,8 +35,10 @@ export async function execute(interaction) {
         .setColor(0xedbc5d)
         .setThumbnail(client.user.avatarURL({ format: "png" }))
         .setTitle("**__Watchtime__**")
-        .addField("Nutzername", twuser)
-        .addField("Watchtime", `${calcWatchtime(watchtime)}`)
-        .addField("Von der registrierten Zeit", `${Math.round((1000 * watchtime) / maxWatchtime) / 10}%`);
+        .addFields(
+            { name: "Nutzername", value: twuser },
+            { name: "Watchtime", value: `${calcWatchtime(watchtime)}` },
+            { name: "Von der registrierten Zeit", value: `${Math.round((1000 * watchtime) / maxWatchtime) / 10}%` },
+        );
     await interaction.reply({ embeds: [embed] });
 }

@@ -32,8 +32,7 @@ export async function run(client, message) {
         .setColor(0xedbc5d)
         .setThumbnail(client.user.avatarURL({ format: "png" }))
         .setTitle("**__Bot_Commands:__**")
-        .addField("Der Bot kann folgende Commands:", ccmds)
-        .addField("Mod-Commands", coms);
-    if (alias.length > 0) embed.addField("Aliase:", mappedStrings.join(" | "));
+        .addFields({ name: "Der Bot kann folgende Commands:", value: ccmds }, { name: "Mod-Commands", value: coms });
+    if (alias.length > 0) embed.addFields({ name: "Aliase:", value: mappedStrings.join(" | ") });
     message.channel.send({ embeds: [embed] });
 }

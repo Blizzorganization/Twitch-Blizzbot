@@ -34,10 +34,12 @@ export async function execute(interaction) {
         .setColor(0xedbc5d)
         .setThumbnail(dcuser.avatarURL())
         .setTitle("**__Linkinginfo__**")
-        .addField("Discord-name", dcuser.username)
-        .addField("Twitch-name", twuser)
-        .addField("__Der Twitchaccount wurde erstellt vor__", age)
-        .addField("__Folgt schon__", fage);
+        .addFields(
+            { name: "Discord-Name", value: dcuser.username },
+            { name: "Twitch-Name", value: twuser },
+            { name: "__Der Twitchaccount wurde erstellt vor__", value: age },
+            { name: "__Folgt schon__", value: fage },
+        );
 
     await interaction.reply({ embeds: [embed] });
 }

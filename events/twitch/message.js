@@ -157,7 +157,12 @@ function hasPerm(client, ctx) {
         if (ctx.badges["broadcaster"]) return permissions.streamer;
         if (ctx.badges["vip"]) return permissions.vip;
     }
-    if (ctx.mod) return permissions.mod;
+    if (client.config.permit) {
+        if (client.permitList.includes(ctx.username)) return permissions.mod;
+    } else if (ctx.mod) {
+        return permissions.mod;
+    }
+
     if (ctx.subscriber) return permissions.sub;
     return permissions.user;
 }

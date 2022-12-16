@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Collection } from "discord.js";
 import EventEmitter from "events";
 import { createInterface } from "readline";
@@ -15,6 +16,7 @@ export class ConsoleClient extends EventEmitter {
     /**
      */
     constructor() {
+        // @ts-ignore
         super();
         /** @type {import("./clients").Clients} */
         this.clients = undefined;
