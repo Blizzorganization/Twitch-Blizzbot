@@ -4,7 +4,6 @@ TODO.todo
 
 #don't commit json files and txt
 configs/*
-!configs/bots.txt
 !configs/example-config.json
 
 #don't commit documentation
