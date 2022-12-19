@@ -14,6 +14,8 @@ export async function run(client, message) {
     const ccmds = (await client.clients.db.allCcmds(twchannel)).sort().join(", ");
     const coms = (await client.clients.db.allCcmds(twchannel, permissions.mod)).join(", ");
     const aliases = await client.clients.db.getAliases(twchannel);
+    const counters = await client.clients.db.allCounters(twchannel);
+    const counternames = counters.map((c) => c.name);
     const mappedAliases = [];
     aliases
         .sort((a, b) => (a.alias > b.alias ? 1 : -1))
@@ -31,8 +33,10 @@ export async function run(client, message) {
     const embed = new MessageEmbed()
         .setColor(0xedbc5d)
         .setThumbnail(client.user.avatarURL({ format: "png" }))
-        .setTitle("**__Bot_Commands:__**")
-        .addFields({ name: "Der Bot kann folgende Commands:", value: ccmds }, { name: "Mod-Commands", value: coms });
-    if (alias.length > 0) embed.addFields({ name: "Aliase:", value: mappedStrings.join(" | ") });
+        .setTitle("**__Bot_Commands:__**");
+    if (ccmds.length > 0) embed.addFields([{ name: "Der Bot kann folgende Commands:", value: ccmds }]);
+    if (coms.length > 0) embed.addFields([{ name: "Mod-Commands", value: coms }]);
+    if (alias.length > 0) embed.addFields([{ name: "Aliase:", value: mappedStrings.join(" | ") }]);
+    if (counternames.length > 0) embed.addFields([{ name: "Counter:", value: counternames.join(", ") }]);
     message.channel.send({ embeds: [embed] });
 }
