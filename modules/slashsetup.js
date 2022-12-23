@@ -28,5 +28,6 @@ export default async function loadSlash(client, guildid) {
  * @returns {import("discord-api-types").RESTPostAPIApplicationCommandsJSONBody} the data field
  */
 function mapCommand(cmd) {
+    // @ts-ignore
     return cmd.data;
 }
