@@ -2,7 +2,7 @@ import { MessageEmbed } from "discord.js";
 import { permissions } from "twitch-blizzbot/constants";
 
 export const adminOnly = true;
-export const alias = ["commands"];
+export const alias = [];
 /**
  * @name helplist
  * @namespace DiscordCommands
@@ -13,9 +13,13 @@ export async function run(client, message) {
     const twchannel = client.config.watchtimechannel;
     const ccmds = (await client.clients.db.allCcmds(twchannel)).sort().join(", ");
     const coms = (await client.clients.db.allCcmds(twchannel, permissions.mod)).join(", ");
-    const aliases = await client.clients.db.getAliases(twchannel);
+
+    // Counter Listing
     const counters = await client.clients.db.allCounters(twchannel);
     const counternames = counters.map((c) => c.name);
+
+    // Alias Listing
+    const aliases = await client.clients.db.getAliases(twchannel);
     const mappedAliases = [];
     aliases
         .sort((a, b) => (a.alias > b.alias ? 1 : -1))
@@ -29,14 +33,19 @@ export async function run(client, message) {
     for (const command in mappedAliases) {
         mappedStrings.push(`${command}= ${mappedAliases[command].join(", ")}`);
     }
-    // message.reply({ content: `Der Bot kann folgende Commands: ${ccmds} und folgende Aliase: ${mappedStrings.join(" | ")}` });
+
+    // embed building
     const embed = new MessageEmbed()
         .setColor(0xedbc5d)
         .setThumbnail(client.user.avatarURL({ format: "png" }))
         .setTitle("**__Bot_Commands:__**");
+
+    // embed components
     if (ccmds.length > 0) embed.addFields([{ name: "Der Bot kann folgende Commands:", value: ccmds }]);
     if (coms.length > 0) embed.addFields([{ name: "Mod-Commands", value: coms }]);
-    if (alias.length > 0) embed.addFields([{ name: "Aliase:", value: mappedStrings.join(" | ") }]);
+    if (aliases.length > 0) embed.addFields([{ name: "Aliase:", value: mappedStrings.join(" | ") }]);
     if (counternames.length > 0) embed.addFields([{ name: "Counter:", value: counternames.join(", ") }]);
+    if (!ccmds.length && !coms.length && !aliases.length && !counternames.length)embed.addFields([{ name: "**Information**", value: "Es ist leider kein Command hinterlegt" }]);
+
     message.channel.send({ embeds: [embed] });
 }

@@ -22,7 +22,11 @@ export async function run(client, message, args) {
         .setFooter({ text: `Seite ${page}` });
     const watchtime = await client.clients.db.watchtimeList(channel, "alltime", 10, page);
     for (const viewer in watchtime) {
-        embed.addField(watchtime[viewer].viewer, calcWatchtime(watchtime[viewer].watchtime), false);
+        embed.addFields({
+            name: watchtime[viewer].viewer,
+            value: calcWatchtime(watchtime[viewer].watchtime),
+            inline: false,
+        });
     }
     let outmsg = await message.channel.send({ embeds: [embed] });
     await outmsg.react("⬅️");
@@ -45,7 +49,11 @@ export async function run(client, message, args) {
             .setDescription(channel);
         const newwatchtime = await client.clients.db.watchtimeList(channel, "alltime", 10, page);
         for (const viewer in newwatchtime) {
-            editEmbed.addField(newwatchtime[viewer].viewer, calcWatchtime(newwatchtime[viewer].watchtime), false);
+            editEmbed.addFields({
+                name: newwatchtime[viewer].viewer,
+                value: calcWatchtime(newwatchtime[viewer].watchtime),
+                inline: false,
+            });
         }
         outmsg = await outmsg.edit({ embeds: [editEmbed] });
         await reaction.remove();
