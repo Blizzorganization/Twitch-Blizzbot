@@ -26,7 +26,7 @@ export async function run(client, target, context, msg, self, args) {
     if (!res || res == "") return client.say(target, "Du musst angeben, was die Antwort sein soll.");
     const existingCmd = await client.clients.db.getCcmd(target.replace(/#+/g, ""), newcmd);
     if (existingCmd) {
-        client.say(target, "Der Command existiert bereits");
+        client.say(target, `${user}, der Command existiert bereits`);
         return;
     }
     await client.clients.db.newCcmd(target.replace(/#+/g, ""), newcmd, res, permissions.user);
