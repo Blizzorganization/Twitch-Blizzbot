@@ -21,11 +21,11 @@ export async function run(client, target, context, msg, self, args) {
     while (args.length > 0) {
         if (!cname || cname == "") cname = args.shift().toLowerCase();
     }
-    if (cname) {
-        await client.clients.db.delCounter(target.replace(/#+/g, ""), cname);
-        client.say(target, `${user}, der Zähler ${cname} wurde entfernt.`);
-        logger.log("command", `* Deleted Counter ${cname}`);
-    } else {
-        client.say(target, "Du musst angeben, welchen Zähler du löschen möchtest.");
+    if (!cname) {
+        await client.say(target, "Du musst angeben, welchen Zähler du löschen möchtest.");
+        return;
     }
+    await client.clients.db.delCounter(target.replace(/#+/g, ""), cname);
+    client.say(target, `${user}, der Zähler ${cname} wurde entfernt.`);
+    logger.log("command", `* Deleted Counter ${cname}`);
 }

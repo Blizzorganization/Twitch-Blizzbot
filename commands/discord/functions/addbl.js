@@ -10,7 +10,8 @@ export const adminOnly = true;
  */
 export async function run(client, message, args) {
     if (!args || args.length == 0) {
-        return message.channel.send({ content: "Du musst angeben, was du blockieren willst!" });
+        message.channel.send({ content: "Du musst angeben, was du blockieren willst!" });
+        return;
     }
     let action = parseInt(args.shift());
     if (isNaN(action)) action = 0;

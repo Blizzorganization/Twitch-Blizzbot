@@ -23,19 +23,19 @@ export async function run(client, target, context, msg, self, args) {
         if (!increase || increase == "") increase = args.shift();
         if (!defaultVal || defaultVal == "") defaultVal = args.shift();
     }
-    if (cname) {
-        await client.clients.db.newCounter(
-            target.replace(/#+/g, ""),
-            cname,
-            isNaN(parseInt(increase)) ? undefined : parseInt(increase),
-            isNaN(parseInt(defaultVal)) ? undefined : parseInt(defaultVal),
-        );
-        client.say(target, `${user}, der Zähler ${cname} wurde hinzugefügt.`);
-        logger.log("command", `* Added Counter ${cname}`);
-    } else {
-        client.say(
+    if (!cname) {
+        await client.say(
             target,
             "Du musst angeben, welchen Zähler (mit optionaler Steigung und einem Startwert) du hinzufügen möchtest.",
         );
+        return;
     }
+    await client.clients.db.newCounter(
+        target.replace(/#+/g, ""),
+        cname,
+        isNaN(parseInt(increase)) ? undefined : parseInt(increase),
+        isNaN(parseInt(defaultVal)) ? undefined : parseInt(defaultVal),
+    );
+    client.say(target, `${user}, der Zähler ${cname} wurde hinzugefügt.`);
+    logger.log("command", `* Added Counter ${cname}`);
 }

@@ -13,5 +13,5 @@ export async function run(client, target) {
     let appHelp = `!${client.helplist.sort().join(", !")}`;
     const ccmds = (await client.clients.db.allCcmds(target)).sort();
     if (ccmds.length > 0) appHelp += `, ${ccmds.join(", ")}`;
-    client.say(target, `Der Bot kann folgende Commands: ${appHelp}`);
+    await client.say(target, `Der Bot kann folgende Commands: ${appHelp}`);
 }

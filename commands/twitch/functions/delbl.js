@@ -23,10 +23,11 @@ export async function run(client, target, context, msg, self, args) {
     const blacklist = client.blacklist[target.replace(/#+/g, "")];
     const blacklistEntry = blacklist.find((entry) => entry.blword == blremove);
     if (!blacklistEntry) {
-        return client.say(
+        await client.say(
             target,
             `"${blremove}" ist in keiner Blacklist vorhanden, kann also auch nicht aus der Blacklist entfernt werden.`,
         );
+        return;
     }
     client.blacklist[target.replace(/#+/g, "")] = blacklist.filter((b) => b !== blacklistEntry);
     await client.clients.db.removeBlacklistWord(target, blremove);

@@ -20,11 +20,14 @@ export async function run(client, target, context, msg, self, args) {
     user = args[0]?.toLowerCase().replace("@", "");
     if (user) {
         watchtime = await client.clients.db.getWatchtime(target, user, currentMonth());
-        if (!watchtime) return client.say(target, "Diesen Nutzer kenne ich nicht.");
+        if (!watchtime) {
+            await client.say(target, "Diesen Nutzer kenne ich nicht.");
+            return;
+        }
     } else {
         user = context["username"];
         watchtime = await client.clients.db.getWatchtime(target, context["username"], currentMonth());
         if (!watchtime) watchtime = 1;
     }
-    client.say(target, `${user} schaut ${target.slice(1)} diesen Monat schon seit ${calcWatchtime(watchtime)}`);
+    await client.say(target, `${user} schaut ${target.slice(1)} diesen Monat schon seit ${calcWatchtime(watchtime)}`);
 }

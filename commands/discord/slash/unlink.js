@@ -16,7 +16,8 @@ export async function execute(interaction) {
     const client = interaction.client;
     const previous = await client.clients.db.getDiscordConnection(interaction.user);
     if (!previous) {
-        return interaction.reply("Du hast keinen Twitchnamen hinterlegt, den ich löschen kann.");
+        await interaction.reply("Du hast keinen Twitchnamen hinterlegt, den ich löschen kann.");
+        return;
     }
     await client.clients.db.deleteDiscordConnection(interaction.user);
     await interaction.reply(`Deine Verknüpfung zu **${previous}** wurde gelöscht.`);

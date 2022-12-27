@@ -24,6 +24,6 @@ export async function run(client, target, context, msg, self, args) {
     const blword = args.join(" ").toLowerCase();
     client.blacklist[target.replace(/#+/g, "")].push({ blword, action, channel: target.replace(/#+/g, "") });
     await client.clients.db.newBlacklistWord(target, blword, action);
-    client.say(target, `"${blword}" wurde in die Blacklist eingetragen TPFufun`);
+    await client.say(target, `"${blword}" wurde in die Blacklist eingetragen TPFufun`);
     logger.info(`* Added "${blword}" to the "${action}" Blacklist of ${target.replace(/#+/g, "")}`);
 }
