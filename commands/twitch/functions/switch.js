@@ -29,6 +29,6 @@ export async function run(client, target, context, msg, self, args) {
         client.say(target, `Der Befehl !${cmdName} ist jetzt ${dbCmd.enabled ? "ausgeschaltet" : "eingeschaltet"}.`);
         return;
     }
-    client.clients.db.newCommand(target, cmdName, false, -1);
-    client.say(target, `Der Befehl !${cmdName} ist jetzt deaktiviert.`);
+    await client.clients.db.newCommand(target, cmdName, false, -1);
+    await client.say(target, `Der Befehl !${cmdName} ist jetzt deaktiviert.`);
 }

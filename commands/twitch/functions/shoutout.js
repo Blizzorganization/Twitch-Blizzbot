@@ -20,7 +20,7 @@ export async function run(client, target, context, msg, self, args) {
     }
     const user = args[0];
 
-    client.say(
+    await client.say(
         target,
         `Kleines Shoutout an ${user} schaut doch auch mal bei https://www.twitch.tv/${user.toLowerCase()} vorbei`,
     );

@@ -45,7 +45,9 @@ export async function run(client, message) {
     if (coms.length > 0) embed.addFields([{ name: "Mod-Commands", value: coms }]);
     if (aliases.length > 0) embed.addFields([{ name: "Aliase:", value: mappedStrings.join(" | ") }]);
     if (counternames.length > 0) embed.addFields([{ name: "Counter:", value: counternames.join(", ") }]);
-    if (!ccmds.length && !coms.length && !aliases.length && !counternames.length)embed.addFields([{ name: "**Information**", value: "Es ist leider kein Command hinterlegt" }]);
+    if (!ccmds.length && !coms.length && !aliases.length && !counternames.length) {
+        embed.addFields([{ name: "**Information**", value: "Es ist leider kein Command hinterlegt" }]);
+    }
 
     message.channel.send({ embeds: [embed] });
 }
