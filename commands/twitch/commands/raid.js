@@ -21,7 +21,7 @@ export function run(client, target) {
      * starts follower only mode after timeout
      */
     function ende() {
-        client.say(target, "/followers 5");
-        client.say(target, "/me Der Follower Modus wurde Aktiviert.");
+        client.say(target, `/followers 5 `);
+        client.say(target, `/me Der Follower Modus wurde Aktiviert.`);
     }
 }
