@@ -1,4 +1,4 @@
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 export const alias = ["hilfe"];
 export const adminOnly = false;
 /**
@@ -8,9 +8,9 @@ export const adminOnly = false;
  * @param  {import("discord.js").Message} message
  */
 export function run(client, message) {
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
         .setColor(0xedbc5d)
-        .setThumbnail(client.user.avatarURL({ format: "png" }))
+        .setThumbnail(client.user.avatarURL({ extension: "png" }))
         .setTitle("**__Der Bot kann folgende Befehle:__**")
         .addFields(
             { name: "!twitchname", value: "Fügt einen neuen Command in den Bot auf Twitch ein." },

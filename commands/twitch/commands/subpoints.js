@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import { permissions } from "twitch-blizzbot/constants";
 
 export const help = false;

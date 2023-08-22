@@ -1,4 +1,4 @@
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { calcWatchtime, currentMonth } from "twitch-blizzbot/functions";
 
 export const adminOnly = true;
@@ -16,7 +16,7 @@ export async function run(client, message, args) {
     if (args && args.length > 0) {
         if (args[0] && !isNaN(parseInt(args[0]))) page = parseInt(args[0]);
     }
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
         .setTitle("Monthly Watchtime")
         .setColor(0xedbc5d)
         .setDescription(channel)
@@ -42,7 +42,7 @@ export async function run(client, message, args) {
         } else {
             page = Math.max(--page, 1);
         }
-        const editEmbed = new MessageEmbed()
+        const editEmbed = new EmbedBuilder()
             .setTitle("Monthly Watchtime")
             .setColor(0xedbc5d)
             .setDescription(channel)

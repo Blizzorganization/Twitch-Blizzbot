@@ -9,7 +9,8 @@ import { logger } from "twitch-blizzbot/logger";
 export async function run(clients) {
     clients.twitch.messages = JSON.parse(readFileSync("configs/automessages.json", "utf8"));
     clients.twitch.permittedlinks = readFileSync("./configs/links.txt", "utf8")
-        .split(/\r\n|\n\r|\n|\r/).filter((link) => link !== "");
+        .split(/\r\n|\n\r|\n|\r/)
+        .filter((link) => link !== "");
     clients.twitch.deletelinks = readFileSync("./configs/TLDs.txt", "utf8")
         .split(/\r\n|\n\r|\n|\r/)
         .filter((link) => link !== "");

@@ -1,4 +1,4 @@
-import { Client, Collection, Intents, TextChannel } from "discord.js";
+import { Client, Collection, IntentsBitField, TextChannel } from "discord.js";
 import { loadCommands, loadEvents } from "./functions.js";
 import { logger } from "./logger.js";
 /**
@@ -36,10 +36,10 @@ export class DiscordClient extends Client {
     constructor(config) {
         super({
             intents: [
-                Intents.FLAGS.GUILDS,
-                Intents.FLAGS.GUILD_MESSAGES,
-                Intents.FLAGS.GUILD_MEMBERS,
-                Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+                IntentsBitField.Flags.Guilds,
+                IntentsBitField.Flags.GuildMessages,
+                IntentsBitField.Flags.GuildMembers,
+                IntentsBitField.Flags.GuildMessageReactions,
             ],
         });
         this.commands = new Collection();

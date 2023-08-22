@@ -1,5 +1,4 @@
-import { MessageEmbed } from "discord.js";
-import fetch from "node-fetch";
+import { EmbedBuilder } from "discord.js";
 import { time } from "twitch-blizzbot/functions";
 
 export const alias = ["twitchnamen", "twname"];
@@ -21,7 +20,7 @@ export async function run(client, message) {
     const res = await fetch(`https://decapi.me/twitch/followage/${channel}/${dbuser}`);
     const fage = time(await res.text());
 
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
         .setColor(0xedbc5d)
         .setThumbnail(dcuser.avatarURL())
         .setTitle("**__Linkinginfo__**")

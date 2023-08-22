@@ -1,5 +1,4 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { calcWatchtime } from "twitch-blizzbot/functions";
 
 export const data = new SlashCommandBuilder()
@@ -16,7 +15,7 @@ export const data = new SlashCommandBuilder()
 /**
  * @name watchtime
  * @namespace DiscordCommands
- * @param  {import("discord.js").CommandInteraction} interaction
+ * @param  {import("discord.js").ChatInputCommandInteraction} interaction
  */
 export async function execute(interaction) {
     /** @type {import("twitch-blizzbot/discordclient").DiscordClient}*/
@@ -31,9 +30,9 @@ export async function execute(interaction) {
     }
     const watchtime = await client.clients.db.getWatchtime(channel, twuser, "alltime");
     const maxWatchtime = await client.clients.db.getWatchtime(channel, client.clients.twitch.getUsername(), "alltime");
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
         .setColor(0xedbc5d)
-        .setThumbnail(client.user.avatarURL({ format: "png" }))
+        .setThumbnail(client.user.avatarURL({ extension: "png" }))
         .setTitle("**__Watchtime__**")
         .addFields(
             { name: "Nutzername", value: twuser },

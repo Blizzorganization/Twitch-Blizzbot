@@ -1,4 +1,4 @@
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { logger } from "twitch-blizzbot/logger";
 
 export const adminOnly = true;
@@ -23,6 +23,6 @@ export async function run(client, message, args) {
         message.reply("Einen solchen Command gibt es nicht.");
         return;
     }
-    message.reply({ content: ccmd.response, embeds: [new MessageEmbed().setDescription("CCMD")] });
+    message.reply({ content: ccmd.response, embeds: [new EmbedBuilder().setDescription("CCMD")] });
     logger.log("command", `* Viewed Command !${commandName}`);
 }

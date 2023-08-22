@@ -197,7 +197,7 @@ async function handleCommand(client, target, context, msg, self, args) {
             if (dbCommandState.enabled === false) return;
             if (dbCommandState.permission === -1) cmdPerm = cmd.perm;
         }
-        if (cmd.perm && (userpermission < cmdPerm)) {
+        if (cmd.perm && userpermission < cmdPerm) {
             if (!cmd.silent) client.say(target, "Du hast keine Rechte");
             return;
         }

@@ -1,4 +1,4 @@
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 export const adminOnly = true;
 /**
  * @name help
@@ -7,9 +7,9 @@ export const adminOnly = true;
  * @param  {import("discord.js").Message} message
  */
 export function run(client, message) {
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
         .setColor(0xedbc5d)
-        .setThumbnail(client.user.avatarURL({ format: "png" }))
+        .setThumbnail(client.user.avatarURL({ extension: "png" }))
         .setTitle("**__Alle Moderations Commands__**")
         .addFields(
             { name: "!add", value: "Fügt einen neuen Command in den Bot auf Twitch ein." },

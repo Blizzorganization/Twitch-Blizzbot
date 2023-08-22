@@ -1,6 +1,4 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
-import { MessageEmbed } from "discord.js";
-import fetch from "node-fetch";
+import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { time } from "twitch-blizzbot/functions";
 
 export const data = new SlashCommandBuilder()
@@ -30,7 +28,7 @@ export async function execute(interaction) {
     const age = time(await resp.text());
     const res = await fetch(`https://decapi.me/twitch/followage/${channel}/${twuser}`);
     const fage = time(await res.text());
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
         .setColor(0xedbc5d)
         .setThumbnail(dcuser.avatarURL())
         .setTitle("**__Linkinginfo__**")

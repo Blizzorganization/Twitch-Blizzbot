@@ -1,5 +1,4 @@
 import lodash from "lodash";
-import fetch from "node-fetch";
 import { getRandom } from "twitch-blizzbot/functions";
 import { logger } from "twitch-blizzbot/logger";
 

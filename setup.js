@@ -236,8 +236,19 @@ export const createConfig = async () => {
     existingconfig.db.keepAlive = true;
     existingconfig.twitch.identity.username = await request("twitchusername", existingconfig.twitch.identity.username);
     existingconfig.twitch.identity.password = await request("twitchpass", existingconfig.twitch.identity.password);
-    existingconfig.twitch.channels = (await request("twitchchannels", existingconfig.twitch.channels?.join(" "))).split(/ +/g);
-    existingconfig.twitch.permit = parseBoolean(await request("permits", typeof existingconfig.twitch.permit === "boolean" ? (existingconfig.twitch.permit ? initStrings[language].yes : initStrings[language].no) : undefined));
+    existingconfig.twitch.channels = (await request("twitchchannels", existingconfig.twitch.channels?.join(" "))).split(
+        / +/g,
+    );
+    existingconfig.twitch.permit = parseBoolean(
+        await request(
+            "permits",
+            typeof existingconfig.twitch.permit === "boolean"
+                ? existingconfig.twitch.permit
+                    ? initStrings[language].yes
+                    : initStrings[language].no
+                : undefined,
+        ),
+    );
     existingconfig.twitch.Raidminutes = parseFloat(await request("raidduration", existingconfig.twitch.Raidminutes));
     existingconfig.twitch.Cooldown = parseInt(await request("twitchcooldown", existingconfig.twitch.Cooldown));
     existingconfig.twitch.automessagedelay = parseInt(await request("automessagedelay"));

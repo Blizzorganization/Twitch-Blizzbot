@@ -1,4 +1,4 @@
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { calcWatchtime, currentMonth } from "twitch-blizzbot/functions";
 
 export const adminOnly = true;
@@ -36,9 +36,9 @@ export async function run(client, message, args) {
         currentMonth(),
     );
     if (!watchtime) return message.channel.send("Diesen Nutzer kenne ich nicht.");
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
         .setColor(0xedbc5d)
-        .setThumbnail(client.user.avatarURL({ format: "png" }))
+        .setThumbnail(client.user.avatarURL({ extension: "png" }))
         .setTitle("**__Monthly Watchtime__**")
         .addFields(
             { name: "Nutzername", value: user },

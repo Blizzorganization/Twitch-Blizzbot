@@ -1,82 +1,70 @@
 export const statements = {
     userlink: {
-        newDiscordConnection:
-        `
+        newDiscordConnection: `
             INSERT INTO userlink(discordid, twitchname)
             VALUES($1, $2)
             ON CONFLICT(discordid) DO
             UPDATE SET twitchname = EXCLUDED.twitchname;
         `,
-        getDiscordConnection:
-        `
+        getDiscordConnection: `
             SELECT twitchname
             FROM userlink
             WHERE discordid = $1;
         `,
-        deleteDiscordConnection:
-        `
+        deleteDiscordConnection: `
             DELETE FROM userlink
             WHERE discordid = $1;
         `,
     },
     channels: {
-        newChannel:
-        `
+        newChannel: `
             INSERT INTO streamer(name, automessage)
             VALUES ($1, $2)
             ON CONFLICT DO NOTHING;
         `,
-        getChannel:
-        `
+        getChannel: `
             SELECT *
             FROM streamer
             WHERE name = $1;
         `,
     },
     customCommands: {
-        changeCommandPermissions:
-        `
+        changeCommandPermissions: `
             UPDATE customcommands
             SET permissions = $1
             WHERE command = $2
             AND channel = $3;
         `,
-        getCommandPermission:
-        `
+        getCommandPermission: `
             SELECT permissions
             FROM customcommands
             WHERE command = $1
             AND channel = $2;
         `,
-        newCommand:
-        `
+        newCommand: `
             INSERT INTO customcommands (command, response, channel, permissions)
             VALUES($1, $2, $3, $4)
             ON CONFLICT
             DO NOTHING;
         `,
-        getCommand:
-        `
+        getCommand: `
             SELECT *
             FROM customcommands
             WHERE command = $1
             AND channel = $2;
         `,
-        updateCommand:
-        `
+        updateCommand: `
             UPDATE customcommands
             SET response = $1
             WHERE command = $2
             AND channel = $3;
         `,
-        deleteCommand:
-        `
+        deleteCommand: `
             DELETE FROM customcommands
             WHERE command = $1
             AND channel = $2;
         `,
-        getAllCommands:
-        `
+        getAllCommands: `
             SELECT command
             FROM customcommands
             WHERE channel = $1
@@ -84,103 +72,89 @@ export const statements = {
         `,
     },
     counters: {
-        newCounter:
-        `
+        newCounter: `
             INSERT INTO counters (channel, name, cur, inc)
             VALUES ($1, $2, $3, $4)
             ON CONFLICT
             DO NOTHING;
         `,
-        getCounter:
-        `
+        getCounter: `
             SELECT cur
             FROM counters
             WHERE name = $1
             AND channel = $2;
         `,
-        incCounter:
-        `
+        incCounter: `
             UPDATE counters
             SET cur = cur + inc
             WHERE name = $1
             AND channel = $2
             RETURNING cur;
         `,
-        setCounter:
-        `
+        setCounter: `
             UPDATE counters
             SET cur = $1
             WHERE name = $2
             AND channel = $3;
         `,
-        editCounter:
-        `
+        editCounter: `
             UPDATE counters
             SET inc = $1
             WHERE name = $2
             AND channel = $3;
         `,
-        delCounter:
-        `
+        delCounter: `
             DELETE FROM counters
             WHERE channel = $1
             AND name = $2;
         `,
-        allCounters:
-        `
+        allCounters: `
             SELECT *
             FROM counters
             WHERE channel = $1;
         `,
     },
     watchtime: {
-        renameWatchtimeUser:
-        `
+        renameWatchtimeUser: `
             UPDATE watchtime
             set viewer = $3
             WHERE viewer = $2
             AND channel = $1;
         `,
-        getWatchtime:
-        `
+        getWatchtime: `
             SELECT watchtime
             FROM watchtime
             WHERE viewer = $1
             AND channel = $2
             AND month = $3;
         `,
-        setWatchtime:
-        `
+        setWatchtime: `
             INSERT INTO watchtime (channel, viewer, watchtime, month)
             VALUES ($1, $2, $3, $4)
             ON CONFLICT
             UPDATE SET watchtime = EXCLUDED.watchtime;
         `,
-        watchtimeNew:
-        `
+        watchtimeNew: `
             INSERT INTO watchtime (channel, viewer, watchtime, month)
             VALUES ($1, unnest( $2::varchar(25)[])::varchar(25), 0, $3)
             ON CONFLICT
             DO NOTHING;
         `,
-        watchtimeInc:
-        `
+        watchtimeInc: `
             UPDATE watchtime
             SET watchtime = watchtime + 1
             WHERE $1::varchar(25)[] @> ARRAY[viewer]::varchar(25)[]
             AND channel = $2
             AND month = $3;
         `,
-        watchtimeIncBy:
-        `
+        watchtimeIncBy: `
             UPDATE watchtime
             SET watchtime = watchtime + $4
             WHERE viewer = $1
             AND channel = $2
             AND month = $3;
         `,
-        watchtimeList:
-        `
+        watchtimeList: `
             SELECT viewer, watchtime
             FROM watchtime
             WHERE month = $1
@@ -191,21 +165,18 @@ export const statements = {
         `,
     },
     aliases: {
-        newAlias:
-        `
+        newAlias: `
             INSERT INTO aliases (channel, alias, command)
             VALUES ($1, $2, $3)
             ON CONFLICT
             DO NOTHING;
         `,
-        delAlias:
-        `
+        delAlias: `
             DELETE FROM aliases
             WHERE channel = $1
             AND alias = $2;
         `,
-        resolveAlias:
-        `
+        resolveAlias: `
             SELECT a.alias, c.command, c.response, c.permissions
             FROM aliases
             as a
@@ -217,8 +188,7 @@ export const statements = {
             WHERE a.alias = $1
             AND a.channel = $2;
         `,
-        getAliases:
-        `
+        getAliases: `
             SELECT *
             FROM aliases
             WHERE channel = $1;
@@ -237,36 +207,31 @@ export const statements = {
             WHERE channel = $1
             AND blword = $2;
         `,
-        loadBlacklist:
-        `
+        loadBlacklist: `
             SELECT *
             FROM blacklist;
         `,
     },
     commands: {
-        newCommand:
-        `
+        newCommand: `
             INSERT INTO commands (channel, command, enabled, permission)
             VALUES ($1, $2, $3, $4)
             ON CONFLICT
             DO NOTHING;
         `,
-        resolveCommand:
-        `
+        resolveCommand: `
             SELECT *
             FROM commands
             WHERE channel = $1
             AND command = $2;
         `,
-        updateCommandEnabled:
-        `
+        updateCommandEnabled: `
             UPDATE commands
             SET enabled = $1
             WHERE channel = $2
             AND command = $3;
         `,
-        updateCommandPermission:
-        `
+        updateCommandPermission: `
             UPDATE commands
             SET permission = $1
             WHERE channel = $2

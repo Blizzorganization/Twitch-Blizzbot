@@ -1,7 +1,10 @@
-import { MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
 import { calcWatchtime, getTable } from "twitch-blizzbot/functions";
 import { logger } from "twitch-blizzbot/logger";
 import _ from "lodash";
+import { ActionRowBuilder } from "discord.js";
+import { ButtonBuilder } from "discord.js";
+import { ButtonStyle } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 /**
  * @param  {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param  {import("discord.js").ButtonInteraction} interaction
@@ -16,14 +19,15 @@ async function blacklistUpdate(client, interaction) {
             "word",
         ),
     );
+    /** @type {ActionRowBuilder<ButtonBuilder>} */
+    const row = new ActionRowBuilder();
+    row.setComponents(
+        new ButtonBuilder().setCustomId("refresh-blacklist").setEmoji("🔄").setStyle(ButtonStyle.Primary),
+    );
     await interaction.update({
         content: `In der Blacklist für ${client.config.watchtimechannel} sind die Wörter \
         \`\`\`fix\n${table.slice(0, 1900)}\`\`\` enthalten.`,
-        components: [
-            new MessageActionRow().setComponents(
-                new MessageButton().setCustomId("refresh-blacklist").setEmoji("🔄").setStyle("PRIMARY"),
-            ),
-        ],
+        components: [row],
     });
 }
 
@@ -50,15 +54,17 @@ async function handleButton(button) {
         default:
             break;
     }
-    const updateRow = new MessageActionRow().addComponents(
-        new MessageButton()
+    /** @type {ActionRowBuilder<ButtonBuilder>} */
+    const updateRow = new ActionRowBuilder();
+    updateRow.addComponents(
+        new ButtonBuilder()
             .setCustomId("-")
             .setLabel("Vorherige Seite")
-            .setStyle("PRIMARY")
+            .setStyle(ButtonStyle.Primary)
             .setDisabled(page == 1),
-        new MessageButton().setCustomId("+").setLabel("Nächste Seite").setStyle("PRIMARY"),
+        new ButtonBuilder().setCustomId("+").setLabel("Nächste Seite").setStyle(ButtonStyle.Primary),
     );
-    const editEmbed = new MessageEmbed()
+    const editEmbed = new EmbedBuilder()
         .setTitle("Watchtime")
         .setColor(0xdfb82d)
         .setFooter({ text: `Seite${page}` })

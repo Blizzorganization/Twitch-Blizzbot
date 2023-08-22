@@ -1,4 +1,6 @@
-import { MessageActionRow, MessageButton } from "discord.js";
+import { ButtonBuilder } from "discord.js";
+import { ButtonStyle } from "discord.js";
+import { ActionRowBuilder } from "discord.js";
 import { permissions } from "twitch-blizzbot/constants";
 import { getTable } from "twitch-blizzbot/functions";
 import { logger } from "twitch-blizzbot/logger";
@@ -23,15 +25,16 @@ export async function run(client, target, context) {
             action: blEntry.action,
         })),
     );
-    client.clients.discord.blchannel.send({
+    /** @type {ActionRowBuilder<ButtonBuilder>} */
+    const row = new ActionRowBuilder();
+    row.setComponents(
+        new ButtonBuilder().setCustomId("refresh-blacklist").setEmoji("🔄").setStyle(ButtonStyle.Primary),
+    );
+    await client.clients.discord.blchannel.send({
         content: `In der Blacklist für ${target} sind die Wörter \
         \`\`\`fix\n${table.slice(0, 1990)}\`\`\` enthalten.`,
-        components: [
-            new MessageActionRow().setComponents(
-                new MessageButton().setCustomId("refresh-blacklist").setEmoji("🔄").setStyle("PRIMARY"),
-            ),
-        ],
+        components: [row],
     });
-    client.say(target, `${user} Blacklist wurde gesendet`);
+    await client.say(target, `${user} Blacklist wurde gesendet`);
     logger.info(`* Sent the blacklist of ${target} to ${context.username}`);
 }

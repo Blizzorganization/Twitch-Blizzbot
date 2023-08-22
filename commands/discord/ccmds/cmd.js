@@ -1,4 +1,4 @@
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { permissions } from "twitch-blizzbot/constants";
 
 export const adminOnly = true;
@@ -35,9 +35,9 @@ export async function run(client, message) {
     }
 
     // embed building
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
         .setColor(0xedbc5d)
-        .setThumbnail(client.user.avatarURL({ format: "png" }))
+        .setThumbnail(client.user.avatarURL({ extension: "png" }))
         .setTitle("**__Bot_Commands:__**");
 
     // embed components

@@ -65,7 +65,7 @@ export class TwitchClient extends Client {
             this.newChannellogs(opts.channels);
             for (const c of opts.channels) this.cooldowns.set(c.replace("#", ""), 0);
         });
-        this.cooldowns = new Map;
+        this.cooldowns = new Map();
         /** @type {{[key: string]: import("fs").WriteStream}} */
         this.channellogs = {};
         scheduleJob("newchannellogs", "0 1 * * *", () => this.newChannellogs(opts.channels));

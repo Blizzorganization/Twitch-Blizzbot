@@ -1,4 +1,4 @@
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { calcWatchtime } from "twitch-blizzbot/functions";
 
 export const alias = ["wt"];
@@ -33,9 +33,9 @@ export async function run(client, message, args) {
     const watchtime = await client.clients.db.getWatchtime(channel, user, "alltime");
     const maxWatchtime = await client.clients.db.getWatchtime(channel, client.clients.twitch.getUsername(), "alltime");
     if (!watchtime) return message.channel.send("Diesen Nutzer kenne ich nicht.");
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
         .setColor(0xedbc5d)
-        .setThumbnail(client.user.avatarURL({ format: "png" }))
+        .setThumbnail(client.user.avatarURL({ extension: "png" }))
         .setTitle("**__Watchtime__**")
         .addFields(
             { name: "Nutzername", value: user },
