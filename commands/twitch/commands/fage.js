@@ -1,24 +1,27 @@
-const { permissions } = require("../../../modules/constants");
-const fetch = require("node-fetch").default;
-const { time } = require("../../../modules/functions");
+import { permissions } from "twitch-blizzbot/constants";
+import { time } from "twitch-blizzbot/functions";
 
-exports.help = true;
-exports.perm = permissions.user;
-exports.alias = ["folgezeit", "followage"];
+export const help = true;
+export const perm = permissions.user;
+export const alias = ["folgezeit", "followage"];
 /**
  * @name followage
  * @namespace TwitchCommands
- * @param {import("../../../modules/twitchclient").TwitchClient} client
+ * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  * @param {import("tmi.js").ChatUserstate} context
  * @param {string} msg
  * @param {boolean} self
+ * @param {string[]} args
  */
-exports.run = async (client, target, context, msg, self, args) => {
-    let user = args[0];
+export async function run(client, target, context, msg, self, args) {
+    let user;
+    user = args[0]?.toLowerCase().replace("@", "");
     if (!user || user == "") user = context["display-name"];
-    const resp = await fetch(`https://2g.be/twitch/following.php?user=${user}&channel=${target.slice(1)}&format=mwdhms`);
+    const resp = await fetch(
+        `https://2g.be/twitch/following.php?user=${user}&channel=${target.slice(1)}&format=mwdhms`,
+    );
     const followage = time(await resp.text());
 
     client.say(target, followage);
-};
+}

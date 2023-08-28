@@ -1,17 +1,15 @@
-const { MessageEmbed } = require("discord.js");
-const { time } = require("../../../modules/functions");
-const fetch = require("node-fetch").default;
+import { EmbedBuilder } from "discord.js";
+import { time } from "twitch-blizzbot/functions";
 
-exports.alias = ["twitchnamen", "twname"];
-exports.adminOnly = false;
+export const alias = ["twitchnamen", "twname"];
+export const adminOnly = false;
 /**
- * @name tname
+ * @name twitchname
  * @namespace DiscordCommands
- * @param {import("../../../modules/discordclient").DiscordClient} client
+ * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
  */
-exports.run = async (client, message) => {
-
+export async function run(client, message) {
     const dcuser = message.mentions.users.first() || message.author;
     let dbuser = await client.clients.db.getDiscordConnection(dcuser);
     if (!dbuser) dbuser = "Du hast keinen Namen hinterlegt";
@@ -22,14 +20,16 @@ exports.run = async (client, message) => {
     const res = await fetch(`https://decapi.me/twitch/followage/${channel}/${dbuser}`);
     const fage = time(await res.text());
 
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
         .setColor(0xedbc5d)
         .setThumbnail(dcuser.avatarURL())
         .setTitle("**__Linkinginfo__**")
-        .addField("__Discord-name__", dcuser.username)
-        .addField("__Twitch-name__", dbuser)
-        .addField("__Der Twitchaccount wurde erstellt vor__", age)
-        .addField("__Folgt schon__", fage);
+        .addFields(
+            { name: "__Discord-Name__", value: dcuser.username },
+            { name: "__Twitch-name__", value: dbuser },
+            { name: "__Der Twitchaccount wurde erstellt vor__", value: age },
+            { name: "__Folgt schon__", value: fage },
+        );
 
     message.channel.send({ embeds: [embed] });
-};
+}

@@ -3,10 +3,8 @@ node_modules/
 TODO.todo
 
 #don't commit json files and txt
-automessages.json
-config.json
-links.txt
-TLDs.txt
+configs/*
+!configs/example-config.json
 
 #don't commit documentation
 docs/

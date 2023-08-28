@@ -1,37 +1,50 @@
-const { MessageActionRow, MessageButton, MessageEmbed } = require("discord.js");
-const { calcWatchtime } = require("../../modules/functions");
+import { calcWatchtime, getTable } from "twitch-blizzbot/functions";
+import { logger } from "twitch-blizzbot/logger";
+import _ from "lodash";
+import { ActionRowBuilder } from "discord.js";
+import { ButtonBuilder } from "discord.js";
+import { ButtonStyle } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 /**
- * @param  {import("../../modules/discordclient").DiscordClient} client
+ * @param  {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param  {import("discord.js").ButtonInteraction} interaction
  */
 async function blacklistUpdate(client, interaction) {
+    const table = getTable(
+        _.sortBy(
+            client.clients.twitch.blacklist[client.config.watchtimechannel].map((blEntry) => ({
+                word: blEntry.blword,
+                action: blEntry.action,
+            })),
+            "word",
+        ),
+    );
+    /** @type {ActionRowBuilder<ButtonBuilder>} */
+    const row = new ActionRowBuilder();
+    row.setComponents(
+        new ButtonBuilder().setCustomId("refresh-blacklist").setEmoji("🔄").setStyle(ButtonStyle.Primary),
+    );
     await interaction.update({
         content: `In der Blacklist für ${client.config.watchtimechannel} sind die Wörter \
-        \`\`\`fix\n${client.clients.twitch.blacklist[client.config.watchtimechannel].sort().join("\n")}\`\`\` enthalten.`,
-        components: [
-            new MessageActionRow()
-                .setComponents(
-                    new MessageButton()
-                        .setCustomId("refresh-blacklist")
-                        .setEmoji("🔄")
-                        .setStyle("PRIMARY"),
-                ),
-        ],
+        \`\`\`fix\n${table.slice(0, 1900)}\`\`\` enthalten.`,
+        components: [row],
     });
 }
 
 /**
- * @param {import("discord.js").ButtonInteraction} i
+ * @param {import("discord.js").ButtonInteraction} button
  */
-async function handleButton(i) {
-    if (i.customId == "refresh-blacklist") return blacklistUpdate(i.client, i);
-    const message = i.message;
-    if (message.embeds[0]?.title !== "Watchtime") return;
-    const channel = message.embeds[0]?.description;
+async function handleButton(button) {
+    /** @type {import("twitch-blizzbot/discordclient").DiscordClient} */
     // @ts-ignore
-    if (!channel) return i.client.logger("Tried to read data from a nonexistent embed in the top10 slash command");
+    const client = button.client;
+    if (button.customId === "refresh-blacklist") return blacklistUpdate(client, button);
+    const message = button.message;
+    if (!["Watchtime", "**__Watchtime:__**"].includes(message.embeds[0]?.title)) return;
+    const channel = message.embeds[0]?.description;
+    if (!channel) return logger.error("Tried to read data from a nonexistent embed in the top10 slash command");
     let page = parseInt(message.embeds[0].footer?.text.replace("Seite", ""));
-    switch (i.customId) {
+    switch (button.customId) {
         case "-":
             page--;
             break;
@@ -41,46 +54,50 @@ async function handleButton(i) {
         default:
             break;
     }
-    const updateRow = new MessageActionRow()
-        .addComponents(
-            new MessageButton()
-                .setCustomId("-")
-                .setLabel("Vorherige Seite")
-                .setStyle("PRIMARY")
-                .setDisabled(page == 1),
-            new MessageButton()
-                .setCustomId("+")
-                .setLabel("Nächste Seite")
-                .setStyle("PRIMARY"),
-        );
-    const editEmbed = new MessageEmbed()
+    /** @type {ActionRowBuilder<ButtonBuilder>} */
+    const updateRow = new ActionRowBuilder();
+    updateRow.addComponents(
+        new ButtonBuilder()
+            .setCustomId("-")
+            .setLabel("Vorherige Seite")
+            .setStyle(ButtonStyle.Primary)
+            .setDisabled(page == 1),
+        new ButtonBuilder().setCustomId("+").setLabel("Nächste Seite").setStyle(ButtonStyle.Primary),
+    );
+    const editEmbed = new EmbedBuilder()
         .setTitle("Watchtime")
         .setColor(0xdfb82d)
         .setFooter({ text: `Seite${page}` })
         .setDescription(channel);
-    // @ts-ignore
-    const updateWatchtime = await i.client.clients.db.watchtimeList(channel, "alltime", 10, page);
+    const updateWatchtime = await client.clients.db.watchtimeList(channel, "alltime", 10, page);
     for (const viewer in updateWatchtime) {
-        editEmbed.addField(updateWatchtime[viewer].viewer, calcWatchtime(updateWatchtime[viewer].watchtime), false);
+        editEmbed.addFields({
+            name: updateWatchtime[viewer].viewer,
+            value: calcWatchtime(updateWatchtime[viewer].watchtime),
+            inline: false,
+        });
     }
-    await i.update({ embeds: [editEmbed], components: [updateRow] });
+    await button.update({ embeds: [editEmbed], components: [updateRow] });
 }
-
 
 /**
  *
- * @param {import("../../modules/discordclient").DiscordClient} client
+ * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Interaction} interaction
  */
-exports.event = (client, interaction) => {
-    if (interaction.isButton()) return handleButton(interaction);
+export function event(client, interaction) {
+    if (interaction.isButton()) {
+        handleButton(interaction);
+        return;
+    }
     if (!interaction.isCommand()) return;
     const commands = client.slashcommands;
     if (!commands.has(interaction.commandName)) return;
     try {
         commands.get(interaction.commandName).execute(interaction);
     } catch (e) {
-        client.clients.logger.error(e);
-        return interaction.reply({ content: "There was an error while executing this command!", ephemeral: true });
+        logger.error(e);
+        interaction.reply({ content: "There was an error while executing this command!", ephemeral: true });
+        return;
     }
-};
+}

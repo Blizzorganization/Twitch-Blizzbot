@@ -1,9 +1,21 @@
 {
   "name": "twitch-blizzbot",
-  "version": "8.0.9",
+  "version": "8.1.0",
   "homepage": "https://github.com/blizzor/Twitch-Blizzbot#readme",
   "bugs": {
     "url": "https://github.com/blizzor/Twitch-Blizzbot/issues"
+  },
+  "exports": {
+    ".": "./bot.js",
+    "./clients": "./modules/clients.js",
+    "./consoleclient": "./modules/consoleclient.js",
+    "./constants": "./modules/constants.js",
+    "./CustomError": "./modules/CustomError.js",
+    "./discordclient": "./modules/discordclient.js",
+    "./functions": "./modules/functions.js",
+    "./logger": "./modules/logger.js",
+    "./twitchclient": "./modules/twitchclient.js",
+    "./slashsetup": "./modules/slashsetup.js"
   },
   "license": "MIT",
   "repository": {
@@ -11,41 +23,55 @@
     "url": "https://github.com/blizzor/Twitch-blizzbot.git"
   },
   "dependencies": {
-    "@discordjs/builders": "^0.5.0",
-    "@discordjs/rest": "^0.1.0-canary.0",
-    "better-sqlite3": "^7.4.3",
-    "discord-api-types": "^0.24.0",
-    "discord.js": "^13.6.0",
-    "enmap": "^5.8.4",
+    "@discordjs/rest": "^2.0.1",
+    "better-sqlite3": "^8.5.1",
+    "discord-api-types": "^0.37.54",
+    "discord.js": "^14.13.0",
+    "enmap": "^5.9.8",
+    "eslint-plugin-jsdoc": "^46.5.0",
     "lodash": "^4.17.21",
-    "node-fetch": "^2.6.6",
-    "node-schedule": "^2.0.0",
-    "pg": "^8.7.1",
-    "request": "^2.65.0",
-    "snowflake": "^0.1.2",
+    "node-schedule": "^2.1.1",
+    "pg": "^8.11.3",
     "tmi.js": "^1.8.5",
-    "winston": "^3.3.3",
-    "winston-daily-rotate-file": "^4.5.5"
+    "winston": "^3.10.0",
+    "winston-daily-rotate-file": "^4.7.1"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.15.7",
-    "@types/lodash": "^4.14.175",
-    "@types/pg": "^8.6.1",
-    "@types/tmi.js": "^1.8.0",
-    "clean-jsdoc-theme": "^3.2.8",
-    "eslint": "^7.32.0",
-    "eslint-config-standard": "^16.0.3",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^5.1.0"
+    "@types/lodash": "^4.14.197",
+    "@types/node": "^20.5.3",
+    "@types/node-schedule": "^2.1.0",
+    "@types/pg": "^8.10.2",
+    "@types/pidusage": "^2.0.2",
+    "@types/tmi.js": "^1.8.3",
+    "eslint": "^8.47.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "husky": "^8.0.3",
+    "js2xmlparser": "^5.0.0",
+    "jsdoc": "^4.0.2",
+    "jsdoc-tsimport-plugin": "^1.0.5",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.0.2",
+    "typescript": "^5.1.6"
   },
-  "optionalDependencies": {
-    "pidusage": "^2.0.21"
+  "peerDependencies": {
+    "pidusage": "^3.0.0"
   },
   "main": "bot.js",
   "scripts": {
-    "start": "node bot",
+    "start": "node --experimental-specifier-resolution=node bot",
     "init": "node setup",
-    "config": "node setup"
+    "config": "node setup",
+    "lint": "eslint .",
+    "format": "eslint . --fix",
+    "prettify": "prettier . -w",
+    "prettify:check": "prettier -c .",
+    "validate": "npm-run-all --parallel lint prettify:check check-types",
+    "precommit": "yarn validate",
+    "prepush": "yarn validate",
+    "prepare": "husky install",
+    "docs": "jsdoc -c jsdoc.json",
+    "check-types": "tsc --noEmit --pretty -p jsconfig.json"
   },
   "files": [
     "./bot.js",
@@ -53,5 +79,5 @@
     "events/**/*.js",
     "commands/**/*.js"
   ],
-  "babel": {}
+  "type": "module"
 }

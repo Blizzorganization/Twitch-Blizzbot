@@ -1,31 +1,40 @@
-const { MessageActionRow, MessageButton } = require("discord.js");
-const { permissions } = require("../../../modules/constants");
+import { ButtonBuilder } from "discord.js";
+import { ButtonStyle } from "discord.js";
+import { ActionRowBuilder } from "discord.js";
+import { permissions } from "twitch-blizzbot/constants";
+import { getTable } from "twitch-blizzbot/functions";
+import { logger } from "twitch-blizzbot/logger";
 
-exports.help = false;
-exports.perm = permissions.mod;
-exports.silent = true;
+export const help = false;
+export const perm = permissions.mod;
+/** @type {string[]} */
+export const alias = [];
+export const silent = true;
 /**
  * @name blacklist
  * @namespace TwitchCommands
- * @param {import("../../../modules/twitchclient").TwitchClient} client
+ * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  * @param {import("tmi.js").ChatUserstate} context
  */
-exports.run = async (client, target, context) => {
+export async function run(client, target, context) {
     const user = context["display-name"];
-    client.clients.discord.blchannel.send({
+    const table = getTable(
+        client.blacklist[target.replace(/#+/g, "")].map((blEntry) => ({
+            word: blEntry.blword,
+            action: blEntry.action,
+        })),
+    );
+    /** @type {ActionRowBuilder<ButtonBuilder>} */
+    const row = new ActionRowBuilder();
+    row.setComponents(
+        new ButtonBuilder().setCustomId("refresh-blacklist").setEmoji("🔄").setStyle(ButtonStyle.Primary),
+    );
+    await client.clients.discord.blchannel.send({
         content: `In der Blacklist für ${target} sind die Wörter \
-        \`\`\`fix\n${client.blacklist[target.replace(/#+/g, "")].sort().join("\n")}\`\`\` enthalten.`,
-        components: [
-            new MessageActionRow()
-                .setComponents(
-                    new MessageButton()
-                        .setCustomId("refresh-blacklist")
-                        .setEmoji("🔄")
-                        .setStyle("PRIMARY"),
-                ),
-        ],
+        \`\`\`fix\n${table.slice(0, 1990)}\`\`\` enthalten.`,
+        components: [row],
     });
-    client.say(target, `${user} Blacklist wurde gesendet`);
-    client.clients.logger.log("info", `* Sent the blacklist of ${target} to ${context.username}`);
-};
+    await client.say(target, `${user} Blacklist wurde gesendet`);
+    logger.info(`* Sent the blacklist of ${target} to ${context.username}`);
+}

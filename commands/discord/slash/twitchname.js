@@ -1,30 +1,43 @@
-const { MessageEmbed } = require("discord.js");
+import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { time } from "twitch-blizzbot/functions";
 
-module.exports = {
-    data: {
-        name: "twitchname",
-        description: "Frage einen twitch username ab",
-        type: 1,
-        options: [{
-            type: 6,
-            name: "user",
-            description: "Ein Nutzer, wenn nicht du gemeint sein sollst",
-            required: false,
-        }],
-    },
-    execute: async (interaction) => {
-        /** @type {import("../../../modules/discordclient").DiscordClient}*/
-        const client = interaction.client;
-        const dcuser = interaction.options.getUser("user") || interaction.user;
-        const twuser = await client.clients.db.getDiscordConnection(dcuser);
-        if (!twuser) return interaction.reply(`Der Nutzer ${dcuser.tag} hat keinen Namen hinterlegt.`);
-        const embed = new MessageEmbed()
-            .setColor(0xedbc5d)
-            .setThumbnail(dcuser.avatarURL())
-            .setTitle("**__Linkinginfo__**")
-            .addField("Discord-name", dcuser.username)
-            .addField("Twitch-name", twuser);
+export const data = new SlashCommandBuilder()
+    .setName("twitchname")
+    .setDescription("Frage einen Twitch Username ab")
+    .addUserOption((input) =>
+        input.setName("user").setRequired(true).setDescription("Ein Nutzer, wenn nicht du gemeint sein sollst"),
+    )
+    .toJSON();
 
-        await interaction.reply({ embeds: [embed] });
-    },
-};
+/**
+ * @name twitchname
+ * @namespace DiscordCommands
+ * @param  {import("discord.js").CommandInteraction} interaction
+ */
+export async function execute(interaction) {
+    /** @type {import("twitch-blizzbot/discordclient").DiscordClient}*/
+    // @ts-ignore
+    const client = interaction.client;
+    const dcuser = interaction.options.getUser("user") || interaction.user;
+    const twuser = await client.clients.db.getDiscordConnection(dcuser);
+    if (!twuser) {
+        return interaction.reply(`Der Nutzer ${dcuser.tag} hat keinen Namen hinterlegt.`);
+    }
+    const channel = client.config.watchtimechannel;
+    const resp = await fetch(`https://decapi.me/twitch/accountage/${twuser}`);
+    const age = time(await resp.text());
+    const res = await fetch(`https://decapi.me/twitch/followage/${channel}/${twuser}`);
+    const fage = time(await res.text());
+    const embed = new EmbedBuilder()
+        .setColor(0xedbc5d)
+        .setThumbnail(dcuser.avatarURL())
+        .setTitle("**__Linkinginfo__**")
+        .addFields(
+            { name: "Discord-Name", value: dcuser.username },
+            { name: "Twitch-Name", value: twuser },
+            { name: "__Der Twitchaccount wurde erstellt vor__", value: age },
+            { name: "__Folgt schon__", value: fage },
+        );
+
+    await interaction.reply({ embeds: [embed] });
+}

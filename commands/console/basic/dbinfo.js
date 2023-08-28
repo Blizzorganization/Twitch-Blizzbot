@@ -1,11 +1,14 @@
-const { getTable } = require("../../modules/functions");
+import fs from "fs";
+import { getTable } from "twitch-blizzbot/functions";
+import { logger } from "twitch-blizzbot/logger";
+import Util from "util";
 
-global.util = require("util");
-global.fs = require("fs");
+global.util = Util;
+global.fs = fs;
 /**
- * @param {import("../../modules/clients").Clients} clients
+ * @param {import("twitch-blizzbot/clients").Clients} clients
  */
-exports.run = async (clients) => {
+export async function run(clients) {
     const query_size = `SELECT
     pg_size_pretty(pg_total_relation_size('watchtime')) as watchtime,
     pg_size_pretty(pg_total_relation_size('streamer')) as streamer,
@@ -22,18 +25,20 @@ exports.run = async (clients) => {
     SELECT 'counters', count(*) from counters union
     SELECT 'userlink', count(*) from userlink union
     SELECT 'blacklist', count(*) from blacklist;`;
-    const size = (await clients.db.query(query_size)).rows[0];
+    const size = (await clients.db.db.query(query_size)).rows[0];
     const lines = [];
-    const lines_data = (await clients.db.query(query_lines)).rows;
-    lines_data.forEach(line => { lines[line["?column?"]] = line.count; });
+    const lines_data = (await clients.db.db.query(query_lines)).rows;
+    lines_data.forEach((line) => {
+        lines[line["?column?"]] = line.count;
+    });
     lines["total"] = `${lines_data.reduce((a, b) => parseInt(a) + parseInt(b.count), 0)}`;
-    clients.logger.log("info", "\n" + getTable({ size, lines }));
-};
+    logger.info(`\n${getTable({ size, lines })}`);
+}
 /**
- * @param  {import("../../modules/clients").Clients} clients
+ * @param  {import("../../../modules/clients").Clients} clients
  * @param  {string} line
  */
-exports.completer = (clients, line) => {
+export function completer(clients, line) {
     // eslint-disable-next-line no-sparse-arrays
     return [, line];
-};
+}

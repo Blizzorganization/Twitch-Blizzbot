@@ -1,23 +1,27 @@
-const { MessageEmbed } = require("discord.js");
+import { EmbedBuilder } from "discord.js";
+export const alias = ["hilfe"];
+export const adminOnly = false;
 /**
+ * @name help
  * @namespace DiscordCommands
- */
-exports.alias = ["hilfe"];
-exports.adminOnly = false;
-/**
- * @param  {import("../../../modules/discordclient").DiscordClient} client
+ * @param  {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param  {import("discord.js").Message} message
  */
-exports.run = (client, message) => {
-    const embed = new MessageEmbed()
+export function run(client, message) {
+    const embed = new EmbedBuilder()
         .setColor(0xedbc5d)
-        .setThumbnail(client.user.avatarURL({ format: "png" }))
+        .setThumbnail(client.user.avatarURL({ extension: "png" }))
         .setTitle("**__Der Bot kann folgende Befehle:__**")
-        .addField("!twitchname", "Zeigt den Twitchnamen an der eingespeichert wurde")
-        .addField("!top10", "Gibt die aktuellen Top10 der Watchtime liste wieder")
-        .addField("!watchtime [Twitch-Name]", "Gibt die aktuelle watchtime des angegebenen Nutzers wieder")
-        .addField("!link [Twitch-Name]", "Um deinen Twitchaccount mit Discord zu verbinden so das du nur noch !watchtime eingeben muss")
-        .addField("!unlink [Twitch-Name]", "Entfernt die Verbindung zu deinem Twitch Account");
+        .addFields(
+            { name: "!twitchname", value: "Fügt einen neuen Command in den Bot auf Twitch ein." },
+            { name: "!top10", value: "Gibt die aktuellen Top10 der Watchtime liste wieder" },
+            { name: "!watchtime [Twitch-Name]", value: "Gibt die aktuelle watchtime des angegebenen Nutzers wieder" },
+            {
+                name: "!link [Twitch-Name]",
+                value: "Um deinen Twitchaccount mit Discord zu verbinden so das du nur noch !watchtime eingeben muss",
+            },
+            { name: "!unlink", value: "Entfernt die Verbindung zu deinem Twitch Account" },
+        );
 
     message.channel.send({ embeds: [embed] });
-};
+}

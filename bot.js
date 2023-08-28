@@ -1,19 +1,23 @@
 #!/usr/bin/node
-const { appendFileSync, readFileSync, existsSync } = require("fs");
-const { Clients } = require("./modules/clients");
-const { ConsoleClient } = require("./modules/consoleclient");
-const { DiscordClient } = require("./modules/discordclient");
-const { TwitchClient } = require("./modules/twitchclient");
-const { createConfig } = require("./setup");
+import { appendFileSync, existsSync, readFileSync } from "fs";
+import { Clients } from "twitch-blizzbot/clients";
+import { ConsoleClient } from "twitch-blizzbot/consoleclient";
+import { DiscordClient } from "twitch-blizzbot/discordclient";
+import { logger } from "twitch-blizzbot/logger";
+import { TwitchClient } from "twitch-blizzbot/twitchclient";
+import { createConfig } from "./setup.js";
 (async () => {
-    if (process.argv0.length >= 18) process.title = `Twitch-Blizzbot@${JSON.parse(readFileSync("./package.json", "utf8")).version}`;
+    if (process.argv0.length >= 18) {
+        process.title = `Twitch-Blizzbot@${JSON.parse(readFileSync("./package.json", "utf8")).version}`;
+    }
     if (!existsSync("./configs/config.json")) await createConfig();
     const config = JSON.parse(readFileSync("./configs/config.json").toString());
-    // making sure a links.txt exists
-    appendFileSync("configs/links.txt", "");
-    // making sure a TLDs.txt exists
-    appendFileSync("configs/TLDs.txt", "");
-    require("./modules/logger").debug("starting bot");
+
+    // making sure a links.txt, TLDs.txt and mods.txt exists
+    ["links", "TLDs", "mods"].forEach((txtFile) => appendFileSync(`configs/${txtFile}.txt`, ""));
+
+    // starting bot
+    logger.debug("starting bot");
     const clients = new Clients(config);
     let discordClient;
     const twitchClient = new TwitchClient(config.twitch);
@@ -24,7 +28,7 @@ const { createConfig } = require("./setup");
     consoleClient.clients = clients;
     if (config.useDiscord == true) {
         if (config.twitch.channels.indexOf(`#${config.discord.watchtimechannel}`) == -1) {
-            clients.logger.error("Der Discord Watchtime Channel muss in den Twitch channeln enthalten sein.");
+            logger.error("Der Discord Watchtime Channel muss in den Twitch channeln enthalten sein.");
             process.exit(1);
         }
         discordClient = new DiscordClient(config.discord);
@@ -34,7 +38,7 @@ const { createConfig } = require("./setup");
         const twReady = new Promise((resolve) => twitchClient.once("connected", () => resolve()));
         Promise.all([dcReady, twReady]).then(() => {
             setTimeout(() => {
-                clients.logger.log("debug", "changing channel topics");
+                logger.info("changing channel topics");
                 discordClient.channelTopic();
             }, 300000);
         });

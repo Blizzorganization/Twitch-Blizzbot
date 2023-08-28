@@ -1,8 +1,9 @@
-const { Collection } = require("discord.js");
-const { createWriteStream, existsSync, mkdirSync, readFileSync } = require("fs");
-const { Client } = require("tmi.js");
-const { loadCommands, loadEvents } = require("./functions");
-const schedule = require("node-schedule");
+import { Collection } from "discord.js";
+import { createWriteStream, existsSync, mkdirSync, readFileSync } from "fs";
+import { scheduleJob } from "node-schedule";
+import { Client } from "tmi.js";
+import { loadCommands, loadEvents } from "./functions.js";
+import { logger } from "./logger.js";
 /**
  * @typedef configExtension
  * @property {number} Cooldown
@@ -10,23 +11,29 @@ const schedule = require("node-schedule");
  * @property {string[]} devs
  * @property {number} Raidminutes
  * @property {string} clientId
- *
+ * @property {boolean} permit
  * @typedef {configExtension & import("tmi.js").Options} config
  */
+
+/**
+ * @typedef {{[key: `${number}`]: string[]}} blacklist
+ */
+
 /**
  * TwitchClient
+ *
  * @class TwitchClient
  * @extends {Client}
- * @property {import("fs").WriteStream[]} channellogs
+ * @property {{[key: string]: import("fs").WriteStream}} channellogs
  * @property {import("./clients").Clients} clients
  * @property {boolean} started
  * @property {Collection} commands
- * @property {{[key: string]: string[]}} blacklist
+ * @property {blacklist} blacklist
  * @property {any} watchtime
  * @property {any} automessage
  * @property {string[]} channels
  */
-exports.TwitchClient = class TwitchClient extends Client {
+export class TwitchClient extends Client {
     /**
      * @param  {config} opts
      */
@@ -34,51 +41,59 @@ exports.TwitchClient = class TwitchClient extends Client {
         super(opts);
         this.config = opts;
         this.started = false;
-        this.commands = new Collection;
+        this.commands = new Collection();
         this.helplist = [];
         /** @type {string[]}*/
         this.channels = [];
-        this.permittedlinks = readFileSync("./configs/links.txt", "utf8").split(/\r\n|\n\r|\n|\r/).filter((link) => link !== "");
-        this.deletelinks = readFileSync("./configs/TLDs.txt", "utf8").split(/\r\n|\n\r|\n|\r/).filter((link) => link !== "");
+        this.permittedlinks = readFileSync("./configs/links.txt", "utf8")
+            .split(/\r\n|\n\r|\n|\r/)
+            .filter((link) => link !== "");
+        this.deletelinks = readFileSync("./configs/TLDs.txt", "utf8")
+            .split(/\r\n|\n\r|\n|\r/)
+            .filter((link) => link !== "");
+        this.permitList = readFileSync("./configs/mods.txt", "utf8")
+            .split(/\r\n|\n\r|\n|\r/)
+            .filter((usr) => usr !== "");
         this.watchtime = undefined;
         this.automessage = undefined;
         /** @type {import("./clients").Clients}*/
         this.clients = undefined;
-        /** @type {{[key: string]: string[]}}*/
-        // @ts-ignore
-        this.blacklist = [];
+        /** @type {{[key: string]: import("../typings/dbtypes").Blacklist[]}}*/
+        this.blacklist = undefined;
         if (!existsSync("./channellogs")) mkdirSync("./channellogs");
         this.once("connected", () => {
             this.newChannellogs(opts.channels);
             for (const c of opts.channels) this.cooldowns.set(c.replace("#", ""), 0);
         });
-        this.cooldowns = new Map;
-        this.channellogs = [];
-        schedule.scheduleJob("newchannellogs", "0 1 * * *", () => this.newChannellogs(opts.channels));
+        this.cooldowns = new Map();
+        /** @type {{[key: string]: import("fs").WriteStream}} */
+        this.channellogs = {};
+        scheduleJob("newchannellogs", "0 1 * * *", () => this.newChannellogs(opts.channels));
         loadCommands(this.commands, "commands/twitch/commands", this.helplist);
         loadCommands(this.commands, "commands/twitch/ccmds", this.helplist);
         loadCommands(this.commands, "commands/twitch/functions", this.helplist);
         loadEvents("events/twitch", this);
         loadEvents("events/twitch/interaction", this);
-        this.messages = require("../configs/automessages.json");
+        this.messages = JSON.parse(readFileSync("./configs/automessages.json", "utf8"));
         this.connect();
     }
     /**
      * generates channellogs
+     *
      * @param {string[]} channels Channels to create channel logs for
      */
     newChannellogs(channels = this.channels) {
         const date = new Date();
-        let month = "" + (date.getMonth() + 1);
-        let day = "" + date.getDate();
+        const month = `${date.getMonth() + 1}`.padStart(2, "0");
+        const day = `${date.getDate()}`.padStart(2, "0");
         const year = date.getFullYear();
-        if (month.length < 2) { month = "0" + month; }
-        if (day.length < 2) { day = "0" + day; }
         const dateString = [year, month, day].join("-");
         for (let channel of channels) {
             channel = channel.replace("#", "");
             if (!existsSync(`./channellogs/${channel}`)) mkdirSync(`./channellogs/${channel}`);
-            this.channellogs[channel] = createWriteStream(`./channellogs/${channel}/${dateString}.chatlog.txt`, { flags: "a" });
+            this.channellogs[channel] = createWriteStream(`./channellogs/${channel}/${dateString}.chatlog.txt`, {
+                flags: "a",
+            });
         }
     }
     /**
@@ -86,12 +101,12 @@ exports.TwitchClient = class TwitchClient extends Client {
      */
     async stop() {
         clearInterval(this.watchtime);
-        this.clients.logger.log("info", "stopped watchtime collector");
+        logger.info("stopped watchtime collector");
         if (this.config.automessagedelay !== 0) {
             clearInterval(this.automessage);
-            this.clients.logger.log("info", "stopped automessaging");
+            logger.info("stopped automessaging");
         }
         await this.disconnect();
-        this.clients.logger.log("info", "disconnected from twitch");
+        logger.info("disconnected from twitch");
     }
-};
+}

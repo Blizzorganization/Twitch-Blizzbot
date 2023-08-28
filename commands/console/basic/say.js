@@ -1,24 +1,27 @@
 /* eslint-disable no-sparse-arrays */
+
+import { logger } from "twitch-blizzbot/logger";
+
 /**
  * @namespace ConsoleCommands
- * @param {import("../../modules/clients").Clients} clients
+ * @param {import("twitch-blizzbot/clients").Clients} clients
  * @param {string[]} args
  */
-exports.run = (clients, args) => {
+export function run(clients, args) {
     let channel;
     if (clients.twitch.config.channels.length == 1) {
         channel = clients.twitch.config.channels[0];
     } else {
         channel = args.shift();
-        if (!channel.startsWith("#")) return clients.logger.error("No channel supplied, message will not be sent.");
+        if (!channel.startsWith("#")) return logger.error("No channel supplied, message will not be sent.");
     }
     clients.twitch.say(channel, args.join(" "));
-};
+}
 /**
- * @param  {import("../../modules/clients").Clients} clients
+ * @param  {import("twitch-blizzbot/clients").Clients} clients
  * @param  {string} line
  */
-exports.completer = (clients, line) => {
+export function completer(clients, line) {
     if (clients.twitch.config.channels.length == 1) return [, line];
     const args = line.split(" ");
     if (args.length > 2) return [, line];
@@ -30,4 +33,4 @@ exports.completer = (clients, line) => {
         hits[key] = `${cmd} ${val}`;
     });
     return [hits.length ? hits : completions, line];
-};
+}

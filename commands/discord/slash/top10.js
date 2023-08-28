@@ -1,48 +1,41 @@
-const { MessageEmbed, MessageActionRow, MessageButton } = require("discord.js");
-const { calcWatchtime } = require("../../../modules/functions");
+import { ButtonStyle } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { calcWatchtime } from "twitch-blizzbot/functions";
 
-
+export const data = new SlashCommandBuilder().setName("top10").setDescription("Watchtime Ranking").toJSON();
 /**
- * @name watchtimelb
+ * @name watchtimechannel
  * @namespace DiscordCommands
- * @param {import("../../../modules/discordclient").DiscordClient} client
- * @param {import("discord.js").Message} message
- * @param {string[]} args
- * @returns {Message|undefined}
+ * @param  {import("discord.js").ChatInputCommandInteraction} interaction
  */
-module.exports = {
-    data: {
-        name: "top10",
-        description: "Watchtime Ranking",
-        type: 1,
-        options: [],
-    },
-    execute: async (interaction) => {
-        /** @type {import("../../../modules/discordclient").DiscordClient}*/
-        const client = interaction.client;
-        const channel = client.config.watchtimechannel;
-        const page = 1;
-        const embed = new MessageEmbed()
-            .setTitle("**__Watchtime:__**")
-            .setColor(0xedbc5d)
-            .setDescription(channel)
-            .setFooter("Seite " + page);
-        const watchtime = await client.clients.db.watchtimeList(channel, "alltime", 10, page);
-        for (const viewer in watchtime) {
-            embed.addField(watchtime[viewer].viewer, calcWatchtime(watchtime[viewer].watchtime), false);
-        }
-        const row = new MessageActionRow()
-            .addComponents(
-                new MessageButton()
-                    .setCustomId("-")
-                    .setLabel("Vorherige Seite")
-                    .setStyle("PRIMARY")
-                    .setDisabled(true),
-                new MessageButton()
-                    .setCustomId("+")
-                    .setLabel("Nächste Seite")
-                    .setStyle("PRIMARY"),
-            );
-        await interaction.reply({ embeds: [embed], components: [row] });
-    },
-};
+export async function execute(interaction) {
+    /** @type {import("twitch-blizzbot/discordclient").DiscordClient}*/
+    // @ts-ignore
+    const client = interaction.client;
+    const channel = client.config.watchtimechannel;
+    const page = 1;
+    const embed = new EmbedBuilder()
+        .setTitle("**__Watchtime:__**")
+        .setColor(0xedbc5d)
+        .setDescription(channel)
+        .setFooter({ text: `Seite ${page}` });
+    const watchtime = await client.clients.db.watchtimeList(channel, "alltime", 10, page);
+    for (const viewer in watchtime) {
+        embed.addFields({
+            name: watchtime[viewer].viewer,
+            value: calcWatchtime(watchtime[viewer].watchtime),
+            inline: false,
+        });
+    }
+    /** @type {ActionRowBuilder<ButtonBuilder>} */
+    const row = new ActionRowBuilder();
+    row.addComponents(
+        new ButtonBuilder()
+            .setCustomId("-")
+            .setLabel("Vorherige Seite")
+            .setStyle(ButtonStyle.Primary)
+            .setDisabled(true),
+        new ButtonBuilder().setCustomId("+").setLabel("Nächste Seite").setStyle(ButtonStyle.Primary),
+    );
+    await interaction.reply({ embeds: [embed], components: [row] });
+}

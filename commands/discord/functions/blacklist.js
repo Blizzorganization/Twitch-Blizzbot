@@ -1,22 +1,25 @@
-const { MessageActionRow, MessageButton } = require("discord.js");
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import { getTable } from "twitch-blizzbot/functions";
 
-exports.adminOnly = true;
+export const adminOnly = true;
 /**
  * @name blacklist
  * @namespace DiscordCommands
- * @param {import("../../../modules/discordclient").DiscordClient} client
+ * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  */
-exports.run = (client) => {
-    client.blchannel.send({
-        content: "```fix\n" + client.clients.twitch.blacklist[client.config.watchtimechannel].sort().join("\n").slice(0, 1990) + "```",
-        components: [
-            new MessageActionRow()
-                .setComponents(
-                    new MessageButton()
-                        .setCustomId("refresh-blacklist")
-                        .setEmoji("🔄")
-                        .setStyle("PRIMARY"),
-                ),
-        ],
+export async function run(client) {
+    /** @type {ActionRowBuilder<ButtonBuilder>} */
+    const row = new ActionRowBuilder();
+    row.addComponents(
+        new ButtonBuilder().setCustomId("refresh-blacklist").setEmoji("🔄").setStyle(ButtonStyle.Primary),
+    );
+    await client.blchannel.send({
+        content: `\`\`\`fix\n${getTable(
+            client.clients.twitch.blacklist[client.config.watchtimechannel].map((blEntry) => ({
+                word: blEntry.blword,
+                action: blEntry.action,
+            })),
+        ).slice(0, 1990)}\`\`\``,
+        components: [row],
     });
-};
+}

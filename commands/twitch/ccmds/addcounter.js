@@ -1,17 +1,21 @@
-const { permissions } = require("../../../modules/constants");
+import { permissions } from "twitch-blizzbot/constants";
+import { logger } from "twitch-blizzbot/logger";
 
-exports.help = false;
-exports.perm = permissions.mod;
+export const help = false;
+export const perm = permissions.mod;
+/** @type {string[]} */
+export const alias = [];
 /**
  * @name addcounter
  * @namespace TwitchCommands
- * @param {import("../../../modules/twitchclient").TwitchClient} client
+ * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  * @param {import("tmi.js").ChatUserstate} context
  * @param {string} msg
  * @param {boolean} self
+ * @param {string[]} args
  */
-exports.run = async (client, target, context, msg, self, args) => {
+export async function run(client, target, context, msg, self, args) {
     const user = context["display-name"];
     let cname, increase, defaultVal;
     while (args.length > 0) {
@@ -19,11 +23,19 @@ exports.run = async (client, target, context, msg, self, args) => {
         if (!increase || increase == "") increase = args.shift();
         if (!defaultVal || defaultVal == "") defaultVal = args.shift();
     }
-    if (cname) {
-        await client.clients.db.newCounter(target.replace(/#+/g, ""), cname, isNaN(parseInt(increase)) ? undefined : parseInt(increase), isNaN(parseInt(defaultVal)) ? undefined : parseInt(defaultVal));
-        client.say(target, `${user} der Zähler ${cname} wurde hinzugefügt.`);
-        client.clients.logger.log("command", `* Added Counter ${cname}`);
-    } else {
-        client.say(target, "Du musst angeben, welchen Zähler (mit optionaler Steigung und einem Startwert) du hinzufügen möchtest.");
+    if (!cname) {
+        await client.say(
+            target,
+            "Du musst angeben, welchen Zähler (mit optionaler Steigung und einem Startwert) du hinzufügen möchtest.",
+        );
+        return;
     }
-};
+    await client.clients.db.newCounter(
+        target.replace(/#+/g, ""),
+        cname,
+        isNaN(parseInt(increase)) ? undefined : parseInt(increase),
+        isNaN(parseInt(defaultVal)) ? undefined : parseInt(defaultVal),
+    );
+    client.say(target, `${user}, der Zähler ${cname} wurde hinzugefügt.`);
+    logger.log("command", `* Added Counter ${cname}`);
+}

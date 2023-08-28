@@ -1,18 +1,22 @@
 #!node
 /* eslint-disable no-console */
-const readline = require("readline");
-const util = require("util");
-const fs = require("fs");
-const { EOL } = require("os");
-const _ = require("lodash");
+import { existsSync, readFileSync, writeFileSync } from "fs";
+import lodash from "lodash";
+import { EOL } from "os";
+import { createInterface } from "readline";
+import { promisify } from "util";
 
-/** @typedef translations
+const { merge } = lodash;
+
+/**
+ * @typedef translations
  * @property {string} welcome
  * @property {string} existing
  * @property {string} confirm
  * @property {string} twitchusername
  * @property {string} twitchpass
  * @property {string} twitchchannels
+ * @property {string} permits
  * @property {string} raidduration
  * @property {string} twitchcooldown
  * @property {string} automessagedelay
@@ -36,18 +40,19 @@ const _ = require("lodash");
  * @property {string} keep
  * @property {string} newValue
  * @property {string} success
-*/
+ */
 /**
  * @typedef all_translations
  * @property {translations} de
  * @property {translations} en
-*/
+ */
 /**
  * @type {all_translations} initStrings
  */
 const initStrings = {
     de: {
-        welcome: "Du hast die Konfiguration auf Deutsch gewählt | If you didn't inted to choose German, please stop the script with ctrl+c and start it again.",
+        welcome:
+            "Du hast die Konfiguration auf Deutsch gewählt | If you didn't inted to choose German, please stop the script with ctrl+c and start it again.",
         existing: "Der vorherige Wert war ",
         confirm: "Ist diese Eingabe korrekt?",
         yes: "ja",
@@ -58,16 +63,20 @@ const initStrings = {
         twitchusername: "Der Nutzername vom Twitch Bot:",
         twitchpass: "Der OAuth Token vom Twitch Bot:",
         twitchchannels: "Die Twitch Kanäle auf die der Bot reagieren soll (getrennt mit Leerzeichen):",
+        permits: "Hier kannst du angeben wie der Bot mit Moderatoren umgehen soll",
         raidduration: "Die Zeit in Minuten, in denen der Follow-Only Modus nach einem Raid deaktiviert wird:",
         twitchcooldown: "Die Zeit in Minuten, wie lange zwischen Befehlen gewartet werden muss:",
         automessagedelay: "Die Zeit in Minuten, wie lange der Bot zwischen automatischen Nachrichten warten soll:",
         twitchclientId: "Die Client ID vom Twitch Bot, notwendig für settitle, setgame:",
         useDiscord: "Möchtest du Discord verwenden?",
         setupDiscord: "Möchtest du Discord trotzdem einrichten?",
-        discordtoken: "Der Token für den Discord Bot (erhältlich unter https://discord.com/developers/applications/me):",
+        discordtoken:
+            "Der Token für den Discord Bot (erhältlich unter https://discord.com/developers/applications/me):",
         discordprefix: "Der Prefix für den Discord Bot:",
-        discordwatchtime: "Der Twitch Kanal, für den die watchtime abgefragt wird (muss in den Twitch Kanälen enthalten sein)",
-        discordevalusers: "Welche Nutzer sollen vollständige Rechte auf den Bot haben? - die NutzerIDs mit Leerzeichen getrennt:",
+        discordwatchtime:
+            "Der Twitch Kanal, für den die watchtime abgefragt wird (muss in den Twitch Kanälen enthalten sein)",
+        discordevalusers:
+            "Welche Nutzer sollen vollständige Rechte auf den Bot haben? - die NutzerIDs mit Leerzeichen getrennt:",
         discordcmdchannel: "Die ID vom Command Channel:",
         discordadminchannel: "Die ID vom Admin Command Channel:",
         discordblchannel: "Die ID vom Blacklist Channel:",
@@ -78,7 +87,8 @@ const initStrings = {
         dbuser: "Der Datenbanknutzer:",
     },
     en: {
-        welcome: "You chose to do the configuration in English. If you didn't intend to choose English, you can stop the script with ctrl+c and restart it",
+        welcome:
+            "You chose to do the configuration in English. If you didn't intend to choose English, you can stop the script with ctrl+c and restart it",
         confirm: "Is this okay?",
         existing: "The previous value was ",
         keep: "Do you want to keep the previous value?",
@@ -89,6 +99,7 @@ const initStrings = {
         twitchusername: "The username of the twitch bot",
         twitchpass: "the twitch bot oauth token (get it at https://twitchapps.com/tmi/)",
         twitchchannels: "a space separated list of channels the bot should listen to",
+        permits: "Here you can specify how the bot should deal with moderators",
         raidduration: "the time a raid removes the follow only mode for",
         twitchcooldown: "the cooldown for chat commands in minutes",
         automessagedelay: "the delay between two automatic messages in minutes",
@@ -97,12 +108,14 @@ const initStrings = {
         setupDiscord: "do you want to use the discord feature",
         discordtoken: "the discord bot token (get it at https://discord.com/developers/applications/me)",
         discordprefix: "the prefix for the discord bot",
-        discordwatchtime: "the watchtime channel to use for discord (has to be specified in the twitch channels section)",
+        discordwatchtime:
+            "the watchtime channel to use for discord (has to be specified in the twitch channels section)",
         discordevalusers: "the ids of the users that should have complete access on the bot separated by spaces",
         discordcmdchannel: "the id of the discord command channel",
         discordadminchannel: "the id of the discord admin commands channel",
         discordblchannel: "the id of the channel the blacklist is sent to when requested on twitch",
-        discordrelaychannel: "the id of the channel that allows for messages to be automatically sent to the twitch chat",
+        discordrelaychannel:
+            "the id of the channel that allows for messages to be automatically sent to the twitch chat",
         dbhost: "the ip address of the database server",
         dbname: "the name of the database",
         dbpass: "the password for the database user",
@@ -119,6 +132,7 @@ let existingconfig = {
             username: undefined,
         },
         Cooldown: undefined,
+        permit: undefined,
         Raidminutes: undefined,
         automessagedelay: undefined,
         channels: undefined,
@@ -150,14 +164,15 @@ let existingconfig = {
         watchtimechannel: undefined,
     },
 };
-if (fs.existsSync("./configs/config.json")) {
-    const file = fs.readFileSync("./configs/config.json", "utf8");
+if (existsSync("./configs/config.json")) {
+    const file = readFileSync("./configs/config.json", "utf8");
     const jsondata = JSON.parse(file);
-    if (jsondata) existingconfig = _.merge(existingconfig, jsondata);
+    if (jsondata) existingconfig = merge(existingconfig, jsondata);
 }
-const createConfig = async () => {
-    const rl = readline.createInterface({
+export const createConfig = async () => {
+    const rl = createInterface({
         input: process.stdin,
+        // @ts-ignore
         output: process.stdout,
         prompt: "> ",
         terminal: true,
@@ -167,10 +182,10 @@ const createConfig = async () => {
      * @param {string} question
      * @returns {Promise<string>}
      */
-    const protoQuestion = util.promisify(rl.question).bind(rl);
+    const protoQuestion = promisify(rl.question).bind(rl);
     /**
      * @param {string} q
-     * @returns {Promise<string>}
+     * @returns {Promise<string>} the answer
      */
     const question = (q) => protoQuestion(`${q}${EOL}`);
     console.log("Welcome to the Twitch Blizzbot configuration guide");
@@ -179,14 +194,18 @@ const createConfig = async () => {
     while (!supportedLanguages.includes(language)) {
         if (language) console.log(`${language} is not a supported language.`);
         // @ts-ignore
-        language = (await question(`Which language do you want to use?${EOL}Following languages are supported:${EOL}en\t\tEnglish${EOL}de\t\tDeutsch`)).toLowerCase();
+        language = (
+            await question(
+                `Which language do you want to use?${EOL}Following languages are supported:${EOL}en\t\tEnglish${EOL}de\t\tDeutsch`,
+            )
+        ).toLowerCase();
     }
     console.log(initStrings[language].welcome);
 
     /**
      * @param  {keyof translations} which which question to ask
-     * @param  {(string | number | boolean)?} pre previous value if exists
-     * @returns {Promise<string>}
+     * @param  {(string | number | boolean)} [pre = undefined] previous value if exists
+     * @returns {Promise<string>} the answer
      */
     async function request(which, pre) {
         let response;
@@ -217,21 +236,59 @@ const createConfig = async () => {
     existingconfig.db.keepAlive = true;
     existingconfig.twitch.identity.username = await request("twitchusername", existingconfig.twitch.identity.username);
     existingconfig.twitch.identity.password = await request("twitchpass", existingconfig.twitch.identity.password);
-    existingconfig.twitch.channels = (await request("twitchchannels", existingconfig.twitch.channels?.join(" "))).split(/ +/g);
+    existingconfig.twitch.channels = (await request("twitchchannels", existingconfig.twitch.channels?.join(" "))).split(
+        / +/g,
+    );
+    existingconfig.twitch.permit = parseBoolean(
+        await request(
+            "permits",
+            typeof existingconfig.twitch.permit === "boolean"
+                ? existingconfig.twitch.permit
+                    ? initStrings[language].yes
+                    : initStrings[language].no
+                : undefined,
+        ),
+    );
     existingconfig.twitch.Raidminutes = parseFloat(await request("raidduration", existingconfig.twitch.Raidminutes));
     existingconfig.twitch.Cooldown = parseInt(await request("twitchcooldown", existingconfig.twitch.Cooldown));
     existingconfig.twitch.automessagedelay = parseInt(await request("automessagedelay"));
     existingconfig.twitch.clientId = await request("twitchclientId", existingconfig.twitch.clientId);
-    existingconfig.useDiscord = parseBoolean(await request("useDiscord", typeof existingconfig.useDiscord === "boolean" ? (existingconfig.useDiscord ? initStrings[language].yes : initStrings[language].no) : undefined));
+    existingconfig.useDiscord = parseBoolean(
+        await request(
+            "useDiscord",
+            typeof existingconfig.useDiscord === "boolean"
+                ? existingconfig.useDiscord
+                    ? initStrings[language].yes
+                    : initStrings[language].no
+                : undefined,
+        ),
+    );
     if (existingconfig.useDiscord || parseBoolean(await request("setupDiscord", undefined))) {
         existingconfig.discord.token = await request("discordtoken", existingconfig.discord.token);
         existingconfig.discord.prefix = await request("discordprefix", existingconfig.discord.prefix);
-        existingconfig.discord.watchtimechannel = await request("discordwatchtime", existingconfig.discord.watchtimechannel);
-        existingconfig.discord.evalUsers = (await request("discordevalusers", existingconfig.discord.evalUsers?.join(" "))).split(" ");
-        existingconfig.discord.channels.commands = await request("discordcmdchannel", existingconfig.discord.channels.commands);
-        existingconfig.discord.channels.adminCommands = await request("discordadminchannel", existingconfig.discord.channels.adminCommands);
-        existingconfig.discord.channels.blacklist = await request("discordblchannel", existingconfig.discord.channels.blacklist);
-        existingconfig.discord.channels.relay = await request("discordrelaychannel", existingconfig.discord.channels.relay);
+        existingconfig.discord.watchtimechannel = await request(
+            "discordwatchtime",
+            existingconfig.discord.watchtimechannel,
+        );
+        existingconfig.discord.evalUsers = (
+            await request("discordevalusers", existingconfig.discord.evalUsers?.join(" "))
+        ).split(" ");
+        existingconfig.discord.channels.commands = await request(
+            "discordcmdchannel",
+            existingconfig.discord.channels.commands,
+        );
+        existingconfig.discord.channels.adminCommands = await request(
+            "discordadminchannel",
+            existingconfig.discord.channels.adminCommands,
+        );
+        existingconfig.discord.channels.blacklist = await request(
+            "discordblchannel",
+            existingconfig.discord.channels.blacklist,
+        );
+        existingconfig.discord.channels.relay = await request(
+            "discordrelaychannel",
+            existingconfig.discord.channels.relay,
+        );
     }
     existingconfig.db.host = await request("dbhost", existingconfig.db.host);
     existingconfig.db.database = await request("dbname", existingconfig.db.database);
@@ -241,11 +298,11 @@ const createConfig = async () => {
     rl.close();
     console.log(initStrings[language].success);
 };
-const writeData = () => fs.writeFileSync("./configs/config.json", JSON.stringify(existingconfig, undefined, 4), "utf8");
+const writeData = () => writeFileSync("./configs/config.json", JSON.stringify(existingconfig, undefined, 4), "utf8");
 
 /**
  * @param {string} response
- * @returns {boolean|null}
+ * @returns {boolean|null} the parsed boolean or null if not a boolean
  */
 function parseBoolean(response) {
     response = response.toLowerCase();
@@ -258,9 +315,8 @@ if (process.argv[1].endsWith("setup.js") || process.argv[1].endsWith("setup")) {
     createConfig();
 }
 (() => {
-    if (!fs.existsSync("configs/automessages.json")) {
-        fs.writeFileSync("configs/automessages.json", "{\"channelname\": [\"message\"]}");
+    if (!existsSync("configs/automessages.json")) {
+        writeFileSync("configs/automessages.json", '{"channelname": ["message"]}');
         return console.log("You should fill in the automessages.json");
     }
 })();
-exports.createConfig = createConfig;

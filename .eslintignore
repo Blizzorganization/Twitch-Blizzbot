@@ -1,0 +1,9 @@
+**/*.d.ts
+docs/**/*
+zdocs/**/*
+.github/**/*
+.eslintrc.json
+configs/*
+logs/**/*
+*.json
+*.md
