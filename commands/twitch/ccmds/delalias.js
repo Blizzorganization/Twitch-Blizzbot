@@ -18,7 +18,7 @@ export const alias = [];
 export async function run(client, target, context, msg, self, args) {
     const user = context["display-name"];
     if (args.length == 0) return;
-    const alias = await client.clients.db.getAlias(target, args[0]);
+    const alias = await client.clients.db.resolveAlias(target, args[0]);
     if (!alias) return client.say(target, `${user}, es gibt keinen Alias mit dem Namen ${args[0]}.`);;
     await client.clients.db.deleteAlias(target.replace(/#+/g, ""), args[0]);
     client.say(target, `${user}, der Alias ${args[0]} wurde entfernt.`);
