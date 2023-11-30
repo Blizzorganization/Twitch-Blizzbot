@@ -17,7 +17,7 @@ export const alias = [];
  */
 export async function run(client, target, context, msg, self, args) {
     const user = context["display-name"];
-    if (args.length == 0) return;
+    if (args.length == 0) return client.say(target, "Du musst angeben, welcher Mod-Alias gelöscht werden soll.");
     await client.clients.db.deleteAlias(target.replace(/#+/g, ""), args[0]);
     client.say(target, `${user}, der Alias für den Moderatoren Command ${args[0]} wurde entfernt.`);
     logger.log("command", `* Deleted alias ${args[0]}`);
