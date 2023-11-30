@@ -221,6 +221,21 @@ export class DB {
         return data.rowCount == 0 ? null : rows[0];
     }
     /**
+     * @param {string} channel Channel where to add the Alias
+     * @param {string} command Command the alias refers to
+     * @returns {Promise<string[]>}
+     */
+    async findRelatedAliases(channel, command) {
+        channel = channel.replace(/#+/g, "");
+        const data = await this.db.query(statements.aliases.findRelated, [channel, command]).catch((e) => {
+            logger.error(e);
+        });
+        /** @type {import("../typings/dbtypes").Alias} */
+        // @ts-ignore
+        const { rows } = data;
+        return rows.map((row) => row.alias);
+    }
+    /**
      * delete an alias
      *
      * @param {string} channel

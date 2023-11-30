@@ -23,6 +23,20 @@ export async function run(client, message, args) {
         message.reply("Einen solchen Command gibt es nicht.");
         return;
     }
-    message.reply({ content: ccmd.response, embeds: [new MessageEmbed().setDescription("CCMD")] });
+    const aliases = await client.clients.db.findRelatedAliases(twChannel, `!${commandName}`);
+
+    // embed building
+    const embed = new MessageEmbed()
+        .setColor(0xedbc5d)
+        .setThumbnail(client.user.avatarURL({ format: "png" }))
+        .setTitle("**__Command-Info:__**");
+
+    // embed components
+     embed.addFields([{ name: `!${commandName}`, value: ccmd.response }]);
+     // @ts-ignore
+     embed.addFields({ name: "Aliase:", value: new Intl.ListFormat("de-DE").format(aliases) || "Es sind keine Aliase zu diesem Befehl vorhanden"})
+     embed.setFooter({text:"CCMD"})
+    
+    message.channel.send({ embeds: [embed] });
     logger.log("command", `* Viewed Command !${commandName}`);
 }
