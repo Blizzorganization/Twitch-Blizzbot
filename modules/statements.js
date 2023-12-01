@@ -194,11 +194,11 @@ export const statements = {
             WHERE channel = $1;
         `,
         findRelated: `
-        SELECT *
-        FROM aliases
-        WHERE channel = $1 
-        AND command = $2;
-    `,
+            SELECT *
+            FROM aliases
+            WHERE channel = $1 
+            AND command = $2;
+        `,
     },
     blacklist: {
         newBlacklistEntry: `
