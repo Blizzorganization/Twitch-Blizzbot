@@ -55,7 +55,7 @@ export class DiscordClient extends Client {
         /** @type {import("discord.js").TextChannel} */
         this.commandchannel = undefined;
         this.started = false;
-        /** @type {import("./clients").Clients} */
+        /** @type {import("./clients.js").Clients} */
         this.clients = undefined;
         loadCommands(this.commands, "commands/discord/commands");
         loadCommands(this.commands, "commands/discord/functions");

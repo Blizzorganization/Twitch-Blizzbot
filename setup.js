@@ -124,7 +124,7 @@ const initStrings = {
 };
 const supportedLanguages = Object.keys(initStrings);
 
-/** @type {import("./typings/config").config} existingconfig*/
+/** @type {import("./typings/config.js").config} existingconfig*/
 let existingconfig = {
     twitch: {
         identity: {
@@ -306,8 +306,8 @@ const writeData = () => writeFileSync("./configs/config.json", JSON.stringify(ex
  */
 function parseBoolean(response) {
     response = response.toLowerCase();
-    if (["y", "j", "yes", "ja", "nya", "jup"].includes(response)) return true;
-    if (["n", "no", "nein", "ne", "nö", "nah", "nop", "nou"].includes(response)) return false;
+    if (["y", "j", "yes", "ja", "nya", "jup", "true"].includes(response)) return true;
+    if (["n", "no", "nein", "ne", "nö", "nah", "nop", "nou", "false"].includes(response)) return false;
     return null;
 }
 if (process.argv[1].endsWith("setup.js") || process.argv[1].endsWith("setup")) {

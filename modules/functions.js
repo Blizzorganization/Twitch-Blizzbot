@@ -39,7 +39,7 @@ export function loadCommands(commandmap, commanddir, helplist = []) {
 /**
  *
  * @param {string} eventdir Event directory relative to project root
- * @param {import("./discordclient").DiscordClient | import("./twitchclient").TwitchClient} eventemitter an EventEmitter
+ * @param {import("./discordclient.js").DiscordClient | import("./twitchclient.js").TwitchClient} eventemitter an EventEmitter
  * @example loadEvents("events/twitch", client)
  * @throws {CustomError} missing command directory
  */

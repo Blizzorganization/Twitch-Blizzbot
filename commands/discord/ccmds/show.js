@@ -32,11 +32,14 @@ export async function run(client, message, args) {
         .setTitle("**__Command-Info:__**");
 
     // embed components
-     embed.addFields([{ name: `!${commandName}`, value: ccmd.response }]);
-     // @ts-ignore
-     embed.addFields({ name: "Aliase:", value: new Intl.ListFormat("de-DE").format(aliases) || "Es sind keine Aliase zu diesem Befehl vorhanden"})
-     embed.setFooter({text:"CCMD"})
-    
+    embed.addFields([{ name: `!${commandName}`, value: ccmd.response }]);
+    // @ts-ignore
+    embed.addFields({
+        name: "Aliase:",
+        value: new Intl.ListFormat("de-DE").format(aliases) || "Es sind keine Aliase zu diesem Befehl vorhanden",
+    });
+    embed.setFooter({ text: "CCMD" });
+
     message.channel.send({ embeds: [embed] });
     logger.log("command", `* Viewed Command !${commandName}`);
 }

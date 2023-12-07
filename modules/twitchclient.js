@@ -56,9 +56,9 @@ export class TwitchClient extends Client {
             .filter((usr) => usr !== "");
         this.watchtime = undefined;
         this.automessage = undefined;
-        /** @type {import("./clients").Clients}*/
+        /** @type {import("./clients.js").Clients}*/
         this.clients = undefined;
-        /** @type {{[key: string]: import("../typings/dbtypes").Blacklist[]}}*/
+        /** @type {{[key: string]: import("../typings/dbtypes.js").Blacklist[]}}*/
         this.blacklist = undefined;
         if (!existsSync("./channellogs")) mkdirSync("./channellogs");
         this.once("connected", () => {

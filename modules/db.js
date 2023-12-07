@@ -19,13 +19,13 @@ const { Pool } = pg;
  */
 export class DB {
     /**
-     * @param {import("../typings/dbtypes").Config} config
+     * @param {import("../typings/dbtypes.js").Config} config
      */
     constructor(config) {
         this.doingWatchtime = false;
         this.db = new Pool(config);
         this.dbname = config.database;
-        /** @type {import("./clients").Clients}*/
+        /** @type {import("./clients.js").Clients}*/
         this.clients = undefined;
         this.ensureTables();
     }
@@ -112,7 +112,7 @@ export class DB {
                 ],
                 [
                     "blacklist",
-                    `CREATE TABLE blacklist 
+                    `CREATE TABLE blacklist
                     (
                         channel VARCHAR(25)
                             REFERENCES streamer(name)
@@ -181,7 +181,7 @@ export class DB {
      * add a new channel to the database
      *
      * @param {string} channel
-     * @returns {Promise<import("../typings/dbtypes").streamer>} the config of the channel
+     * @returns {Promise<import("../typings/dbtypes.js").streamer>} the config of the channel
      */
     async getChannel(channel) {
         const data = await this.db.query(statements.channels.getChannel, [channel]).catch((e) => {
@@ -207,7 +207,7 @@ export class DB {
     /**
      * @param {string} channel
      * @param {string} name
-     * @returns {Promise<import("../typings/dbtypes").resolvedAlias|null>} command data
+     * @returns {Promise<import("../typings/dbtypes.js").resolvedAlias|null>} command data
      */
     async resolveAlias(channel, name) {
         channel = channel.replace(/#+/g, "");
@@ -215,22 +215,24 @@ export class DB {
             logger.error(e);
         });
         if (!data) return null;
-        /** @type {import("../typings/dbtypes").Alias} */
+        /** @type {import("../typings/dbtypes.js").Alias} */
         // @ts-ignore
         const { rows } = data;
         return data.rowCount == 0 ? null : rows[0];
     }
     /**
+     * find Alias
+     *
      * @param {string} channel Channel where to add the Alias
      * @param {string} command Command the alias refers to
-     * @returns {Promise<string[]>}
+     * @returns {Promise<string[]>} string returns
      */
     async findRelatedAliases(channel, command) {
         channel = channel.replace(/#+/g, "");
         const data = await this.db.query(statements.aliases.findRelated, [channel, command]).catch((e) => {
             logger.error(e);
         });
-        /** @type {import("../typings/dbtypes").Alias} */
+        /** @type {import("../typings/dbtypes.js").Alias} */
         // @ts-ignore
         const { rows } = data;
         return rows.map((row) => row.alias);
@@ -251,7 +253,7 @@ export class DB {
      * Get all existing aliases
      *
      * @param {string} channel
-     * @returns {Promise<import("../typings/dbtypes").Alias[]>} List of all Aliases
+     * @returns {Promise<import("../typings/dbtypes.js").Alias[]>} List of all Aliases
      */
     async getAliases(channel) {
         channel = channel.replace(/#+/g, "");
@@ -259,7 +261,7 @@ export class DB {
             logger.error(e);
         });
         if (!data) return [];
-        /** @type {import("../typings/dbtypes").Alias[]} */
+        /** @type {import("../typings/dbtypes.js").Alias[]} */
         // @ts-ignore
         const { rows } = data;
         return rows || [];
@@ -347,7 +349,7 @@ export class DB {
     }
     /**
      * @param  {string} channel
-     * @returns {Promise<import("../typings/dbtypes").Counter[]>} a list of counters
+     * @returns {Promise<import("../typings/dbtypes.js").Counter[]>} a list of counters
      */
     async allCounters(channel) {
         channel = channel.replace(/#+/g, "");
@@ -355,7 +357,7 @@ export class DB {
             logger.error(e.message);
         });
         if (!data) return [];
-        /** @type {import("../typings/dbtypes").Counter[]} */
+        /** @type {import("../typings/dbtypes.js").Counter[]} */
         // @ts-ignore
         const { rows } = data;
         return rows;
@@ -376,7 +378,7 @@ export class DB {
             logger.error(e);
         });
         if (!data) return;
-        /** @type {import("../typings/dbtypes").CustomCommand[]} */
+        /** @type {import("../typings/dbtypes.js").CustomCommand[]} */
         const rows = data.rows;
         return rows.map((row) => row.command);
     }
@@ -385,7 +387,7 @@ export class DB {
      *
      * @param {string} channel
      * @param {string} commandname
-     * @returns {Promise<?import("../typings/dbtypes").CustomCommand>} response
+     * @returns {Promise<?import("../typings/dbtypes.js").CustomCommand>} response
      */
     async getCcmd(channel, commandname) {
         channel = channel.replace(/#+/g, "");
@@ -412,7 +414,7 @@ export class DB {
             });
     }
     /**
-     * @param  {import("../typings/dbtypes").CustomCommand[]} cmdData
+     * @param  {import("../typings/dbtypes.js").CustomCommand[]} cmdData
      * @param  {string} channel
      * @param  {"user"|"mod"} cmdType
      */
@@ -726,7 +728,7 @@ export class DB {
     /**
      * @param {string} channel
      * @param {string} command
-     * @returns {Promise<import("../typings/dbtypes").Command|null>} the command if it exists in the database
+     * @returns {Promise<import("../typings/dbtypes.js").Command|null>} the command if it exists in the database
      */
     async resolveCommand(channel, command) {
         channel = channel.replace(/#+/, "");
