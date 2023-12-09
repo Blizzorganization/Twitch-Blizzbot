@@ -19,10 +19,10 @@ export async function run(client, target, context, msg, self, args) {
     let user;
     user = args[0]?.toLowerCase().replace("@", "");
     if (!user || user == "") user = context["display-name"];
-    const resp = await fetch(
-        `https://2g.be/twitch/following.php?user=${user}&channel=${target.slice(1)}&format=mwdhms`,
-    );
+
+    const apitoken = client.config.clientId;
+    const resp = await fetch(`https://decapi.me/twitch/followage/${target.slice(1)}/${user}?token=${apitoken}`);
     const followage = time(await resp.text());
 
-    client.say(target, followage);
+    client.say(target, `@${user} folgt schon: ${followage}`);
 }
