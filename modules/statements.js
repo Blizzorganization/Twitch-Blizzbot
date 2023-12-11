@@ -59,6 +59,12 @@ export const statements = {
             WHERE command = $2
             AND channel = $3;
         `,
+        renameCommand: `
+        UPDATE customcommands
+        SET command = $1
+        WHERE command = $2
+        AND channel = $3;
+    `,
         deleteCommand: `
             DELETE FROM customcommands
             WHERE command = $1
@@ -196,7 +202,7 @@ export const statements = {
         findRelated: `
             SELECT *
             FROM aliases
-            WHERE channel = $1 
+            WHERE channel = $1
             AND command = $2;
         `,
     },

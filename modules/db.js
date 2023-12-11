@@ -460,6 +460,19 @@ export class DB {
         });
     }
     /**
+     * Edit a Customcommand/change its name
+     *
+     * @param {string} channel
+     * @param {string} commandname
+     * @param {string} newName
+     */
+    async renameCCmd(channel, commandname, newName) {
+        channel = channel.replace(/#+/g, "");
+        await this.db.query(statements.customCommands.renameCommand, [newName, commandname, channel]).catch((e) => {
+            logger.error(e);
+        });
+    }
+    /**
      * delete a Customcommand
      *
      * @param {string} channel

@@ -26,9 +26,10 @@ export async function execute(interaction) {
         return interaction.reply(`Der Nutzer ${dcuser.tag} hat keinen Namen hinterlegt.`);
     }
     const channel = client.config.watchtimechannel;
+    const apitoken = client.clients.config.twitch.clientId;
     const resp = await fetch(`https://decapi.me/twitch/accountage/${twuser}`);
     const age = time(await resp.text());
-    const res = await fetch(`https://decapi.me/twitch/followage/${channel}/${twuser}`);
+    const res = await fetch(`https://decapi.me/twitch/followage/${channel}/${twuser}?token=${apitoken}`);
     const fage = time(await res.text());
     const embed = new MessageEmbed()
         .setColor(0xedbc5d)
