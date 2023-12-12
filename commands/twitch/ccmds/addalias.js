@@ -18,14 +18,14 @@ export const alias = [];
 export async function run(client, target, context, msg, self, args) {
     const user = context["display-name"];
     if (args.length <= 1) {
-        await client.say(target, "Du musst angeben, welchen Alias und welchen Befehl du verwenden möchtest.");
+        await client.say(target, "Du musst angeben, welchen Alias und welchen Command du verwenden möchtest.");
         return;
     }
     const newcmd = args.shift().toLowerCase();
     const res = args.join(" ");
     if (!res || res == "") return client.say(target, "Du musst angeben, worauf der Alias verknüpft sein soll.");
     if (!(await client.clients.db.getCcmd(target, res))) {
-        client.say(target, "Diesen Befehl kenne ich nicht.");
+        client.say(target, "Diesen Command kenne ich nicht.");
         return;
     }
     await client.clients.db.newAlias(target.replace(/#+/g, ""), newcmd, res);

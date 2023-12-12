@@ -17,12 +17,12 @@ export const alias = [];
  */
 export async function run(client, target, context, msg, self, args) {
     const user = context["display-name"];
-    if (!args || args.length == 0) return client.say(target, "Welchen Befehl möchtest du umbenennen?");
+    if (!args || args.length == 0) return client.say(target, "Welchen Command möchtest du umbenennen?");
     const [commandName, newName] = args;
     const cmd = await client.clients.db.getCcmd(target, commandName);
-    if (!cmd) return client.say(target, `Ich kenne keinen Befehl ${commandName}.`);
+    if (!cmd) return client.say(target, `Ich kenne keinen Command ${commandName}.`);
     const existingCmd = await client.clients.db.getCcmd(target, newName);
-    if (existingCmd) return client.say(target, `Es gibt bereits einen Befehl ${newName}`);
+    if (existingCmd) return client.say(target, `Es gibt bereits einen Command ${newName}`);
     if (!newName) return client.say(target, `Du musst angeben in was ${commandName} umbenannt werden soll.`);
     await client.clients.db.renameCCmd(target.replace(/#+/g, ""), commandName, newName);
 

@@ -17,9 +17,9 @@ export const alias = [];
  */
 export async function run(client, target, context, msg, self, args) {
     const user = context["display-name"];
-    if (args.length == 0) return client.say(target, "Du musst einen Befehl angeben, der gelöscht werden soll.");
+    if (args.length == 0) return client.say(target, "Du musst einen Command angeben, der gelöscht werden soll.");
     const cmd = await client.clients.db.getCcmd(target, args[0]);
-    if (!cmd) return client.say(target, `Ich kenne keinen Befehl ${args[0]}.`);
+    if (!cmd) return client.say(target, `Ich kenne keinen Command ${args[0]}.`);
     if (cmd.permissions !== permissions.user) return client.say(target, `${args[0]} ist kein Nutzer Customcommand.`);
     await client.clients.db.delCcmd(target.replace(/#+/g, ""), args[0]);
     client.say(target, `${user}, der Command ${args[0]} wurde entfernt.`);

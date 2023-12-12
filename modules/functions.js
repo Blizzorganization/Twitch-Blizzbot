@@ -139,5 +139,6 @@ export function time(str) {
         .replace("is not following", "ist kein Follower von")
         .replace("does not follow", "ist kein Follower von")
         .replace("404 Page Not Found", "Keine Informationen")
+        .replace("User not found", "Finde keinen User mit dem Namen")
         .replace("A user cannot follow themself", "man kann sich nicht selber folgen");
 }

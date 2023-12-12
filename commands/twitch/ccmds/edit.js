@@ -17,7 +17,7 @@ export const alias = [];
  */
 export async function run(client, target, context, msg, self, args) {
     const user = context["display-name"];
-    if (!args || args.length == 0) return client.say(target, "Welchen Befehl möchtest du bearbeiten?");
+    if (!args || args.length == 0) return client.say(target, "Welchen Command möchtest du bearbeiten?");
     const cmd = await client.clients.db.getCcmd(target, args[0]);
     if (!cmd) return client.say(target, `Ich kenne keinen Befehl ${args[0]}.`);
     if (cmd.permissions !== permissions.user) return client.say(target, `${args[0]} ist kein Nutzer Customcommand.`);

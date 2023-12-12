@@ -18,7 +18,7 @@ export const alias = [];
 export async function run(client, target, context, msg, self, args) {
     const user = context["display-name"];
     if (args.length <= 1) {
-        client.say(target, "Du musst angeben, welchen Befehl und welche Antwort du hinzufügen möchtest.");
+        client.say(target, "Du musst angeben, welchen Command und welche Antwort du hinzufügen möchtest.");
         return;
     }
     const newcmd = args.shift().toLowerCase();

@@ -17,10 +17,10 @@ export const alias = [];
  */
 export async function run(client, target, context, msg, self, args) {
     const user = context["display-name"];
-    if (!args || args.length == 0) return client.say(target, "Welchen Befehl möchtest du bearbeiten?");
+    if (!args || args.length == 0) return client.say(target, "Welchen Mod-Command möchtest du bearbeiten?");
 
     const cmd = await client.clients.db.getCcmd(target, args[0]);
-    if (!cmd) return client.say(target, `Ich kenne keinen Befehl ${args[0]}.`);
+    if (!cmd) return client.say(target, `Ich kenne keinen Command ${args[0]}.`);
     if (cmd.permissions !== permissions.mod) return client.say(target, `${args[0]} ist kein Mod Only Customcommand.`);
     const newcmd = args.shift().toLowerCase();
     const res = args.join(" ");
