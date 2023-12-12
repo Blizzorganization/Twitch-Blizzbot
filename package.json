@@ -1,9 +1,9 @@
 {
   "name": "twitch-blizzbot",
-  "version": "8.1.5",
-  "homepage": "https://github.com/blizzor/Twitch-Blizzbot#readme",
+  "version": "8.1.6",
+  "homepage": "https://github.com/Blizzorganization/Twitch-Blizzbot#readme",
   "bugs": {
-    "url": "https://github.com/blizzor/Twitch-Blizzbot/issues"
+    "url": "https://github.com/Blizzorganization/Twitch-Blizzbot/issues"
   },
   "exports": {
     ".": "./bot.js",
@@ -20,7 +20,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/blizzor/Twitch-blizzbot.git"
+    "url": "https://github.com/Blizzorganization/Twitch-blizzbot.git"
   },
   "dependencies": {
     "@discordjs/builders": "^0.15.0",

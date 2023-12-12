@@ -23,9 +23,9 @@ export async function run(client, target, context, msg, self, args) {
     if (!cmd) return client.say(target, `Ich kenne keinen Befehl ${commandName}.`);
     const existingCmd = await client.clients.db.getCcmd(target, newName);
     if (existingCmd) return client.say(target, `Es gibt bereits einen Befehl ${newName}`);
-    if (!newName) return client.say(target, "Du musst angeben wie der neue Name vom Command ist");
+    if (!newName) return client.say(target, `Du musst angeben in was ${commandName} umbenannt werden soll.`);
     await client.clients.db.renameCCmd(target.replace(/#+/g, ""), commandName, newName);
 
     client.say(target, `${user}, der Command ${commandName} wurde zu ${newName} umbenannt.`);
-    logger.log("command", `* Rename Customcommand ${newName}`);
+    logger.log("command", `* Rename Customcommand ${commandName} to ${newName}`);
 }
