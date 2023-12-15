@@ -2,7 +2,7 @@ import { permissions } from "twitch-blizzbot/constants";
 
 export const help = false;
 export const perm = permissions.user;
-export const alias = ["befehl", "befehle", "command", "commands", "cmd", "cmds"];
+export const alias = ["befehle", "command", "commands", "cmd", "cmds"];
 /**
  * @name help
  * @namespace TwitchCommands
