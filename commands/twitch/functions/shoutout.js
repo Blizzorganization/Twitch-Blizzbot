@@ -15,7 +15,7 @@ export const alias = ["so"];
  */
 export async function run(client, target, context, msg, self, args) {
     if (!args || args.length == 0) {
-        client.say(target, "Du musst einen Namen angeben.");
+        await client.say(target, "Du musst einen Namen angeben.");
         return;
     }
     const user = args[0];

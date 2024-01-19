@@ -1,5 +1,4 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import fetch from "node-fetch";
 import { time } from "twitch-blizzbot/functions";
 
@@ -14,16 +13,18 @@ export const data = new SlashCommandBuilder()
 /**
  * @name twitchname
  * @namespace DiscordCommands
- * @param  {import("discord.js").CommandInteraction} interaction
+ * @param  {import("discord.js").ChatInputCommandInteraction} interaction
+ * @returns {Promise<void>}
  */
 export async function execute(interaction) {
     /** @type {import("twitch-blizzbot/discordclient").DiscordClient}*/
-    // @ts-ignore
+    // @ts-expect-error -- Interaction is created by the DiscordClient and therefor references it
     const client = interaction.client;
     const dcuser = interaction.options.getUser("user") || interaction.user;
     const twuser = await client.clients.db.getDiscordConnection(dcuser);
     if (!twuser) {
-        return interaction.reply(`Der Nutzer ${dcuser.tag} hat keinen Namen hinterlegt.`);
+        await interaction.reply(`Der Nutzer ${dcuser.tag} hat keinen Namen hinterlegt.`);
+        return;
     }
     const channel = client.config.watchtimechannel;
     const apitoken = client.clients.config.twitch.clientId;
@@ -31,7 +32,7 @@ export async function execute(interaction) {
     const age = time(await resp.text());
     const res = await fetch(`https://decapi.me/twitch/followage/${channel}/${twuser}?token=${apitoken}`);
     const fage = time(await res.text());
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
         .setColor(0xedbc5d)
         .setThumbnail(dcuser.avatarURL())
         .setTitle("**__Linkinginfo__**")

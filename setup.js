@@ -166,22 +166,19 @@ let existingconfig = {
 };
 if (existsSync("./configs/config.json")) {
     const file = readFileSync("./configs/config.json", "utf8");
-    const jsondata = JSON.parse(file);
-    if (jsondata) existingconfig = merge(existingconfig, jsondata);
+    const jsonData = JSON.parse(file);
+    if (jsonData) existingconfig = merge(existingconfig, jsonData);
 }
 export const createConfig = async () => {
     const rl = createInterface({
         input: process.stdin,
-        // @ts-ignore
         output: process.stdout,
         prompt: "> ",
         terminal: true,
     });
 
-    /**
-     * @param {string} question
-     * @returns {Promise<string>}
-     */
+    /** @type {(question: string) => Promise<string>} */
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const protoQuestion = promisify(rl.question).bind(rl);
     /**
      * @param {string} q
@@ -193,7 +190,7 @@ export const createConfig = async () => {
     let language;
     while (!supportedLanguages.includes(language)) {
         if (language) console.log(`${language} is not a supported language.`);
-        // @ts-ignore
+        // @ts-expect-error -- as this is a checking loop we are validating that we are using an existing language
         language = (
             await question(
                 `Which language do you want to use?${EOL}Following languages are supported:${EOL}en\t\tEnglish${EOL}de\t\tDeutsch`,
@@ -204,7 +201,7 @@ export const createConfig = async () => {
 
     /**
      * @param  {keyof translations} which which question to ask
-     * @param  {(string | number | boolean)} [pre = undefined] previous value if exists
+     * @param  {(string | number | boolean)} [pre] previous value if exists
      * @returns {Promise<string>} the answer
      */
     async function request(which, pre) {
@@ -312,7 +309,7 @@ function parseBoolean(response) {
 }
 if (process.argv[1].endsWith("setup.js") || process.argv[1].endsWith("setup")) {
     process.on("exit", writeData);
-    createConfig();
+    await createConfig();
 }
 (() => {
     if (!existsSync("configs/automessages.json")) {

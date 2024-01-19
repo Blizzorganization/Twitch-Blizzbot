@@ -6,6 +6,7 @@ import { logger } from "twitch-blizzbot/logger";
  * @namespace ConsoleCommands
  * @param {import("twitch-blizzbot/clients").Clients} clients
  * @param {string[]} args
+ * @returns {Promise<void>}
  */
 export async function run(clients, args) {
     if (!args || args.length < 2) {
@@ -16,14 +17,17 @@ export async function run(clients, args) {
     let cmdName = args.shift().toLowerCase();
     if (cmdName.startsWith("!")) cmdName = cmdName.slice(1);
     const cmd = clients.twitch.commands.get(cmdName);
-    if (!cmd) return logger.warn("Diesen Befehl gibt es nicht.");
+    if (!cmd) {
+        logger.warn("Diesen Befehl gibt es nicht.");
+        return;
+    }
     const dbCmd = await clients.db.resolveCommand(channel, cmdName);
     if (dbCmd) {
-        clients.db.updateCommandEnabled(channel, cmdName, !dbCmd.enabled);
+        await clients.db.updateCommandEnabled(channel, cmdName, !dbCmd.enabled);
         logger.info(`Der Befehl !${cmdName} ist jetzt ${dbCmd.enabled ? "ausgeschaltet" : "eingeschaltet"}.`);
         return;
     }
-    clients.db.newCommand(channel, cmdName, false, -1);
+    await clients.db.newCommand(channel, cmdName, false, -1);
     logger.info(`Der Befehl !${cmdName} ist jetzt deaktiviert.`);
 }
 /**

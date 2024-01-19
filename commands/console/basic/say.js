@@ -8,7 +8,7 @@ import { logger } from "twitch-blizzbot/logger";
  * @param {import("twitch-blizzbot/clients").Clients} clients
  * @param {string[]} args
  */
-export function run(clients, args) {
+export async function run(clients, args) {
     let channel;
     if (clients.twitch.config.channels.length == 1) {
         channel = clients.twitch.config.channels[0];
@@ -19,7 +19,7 @@ export function run(clients, args) {
             return;
         }
     }
-    clients.twitch.say(channel, args.join(" "));
+    await clients.twitch.say(channel, args.join(" "));
 }
 /**
  * @param  {import("twitch-blizzbot/clients").Clients} clients

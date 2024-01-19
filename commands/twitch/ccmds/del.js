@@ -14,14 +14,24 @@ export const alias = [];
  * @param {string} msg
  * @param {boolean} self
  * @param {string[]} args
+ * @returns {Promise<void>}
  */
 export async function run(client, target, context, msg, self, args) {
     const user = context["display-name"];
-    if (args.length == 0) return client.say(target, "Du musst einen Command angeben, der gelöscht werden soll.");
+    if (args.length == 0) {
+        await client.say(target, "Du musst einen Command angeben, der gelöscht werden soll.");
+        return;
+    }
     const cmd = await client.clients.db.getCcmd(target, args[0]);
-    if (!cmd) return client.say(target, `Ich kenne keinen Command ${args[0]}.`);
-    if (cmd.permissions !== permissions.user) return client.say(target, `${args[0]} ist kein Nutzer Customcommand.`);
+    if (!cmd) {
+        await client.say(target, `Ich kenne keinen Command ${args[0]}.`);
+        return;
+    }
+    if (cmd.permissions !== permissions.user) {
+        await client.say(target, `${args[0]} ist kein Nutzer Customcommand.`);
+        return;
+    }
     await client.clients.db.delCcmd(target.replace(/#+/g, ""), args[0]);
-    client.say(target, `${user}, der Command ${args[0]} wurde entfernt.`);
+    await client.say(target, `${user}, der Command ${args[0]} wurde entfernt.`);
     logger.log("command", `* Deleted Customcommand ${args[0]}`);
 }

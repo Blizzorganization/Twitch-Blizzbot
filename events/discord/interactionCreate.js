@@ -1,7 +1,8 @@
-import { MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, EmbedBuilder } from "discord.js";
 import { calcWatchtime, getTable } from "twitch-blizzbot/functions";
 import { logger } from "twitch-blizzbot/logger";
 import _ from "lodash";
+import { ButtonStyle } from "discord.js";
 /**
  * @param  {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param  {import("discord.js").ButtonInteraction} interaction
@@ -16,29 +17,34 @@ async function blacklistUpdate(client, interaction) {
             "word",
         ),
     );
+    /** @type {ActionRowBuilder<ButtonBuilder>} */
+    const row = new ActionRowBuilder();
+    row.setComponents(
+        new ButtonBuilder().setCustomId("refresh-blacklist").setEmoji("🔄").setStyle(ButtonStyle.Primary),
+    );
     await interaction.update({
         content: `In der Blacklist für ${client.config.watchtimechannel} sind die Wörter \
         \`\`\`fix\n${table.slice(0, 1900)}\`\`\` enthalten.`,
-        components: [
-            new MessageActionRow().setComponents(
-                new MessageButton().setCustomId("refresh-blacklist").setEmoji("🔄").setStyle("PRIMARY"),
-            ),
-        ],
+        components: [row],
     });
 }
 
 /**
  * @param {import("discord.js").ButtonInteraction} button
+ * @returns {Promise<void>}
  */
 async function handleButton(button) {
     /** @type {import("twitch-blizzbot/discordclient").DiscordClient} */
-    // @ts-ignore
+    // @ts-expect-error -- the client instatiating the button is of instance DiscordClient so this client is also instance of DiscordClient
     const client = button.client;
     if (button.customId === "refresh-blacklist") return blacklistUpdate(client, button);
     const message = button.message;
     if (!["Watchtime", "**__Watchtime:__**"].includes(message.embeds[0]?.title)) return;
     const channel = message.embeds[0]?.description;
-    if (!channel) return logger.error("Tried to read data from a nonexistent embed in the top10 slash command");
+    if (!channel) {
+        logger.error("Tried to read data from a nonexistent embed in the top10 slash command");
+        return;
+    }
     let page = parseInt(message.embeds[0].footer?.text.replace("Seite", ""));
     switch (button.customId) {
         case "-":
@@ -50,15 +56,17 @@ async function handleButton(button) {
         default:
             break;
     }
-    const updateRow = new MessageActionRow().addComponents(
-        new MessageButton()
+    /** @type {ActionRowBuilder<ButtonBuilder>} */
+    const updateRow = new ActionRowBuilder();
+    updateRow.addComponents(
+        new ButtonBuilder()
             .setCustomId("-")
             .setLabel("Vorherige Seite")
-            .setStyle("PRIMARY")
+            .setStyle(ButtonStyle.Primary)
             .setDisabled(page == 1),
-        new MessageButton().setCustomId("+").setLabel("Nächste Seite").setStyle("PRIMARY"),
+        new ButtonBuilder().setCustomId("+").setLabel("Nächste Seite").setStyle(ButtonStyle.Primary),
     );
-    const editEmbed = new MessageEmbed()
+    const editEmbed = new EmbedBuilder()
         .setTitle("Watchtime")
         .setColor(0xdfb82d)
         .setFooter({ text: `Seite${page}` })
@@ -79,9 +87,9 @@ async function handleButton(button) {
  * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Interaction} interaction
  */
-export function event(client, interaction) {
+export async function event(client, interaction) {
     if (interaction.isButton()) {
-        handleButton(interaction);
+        await handleButton(interaction);
         return;
     }
     if (!interaction.isCommand()) return;
@@ -91,7 +99,7 @@ export function event(client, interaction) {
         commands.get(interaction.commandName).execute(interaction);
     } catch (e) {
         logger.error(e);
-        interaction.reply({ content: "There was an error while executing this command!", ephemeral: true });
+        await interaction.reply({ content: "There was an error while executing this command!", ephemeral: true });
         return;
     }
 }

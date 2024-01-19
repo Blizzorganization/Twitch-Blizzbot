@@ -1,5 +1,4 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { calcWatchtime } from "twitch-blizzbot/functions";
 
 export const data = new SlashCommandBuilder()
@@ -16,24 +15,26 @@ export const data = new SlashCommandBuilder()
 /**
  * @name watchtime
  * @namespace DiscordCommands
- * @param  {import("discord.js").CommandInteraction} interaction
+ * @param  {import("discord.js").ChatInputCommandInteraction} interaction
+ * @returns {Promise<void>}
  */
 export async function execute(interaction) {
     /** @type {import("twitch-blizzbot/discordclient").DiscordClient}*/
-    // @ts-expect-error
+    // @ts-expect-error -- Interaction is created by the DiscordClient and therefor references it
     const client = interaction.client;
     const channel = client.config.watchtimechannel;
     const dcuser = interaction.options.getUser("user") || interaction.user;
     const twuser =
         interaction.options.getString("twitchuser") || (await client.clients.db.getDiscordConnection(dcuser));
     if (!twuser) {
-        return interaction.reply("Du musst dich zuerst registrieren - /link");
+        await interaction.reply("Du musst dich zuerst registrieren - /link");
+        return;
     }
     const watchtime = await client.clients.db.getWatchtime(channel, twuser, "alltime");
     const maxWatchtime = await client.clients.db.getWatchtime(channel, client.clients.twitch.getUsername(), "alltime");
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
         .setColor(0xedbc5d)
-        .setThumbnail(client.user.avatarURL({ format: "png" }))
+        .setThumbnail(client.user.avatarURL({ extension: "png" }))
         .setTitle("**__Watchtime__**")
         .addFields(
             { name: "Nutzername", value: twuser },

@@ -15,5 +15,5 @@ export async function run(client, target) {
     const pointsrequest = await fetch(`https://decapi.me/twitch/subpoints/${target.slice(1)}`);
     const points = await pointsrequest.text();
 
-    client.say(target, `${target.slice(1)} hat zur Zeit ${points} Subpoints`);
+    await client.say(target, `${target.slice(1)} hat zur Zeit ${points} Subpoints`);
 }

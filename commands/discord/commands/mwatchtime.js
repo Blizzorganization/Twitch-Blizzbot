@@ -1,4 +1,4 @@
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { calcWatchtime, currentMonth } from "twitch-blizzbot/functions";
 
 export const adminOnly = true;
@@ -9,6 +9,7 @@ export const adminOnly = true;
  * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
  * @param {string[]} args
+ * @returns {Promise<void>}
  */
 export async function run(client, message, args) {
     const channel = client.config.watchtimechannel;
@@ -16,7 +17,7 @@ export async function run(client, message, args) {
     if (args && args.length > 0) {
         if (args[0] && !isNaN(parseInt(args[0]))) page = parseInt(args[0]);
     }
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
         .setTitle("Monthly Watchtime")
         .setColor(0xedbc5d)
         .setDescription(channel)
@@ -42,7 +43,7 @@ export async function run(client, message, args) {
         } else {
             page = Math.max(--page, 1);
         }
-        const editEmbed = new MessageEmbed()
+        const editEmbed = new EmbedBuilder()
             .setTitle("Monthly Watchtime")
             .setColor(0xedbc5d)
             .setDescription(channel)
@@ -59,7 +60,7 @@ export async function run(client, message, args) {
         await reaction.remove();
         await outmsg.react(reaction.emoji);
     });
-    coll.on("end", () => {
-        outmsg.edit({ content: "Die Zeit ist abgelaufen.", embeds: outmsg.embeds });
+    coll.on("end", async () => {
+        await outmsg.edit({ content: "Die Zeit ist abgelaufen.", embeds: outmsg.embeds });
     });
 }

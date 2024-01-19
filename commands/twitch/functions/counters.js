@@ -18,5 +18,5 @@ export async function run(client, target) {
     } else {
         appHelp = "Es sind keine Zähler hinterlegt.";
     }
-    client.say(target, appHelp);
+    await client.say(target, appHelp);
 }

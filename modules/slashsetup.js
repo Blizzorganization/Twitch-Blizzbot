@@ -1,5 +1,4 @@
-import { REST } from "@discordjs/rest";
-import { Routes } from "discord-api-types/v9";
+import { REST, Routes } from "discord.js";
 import { logger } from "./logger.js";
 
 /**
@@ -9,7 +8,7 @@ import { logger } from "./logger.js";
 export default async function loadSlash(client, guildid) {
     const commands = client.slashcommands.map(mapCommand);
 
-    const rest = new REST({ version: "9" }).setToken(client.token);
+    const rest = new REST({ version: "10" }).setToken(client.token);
     try {
         logger.debug("Started refreshing application (/) commands.");
 
@@ -25,9 +24,8 @@ export default async function loadSlash(client, guildid) {
 }
 /**
  * @param  {import("../typings/SlashCommand.js").SlashCommand} cmd
- * @returns {import("discord-api-types/rest").RESTPostAPIApplicationCommandsJSONBody} the data field
+ * @returns {import("discord.js").RESTPostAPIApplicationCommandsJSONBody} the data field
  */
 function mapCommand(cmd) {
-    // @ts-ignore
     return cmd.data;
 }

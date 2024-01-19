@@ -14,10 +14,12 @@ export const alias = [];
  * @param {string} msg
  * @param {boolean} self
  * @param {string[]} args
+ * @returns {Promise<void>}
  */
 export async function run(client, target, context, msg, self, args) {
     if (!args || args.length < 2) {
-        return client.say(target, "Du musst angeben, welches Wort du mit welcher Aktion versehen willst!");
+        await client.say(target, "Du musst angeben, welches Wort du mit welcher Aktion versehen willst!");
+        return;
     }
     let action = parseInt(args.shift(), 10);
     if (isNaN(action)) action = 0;

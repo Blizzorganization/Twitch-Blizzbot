@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
+import { SlashCommandBuilder } from "discord.js";
 
 export const data = new SlashCommandBuilder()
     .setName("unlink")
@@ -8,11 +8,11 @@ export const data = new SlashCommandBuilder()
 /**
  * @name userlink
  * @namespace DiscordCommands
- * @param  {import("discord.js").CommandInteraction} interaction
+ * @param  {import("discord.js").ChatInputCommandInteraction} interaction
  */
 export async function execute(interaction) {
     /** @type {import("twitch-blizzbot/discordclient").DiscordClient}*/
-    // @ts-ignore
+    // @ts-expect-error -- Interaction is created by the DiscordClient and therefor references it
     const client = interaction.client;
     const previous = await client.clients.db.getDiscordConnection(interaction.user);
     if (!previous) {

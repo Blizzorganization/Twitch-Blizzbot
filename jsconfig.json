@@ -45,6 +45,5 @@
         "bot.js",
         "typings/*",
         "package.json"
-    ],
-    "exclude": ["modules/abstractDb.js", "node_modules/**/*", "node_modules/pidusage/lib/stats.js"],
+    ]
 }

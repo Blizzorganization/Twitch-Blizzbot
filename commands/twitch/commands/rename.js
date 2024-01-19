@@ -13,18 +13,23 @@ export const alias = [];
  * @param {string} msg
  * @param {boolean} self
  * @param {string[]} args
+ * @returns {Promise<void>}
  */
 export async function run(client, target, context, msg, self, args) {
-    if (!args || args.length == 0) return client.say(target, "Du musst einen neuen Namen angeben.");
+    if (!args || args.length == 0) {
+        await client.say(target, "Du musst einen neuen Namen angeben.");
+        return;
+    }
     const oldName = args[0].toLowerCase();
     const newName = context["username"];
     const existingUser = await client.clients.db.getWatchtime(target, newName, "alltime");
     if (existingUser) {
-        return client.say(
+        await client.say(
             target,
             "Dieser Nutzer hat bereits watchtime gesammelt. Wenn du die watchtime dieses Accounts trotzdem übertragen möchtest, wende dich bitte an eine:n Moderator:in",
         );
+        return;
     }
     await client.clients.db.renameWatchtimeUser(target, oldName, newName);
-    client.say(target, `Deine Watchtime wurde erfolgreich von ${oldName} umgeschrieben.`);
+    await client.say(target, `Deine Watchtime wurde erfolgreich von ${oldName} umgeschrieben.`);
 }

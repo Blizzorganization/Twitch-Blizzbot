@@ -3,7 +3,7 @@
  * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
  */
-export function event(client, message) {
+export async function event(client, message) {
     if (message.author.id == client.user.id) return;
     if (message.author.bot) return;
     let args = message.content.split(" ");
@@ -18,7 +18,7 @@ export function event(client, message) {
                     channel = args.shift().toLowerCase();
                 }
                 if (!channel.startsWith("#")) {
-                    message.channel.send({
+                    await message.channel.send({
                         content: "Es wurde nicht angegeben, wo die Nachricht gesendet werden soll.",
                     });
                     return;
@@ -28,7 +28,7 @@ export function event(client, message) {
                         args[i] = arg.split(":")[1];
                     }
                 });
-                client.clients.twitch.say(channel, args.join(" "));
+                await client.clients.twitch.say(channel, args.join(" "));
             }
             break;
         case client.config.channels.adminCommands:

@@ -17,5 +17,5 @@ export async function run(client, target) {
     } else {
         appHelp = "Es sind keine Mod-Commands hinterlegt.";
     }
-    client.say(target, appHelp);
+    await client.say(target, appHelp);
 }

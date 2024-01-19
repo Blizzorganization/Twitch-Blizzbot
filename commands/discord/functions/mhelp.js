@@ -1,15 +1,16 @@
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 export const adminOnly = true;
 /**
  * @name help
  * @namespace DiscordCommands
  * @param  {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param  {import("discord.js").Message} message
+ * @returns {Promise<void>}
  */
-export function run(client, message) {
-    const embed = new MessageEmbed()
+export async function run(client, message) {
+    const embed = new EmbedBuilder()
         .setColor(0xedbc5d)
-        .setThumbnail(client.user.avatarURL({ format: "png" }))
+        .setThumbnail(client.user.avatarURL({ extension: "png" }))
         .setTitle("**__Alle Moderations Commands__**")
         .addFields(
             { name: "!add", value: "Fügt einen neuen Command in den Bot auf Twitch ein." },
@@ -24,5 +25,5 @@ export function run(client, message) {
             { name: "!mtime", value: "Zeigt an wie vie Zeit der Nutzer im Stream  verbracht hat" },
         );
 
-    message.channel.send({ embeds: [embed] });
+    await message.channel.send({ embeds: [embed] });
 }

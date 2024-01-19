@@ -14,17 +14,27 @@ export const alias = [];
  * @param {string} msg
  * @param {boolean} self
  * @param {string[]} args
+ * @returns {Promise<void>}
  */
 export async function run(client, target, context, msg, self, args) {
     const user = context["display-name"];
-    if (!args || args.length == 0) return client.say(target, "Welchen Mod-Command möchtest du bearbeiten?");
+    if (!args || args.length == 0) {
+        await client.say(target, "Welchen Mod-Command möchtest du bearbeiten?");
+        return;
+    }
 
     const cmd = await client.clients.db.getCcmd(target, args[0]);
-    if (!cmd) return client.say(target, `Ich kenne keinen Command ${args[0]}.`);
-    if (cmd.permissions !== permissions.mod) return client.say(target, `${args[0]} ist kein Mod Only Customcommand.`);
+    if (!cmd) {
+        await client.say(target, `Ich kenne keinen Command ${args[0]}.`);
+        return;
+    }
+    if (cmd.permissions !== permissions.mod) {
+        await client.say(target, `${args[0]} ist kein Mod Only Customcommand.`);
+        return;
+    }
     const newcmd = args.shift().toLowerCase();
     const res = args.join(" ");
     await client.clients.db.editCcmd(target.replace(/#+/g, ""), newcmd, res);
-    client.say(target, `${user}, der Mod-Command ${newcmd} wurde editiert.`);
+    await client.say(target, `${user}, der Mod-Command ${newcmd} wurde editiert.`);
     logger.log("command", `* Edited Customcommand ${newcmd}`);
 }

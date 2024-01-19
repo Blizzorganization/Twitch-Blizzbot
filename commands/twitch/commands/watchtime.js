@@ -28,5 +28,5 @@ export async function run(client, target, context, msg, self, args) {
         watchtime = await client.clients.db.getWatchtime(target, context["username"], "alltime");
         if (!watchtime) watchtime = 1;
     }
-    client.say(target, `${user} schaut ${target.slice(1)} schon seit ${calcWatchtime(watchtime)}`);
+    await client.say(target, `${user} schaut ${target.slice(1)} schon seit ${calcWatchtime(watchtime)}`);
 }

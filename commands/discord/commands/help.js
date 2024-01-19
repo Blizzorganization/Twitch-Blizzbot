@@ -1,4 +1,4 @@
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 export const alias = ["hilfe"];
 export const adminOnly = false;
 /**
@@ -6,11 +6,12 @@ export const adminOnly = false;
  * @namespace DiscordCommands
  * @param  {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param  {import("discord.js").Message} message
+ * @returns {Promise<void>}
  */
-export function run(client, message) {
-    const embed = new MessageEmbed()
+export async function run(client, message) {
+    const embed = new EmbedBuilder()
         .setColor(0xedbc5d)
-        .setThumbnail(client.user.avatarURL({ format: "png" }))
+        .setThumbnail(client.user.avatarURL({ extension: "png" }))
         .setTitle("**__Der Bot kann folgende Befehle:__**")
         .addFields(
             { name: "!twitchname", value: "Fügt einen neuen Command in den Bot auf Twitch ein." },
@@ -23,5 +24,5 @@ export function run(client, message) {
             { name: "!unlink", value: "Entfernt die Verbindung zu deinem Twitch Account" },
         );
 
-    message.channel.send({ embeds: [embed] });
+    await message.channel.send({ embeds: [embed] });
 }

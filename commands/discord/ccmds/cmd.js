@@ -1,13 +1,15 @@
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { permissions } from "twitch-blizzbot/constants";
 
 export const adminOnly = true;
+/** @type {string[]} */
 export const alias = [];
 /**
  * @name helplist
  * @namespace DiscordCommands
  * @param  {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param  {import("discord.js").Message} message
+ * @returns {Promise<void>}
  */
 export async function run(client, message) {
     const twchannel = client.config.watchtimechannel;
@@ -35,9 +37,9 @@ export async function run(client, message) {
     }
 
     // embed building
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
         .setColor(0xedbc5d)
-        .setThumbnail(client.user.avatarURL({ format: "png" }))
+        .setThumbnail(client.user.avatarURL({ extension: "png" }))
         .setTitle("**__Bot_Commands:__**");
 
     // embed components
@@ -49,5 +51,5 @@ export async function run(client, message) {
         embed.addFields([{ name: "**Information**", value: "Es ist leider kein Command hinterlegt" }]);
     }
 
-    message.channel.send({ embeds: [embed] });
+    await message.channel.send({ embeds: [embed] });
 }

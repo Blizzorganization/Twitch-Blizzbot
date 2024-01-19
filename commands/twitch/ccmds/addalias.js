@@ -14,6 +14,7 @@ export const alias = [];
  * @param {string} msg
  * @param {boolean} self
  * @param {string[]} args
+ * @returns {Promise<void>}
  */
 export async function run(client, target, context, msg, self, args) {
     const user = context["display-name"];
@@ -23,12 +24,15 @@ export async function run(client, target, context, msg, self, args) {
     }
     const newcmd = args.shift().toLowerCase();
     const res = args.join(" ");
-    if (!res || res == "") return client.say(target, "Du musst angeben, worauf der Alias verknüpft sein soll.");
+    if (!res || res == "") {
+        await client.say(target, "Du musst angeben, worauf der Alias verknüpft sein soll.");
+        return;
+    }
     if (!(await client.clients.db.getCcmd(target, res))) {
-        client.say(target, "Diesen Command kenne ich nicht.");
+        await client.say(target, "Diesen Command kenne ich nicht.");
         return;
     }
     await client.clients.db.newAlias(target.replace(/#+/g, ""), newcmd, res);
-    client.say(target, `${user}, der Alias ${newcmd} für ${res} wurde hinzugefügt.`);
+    await client.say(target, `${user}, der Alias ${newcmd} für ${res} wurde hinzugefügt.`);
     logger.log("command", `* Added Alias ${newcmd} for Customcommand ${res}`);
 }

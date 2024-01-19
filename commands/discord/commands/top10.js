@@ -1,4 +1,4 @@
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { calcWatchtime } from "twitch-blizzbot/functions";
 
 export const adminOnly = false;
@@ -15,7 +15,7 @@ export async function run(client, message, args) {
     if (args && args.length > 0) {
         if (args[0] && !isNaN(parseInt(args[0]))) page = parseInt(args[0]);
     }
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
         .setTitle("**__Watchtime:__**")
         .setColor(0xedbc5d)
         .setDescription(channel)
@@ -42,7 +42,7 @@ export async function run(client, message, args) {
         } else {
             page = Math.max(--page, 1);
         }
-        const editEmbed = new MessageEmbed()
+        const editEmbed = new EmbedBuilder()
             .setTitle("**__Watchtime:__**")
             .setColor(0xedbc5d)
             .setFooter({ text: `Seite ${page}` })
@@ -59,8 +59,8 @@ export async function run(client, message, args) {
         await reaction.remove();
         await outmsg.react(reaction.emoji.name);
     });
-    coll.on("end", () => {
-        outmsg.edit({
+    coll.on("end", async () => {
+        await outmsg.edit({
             content: "Die Zeit ist abgelaufen, wenn du erneut abfragen möchtest, so frage erneut an.",
             embeds: outmsg.embeds,
         });

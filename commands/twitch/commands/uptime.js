@@ -20,5 +20,5 @@ export async function run(client, target) {
         await client.say(target, `${target.slice(1)} ist offline.`);
         return;
     }
-    client.say(target, `${target.slice(1)} ist seit ${uptime} live. blizzorLogo`);
+    await client.say(target, `${target.slice(1)} ist seit ${uptime} live. blizzorLogo`);
 }

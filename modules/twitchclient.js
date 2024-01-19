@@ -21,52 +21,40 @@ import { logger } from "./logger.js";
 
 /**
  * TwitchClient
- *
  * @class TwitchClient
  * @augments {Client}
- * @property {{[key: string]: import("fs").WriteStream}} channellogs
- * @property {import("./clients").Clients} clients
- * @property {boolean} started
- * @property {Collection} commands
- * @property {blacklist} blacklist
- * @property {any} watchtime
- * @property {any} automessage
- * @property {string[]} channels
  */
 export class TwitchClient extends Client {
-    /**
-     * @param  {config} opts
-     */
+    /** @param {config} opts */
     constructor(opts) {
         super(opts);
         this.config = opts;
         this.started = false;
+        /** @type {Collection<string, import("../typings/twitchcommand.ts").TwitchCommand>} */
         this.commands = new Collection();
+        /** @type {string[]}*/
         this.helplist = [];
         /** @type {string[]}*/
         this.channels = [];
-        this.permittedlinks = readFileSync("./configs/links.txt", "utf8")
-            .split(/\r\n|\n\r|\n|\r/)
-            .filter((link) => link !== "");
-        this.deletelinks = readFileSync("./configs/TLDs.txt", "utf8")
-            .split(/\r\n|\n\r|\n|\r/)
-            .filter((link) => link !== "");
-        this.permitList = readFileSync("./configs/mods.txt", "utf8")
-            .split(/\r\n|\n\r|\n|\r/)
-            .filter((usr) => usr !== "");
+        this.permittedlinks = parsePermittedLinks();
+        this.deletelinks = parseTLDs();
+        this.permitList = parsePermitList();
+        /** @type {ReturnType<typeof setInterval>|undefined} */
         this.watchtime = undefined;
+        /** @type {ReturnType<typeof setInterval>|undefined} */
         this.automessage = undefined;
         /** @type {import("./clients.js").Clients}*/
+        // @ts-expect-error -- late-init
         this.clients = undefined;
-        /** @type {{[key: string]: import("../typings/dbtypes.js").Blacklist[]}}*/
+        /** @type {Record<string, import("../typings/dbtypes.js").Blacklist[]>}*/
         this.blacklist = undefined;
         if (!existsSync("./channellogs")) mkdirSync("./channellogs");
         this.once("connected", () => {
             this.newChannellogs(opts.channels);
-            for (const c of opts.channels) this.cooldowns.set(c.replace("#", ""), 0);
+            for (const c of opts.channels ?? []) this.cooldowns.set(c.replace("#", ""), 0);
         });
         this.cooldowns = new Map();
-        /** @type {{[key: string]: import("fs").WriteStream}} */
+        /** @type {Record<string, import("fs").WriteStream>} */
         this.channellogs = {};
         scheduleJob("newchannellogs", "0 1 * * *", () => this.newChannellogs(opts.channels));
         loadCommands(this.commands, "commands/twitch/commands", this.helplist);
@@ -74,12 +62,16 @@ export class TwitchClient extends Client {
         loadCommands(this.commands, "commands/twitch/functions", this.helplist);
         loadEvents("events/twitch", this);
         loadEvents("events/twitch/interaction", this);
-        this.messages = JSON.parse(readFileSync("./configs/automessages.json", "utf8"));
-        this.connect();
+        /** @type {Record<string, string[]|undefined>} */
+        this.messages = parseAutomessages();
+        /** @type {Map<string, number>} */
+        this.autoMessagePositions = new Map();
+        this.connect().catch(() => {
+            logger.error("Failed to connect to Twitch.");
+        });
     }
     /**
      * generates channellogs
-     *
      * @param {string[]} channels Channels to create channel logs for
      */
     newChannellogs(channels = this.channels) {
@@ -97,6 +89,18 @@ export class TwitchClient extends Client {
         }
     }
     /**
+     *
+     * @param {string} channel without # prefix
+     * @returns {string|void}
+     */
+    getNextAutomessageFor(channel) {
+        const messages = this.messages[channel];
+        const nextMessagePosition = this.autoMessagePositions.get(channel) ?? 0;
+        const retVal = messages[nextMessagePosition];
+        this.autoMessagePositions.set(channel, nextMessagePosition + 1 < messages.length ? nextMessagePosition + 1 : 0);
+        return retVal;
+    }
+    /**
      * stops the Twitch Client
      */
     async stop() {
@@ -109,4 +113,40 @@ export class TwitchClient extends Client {
         await this.disconnect();
         logger.info("disconnected from twitch");
     }
+}
+/**
+ *
+ * @returns {Record<string, string[]>}
+ */
+function parseAutomessages() {
+    return JSON.parse(readFileSync("./configs/automessages.json", "utf8"));
+}
+
+/**
+ * @returns {string[]}
+ */
+function parsePermitList() {
+    return readFileSync("./configs/mods.txt", "utf8")
+        .split(/\r\n|\n\r|\n|\r/)
+        .filter((usr) => usr !== "");
+}
+
+/**
+ *
+ * @returns {string[]}
+ */
+function parseTLDs() {
+    return readFileSync("./configs/TLDs.txt", "utf8")
+        .split(/\r\n|\n\r|\n|\r/)
+        .filter((link) => link !== "");
+}
+
+/**
+ *
+ * @returns {string[]}
+ */
+function parsePermittedLinks() {
+    return readFileSync("./configs/links.txt", "utf8")
+        .split(/\r\n|\n\r|\n|\r/)
+        .filter((link) => link !== "");
 }

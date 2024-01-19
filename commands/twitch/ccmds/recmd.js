@@ -14,18 +14,31 @@ export const alias = [];
  * @param {string} msg
  * @param {boolean} self
  * @param {string[]} args
+ * @returns {Promise<void>}
  */
 export async function run(client, target, context, msg, self, args) {
     const user = context["display-name"];
-    if (!args || args.length == 0) return client.say(target, "Welchen Command möchtest du umbenennen?");
+    if (!args || args.length == 0) {
+        await client.say(target, "Welchen Command möchtest du umbenennen?");
+        return;
+    }
     const [commandName, newName] = args;
     const cmd = await client.clients.db.getCcmd(target, commandName);
-    if (!cmd) return client.say(target, `Ich kenne keinen Command ${commandName}.`);
+    if (!cmd) {
+        await client.say(target, `Ich kenne keinen Command ${commandName}.`);
+        return;
+    }
     const existingCmd = await client.clients.db.getCcmd(target, newName);
-    if (existingCmd) return client.say(target, `Es gibt bereits einen Command ${newName}`);
-    if (!newName) return client.say(target, `Du musst angeben in was ${commandName} umbenannt werden soll.`);
+    if (existingCmd) {
+        await client.say(target, `Es gibt bereits einen Command ${newName}`);
+        return;
+    }
+    if (!newName) {
+        await client.say(target, `Du musst angeben in was ${commandName} umbenannt werden soll.`);
+        return;
+    }
     await client.clients.db.renameCCmd(target.replace(/#+/g, ""), commandName, newName);
 
-    client.say(target, `${user}, der Command ${commandName} wurde zu ${newName} umbenannt.`);
+    await client.say(target, `${user}, der Command ${commandName} wurde zu ${newName} umbenannt.`);
     logger.log("command", `* Rename Customcommand ${commandName} to ${newName}`);
 }

@@ -22,5 +22,5 @@ export async function run(client, target, context, msg, self, args) {
     const resp = await fetch(`https://decapi.me/twitch/accountage/${user}`);
     const age = time(await resp.text());
 
-    client.say(target, `Der Account ${user} wurde vor ${age} erstellt.`);
+    await client.say(target, `Der Account ${user} wurde vor ${age} erstellt.`);
 }

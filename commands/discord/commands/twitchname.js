@@ -1,4 +1,4 @@
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import fetch from "node-fetch";
 import { time } from "twitch-blizzbot/functions";
 
@@ -9,6 +9,7 @@ export const adminOnly = false;
  * @namespace DiscordCommands
  * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
+ * @returns {Promise<void>}
  */
 export async function run(client, message) {
     const dcuser = message.mentions.users.first() || message.author;
@@ -21,7 +22,7 @@ export async function run(client, message) {
     const res = await fetch(`https://decapi.me/twitch/followage/${channel}/${dbuser}`);
     const fage = time(await res.text());
 
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
         .setColor(0xedbc5d)
         .setThumbnail(dcuser.avatarURL())
         .setTitle("**__Linkinginfo__**")
@@ -32,5 +33,5 @@ export async function run(client, message) {
             { name: "__Folgt schon__", value: fage },
         );
 
-    message.channel.send({ embeds: [embed] });
+    await message.channel.send({ embeds: [embed] });
 }

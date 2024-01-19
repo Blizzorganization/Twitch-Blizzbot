@@ -14,10 +14,12 @@ export const alias = [];
  * @param {string} msg
  * @param {boolean} self
  * @param {string[]} args
+ * @returns {Promise<void>}
  */
 export async function run(client, target, context, msg, self, args) {
     if (!args || args.length == 0) {
-        return client.say(target, "Du musst angeben, was du von der Blacklist entfernen willst!");
+        await client.say(target, "Du musst angeben, was du von der Blacklist entfernen willst!");
+        return;
     }
     const blremove = args.join(" ").toLowerCase();
     const blacklist = client.blacklist[target.replace(/#+/g, "")];
@@ -31,6 +33,6 @@ export async function run(client, target, context, msg, self, args) {
     }
     client.blacklist[target.replace(/#+/g, "")] = blacklist.filter((b) => b !== blacklistEntry);
     await client.clients.db.removeBlacklistWord(target, blremove);
-    client.say(target, `"${blremove}" wurde von der Blacklist entfernt`);
+    await client.say(target, `"${blremove}" wurde von der Blacklist entfernt`);
     logger.info(`* Removed "${blremove}" from the Blacklist of ${target}`);
 }

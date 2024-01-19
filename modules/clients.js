@@ -4,7 +4,6 @@ import slashsetup from "./slashsetup.js";
 
 /**
  * a class containing all client objects
- *
  * @class Clients
  */
 export class Clients {

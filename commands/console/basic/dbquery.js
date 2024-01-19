@@ -6,13 +6,20 @@ import { inspect } from "util";
  * @namespace ConsoleCommands
  * @param {import("twitch-blizzbot/clients").Clients} clients
  * @param {string[]} args
+ * @returns {Promise<void>}
  */
 export async function run(clients, args) {
     const data = await clients.db.db.query(args.join(" ")).catch((e) => {
         if (e !== undefined) logger.error(e);
     });
-    if (!data) return logger.error("Your query produced an error.");
-    if (data.rows.length == 0) return logger.warn("Your query didn't return any data.");
+    if (!data) {
+        logger.error("Your query produced an error.");
+        return;
+    }
+    if (data.rows.length == 0) {
+        logger.warn("Your query didn't return any data.");
+        return;
+    }
     data.rows.length == 1
         ? logger.info(inspect(data.rows[0], { colors: true }))
         : logger.info(`\n${getTable(data.rows)}`);

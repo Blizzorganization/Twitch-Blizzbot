@@ -14,6 +14,7 @@ export const alias = [];
  * @param {string} msg
  * @param {boolean} self
  * @param {string[]} args
+ * @returns {Promise<void>}
  */
 export async function run(client, target, context, msg, self, args) {
     const user = context["display-name"];
@@ -23,13 +24,16 @@ export async function run(client, target, context, msg, self, args) {
     }
     const newcmd = args.shift().toLowerCase();
     const res = args.join(" ");
-    if (!res || res == "") return client.say(target, "Du musst angeben, was die Antwort sein soll.");
+    if (!res || res == "") {
+        await client.say(target, "Du musst angeben, was die Antwort sein soll.");
+        return;
+    }
     const existingCmd = await client.clients.db.getCcmd(target.replace(/#+/g, ""), newcmd);
     if (existingCmd) {
-        client.say(target, `${user}, der Command existiert bereits`);
+        await client.say(target, `${user}, der Command existiert bereits`);
         return;
     }
     await client.clients.db.newCcmd(target.replace(/#+/g, ""), newcmd, res, permissions.mod);
-    client.say(target, `${user}, der Mod-Command ${newcmd} wurde hinzugefügt.`);
+    await client.say(target, `${user}, der Mod-Command ${newcmd} wurde hinzugefügt.`);
     logger.log("command", `* Added Customcommand ${newcmd}`);
 }
