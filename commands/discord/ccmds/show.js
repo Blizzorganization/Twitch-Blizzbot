@@ -40,5 +40,5 @@ export async function run(client, message, args) {
     embed.setFooter({ text: "CCMD" });
 
     await message.channel.send({ embeds: [embed] });
-    logger.log("command", `* Viewed Command !${commandName}`);
+    logger.info(`* Viewed Command !${commandName}`);
 }

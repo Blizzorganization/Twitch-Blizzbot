@@ -40,5 +40,5 @@ export async function run(client, target, context, msg, self, args) {
     await client.clients.db.renameCCmd(target.replace(/#+/g, ""), commandName, newName);
 
     await client.say(target, `${user}, der Command ${commandName} wurde zu ${newName} umbenannt.`);
-    logger.log("command", `* Rename Customcommand ${commandName} to ${newName}`);
+    logger.info(`* Rename Customcommand ${commandName} to ${newName}`);
 }

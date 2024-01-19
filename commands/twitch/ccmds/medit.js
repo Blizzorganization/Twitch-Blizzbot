@@ -36,5 +36,5 @@ export async function run(client, target, context, msg, self, args) {
     const res = args.join(" ");
     await client.clients.db.editCcmd(target.replace(/#+/g, ""), newcmd, res);
     await client.say(target, `${user}, der Mod-Command ${newcmd} wurde editiert.`);
-    logger.log("command", `* Edited Customcommand ${newcmd}`);
+    logger.info(`* Edited Customcommand ${newcmd}`);
 }

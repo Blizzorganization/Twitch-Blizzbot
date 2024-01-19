@@ -56,5 +56,5 @@ export async function run(client, target, context, msg, self, args) {
             return;
     }
     await client.say(target, `${user}, der Zähler ${name} wurde editiert.`);
-    logger.log("command", `* Edited Counter ${name}`);
+    logger.info(`* Edited Counter ${name}`);
 }

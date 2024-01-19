@@ -33,5 +33,5 @@ export async function run(client, target, context, msg, self, args) {
     }
     await client.clients.db.delCcmd(target.replace(/#+/g, ""), args[0]);
     await client.say(target, `${user}, der Command ${args[0]} wurde entfernt.`);
-    logger.log("command", `* Deleted Customcommand ${args[0]}`);
+    logger.info(`* Deleted Customcommand ${args[0]}`);
 }

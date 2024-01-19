@@ -20,5 +20,5 @@ export async function run(client, message, args) {
 
     await client.clients.db.deleteAlias(twchannel, args[0]);
     await message.reply({ content: `Der Alias ${args[0]} wurde entfernt.` });
-    logger.log("command", `* Deleted alias ${args[0]}`);
+    logger.info(`* Deleted alias ${args[0]}`);
 }

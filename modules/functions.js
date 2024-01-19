@@ -22,7 +22,7 @@ export function loadCommands(commandmap, commanddir, helplist = []) {
                 if (!file.endsWith(".js")) return;
                 const command = file.split(".")[0];
                 const props = await import(`../${commanddir}/${command}.js`);
-                logger.log("command", `Attempting to load Command ${command}`);
+                logger.info(`Attempting to load Command ${command}`);
                 commandmap.set(command, props);
                 if (props.help) helplist.push(command);
                 if (!props.alias) return;

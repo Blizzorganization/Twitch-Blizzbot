@@ -34,5 +34,5 @@ export async function run(client, target, context, msg, self, args) {
     }
     await client.clients.db.newAlias(target.replace(/#+/g, ""), newcmd, res);
     await client.say(target, `${user}, der Alias ${newcmd} für ${res} wurde hinzugefügt.`);
-    logger.log("command", `* Added Alias ${newcmd} for Customcommand ${res}`);
+    logger.info(`* Added Alias ${newcmd} for Customcommand ${res}`);
 }

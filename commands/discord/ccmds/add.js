@@ -29,5 +29,5 @@ export async function run(client, message, args) {
     }
     await client.clients.db.newCcmd(twchannel, newcmd, res, permissions.user);
     await message.reply({ content: `Der Command ${newcmd} wurde hinzugefügt.` });
-    logger.log("command", `* Added Customcommand ${newcmd}`);
+    logger.info(`* Added Customcommand ${newcmd}`);
 }

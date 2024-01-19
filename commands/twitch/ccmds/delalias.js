@@ -30,5 +30,5 @@ export async function run(client, target, context, msg, self, args) {
     }
     await client.clients.db.deleteAlias(target.replace(/#+/g, ""), args[0]);
     await client.say(target, `${user}, der Alias ${args[0]} wurde entfernt.`);
-    logger.log("command", `* Deleted alias ${args[0]}`);
+    logger.info(`* Deleted alias ${args[0]}`);
 }

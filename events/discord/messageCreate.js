@@ -4,7 +4,7 @@
  * @param {import("discord.js").Message} message
  */
 export async function event(client, message) {
-    if (message.author.id == client.user.id) return;
+    if (message.author.id === client.user.id) return;
     if (message.author.bot) return;
     let args = message.content.split(" ");
     let admincmd = false;

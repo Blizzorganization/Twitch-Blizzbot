@@ -27,5 +27,5 @@ export async function run(client, target, context, msg, self, args) {
     }
     await client.clients.db.delCounter(target.replace(/#+/g, ""), cname);
     await client.say(target, `${user}, der Zähler ${cname} wurde entfernt.`);
-    logger.log("command", `* Deleted Counter ${cname}`);
+    logger.info(`* Deleted Counter ${cname}`);
 }

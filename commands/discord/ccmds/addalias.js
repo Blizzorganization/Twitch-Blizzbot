@@ -26,5 +26,5 @@ export async function run(client, message, args) {
     }
     await client.clients.db.newAlias(twchannel, newcmd, res);
     await message.reply({ content: `Der Alias ${newcmd} für ${res} wurde hinzugefügt.` });
-    logger.log("command", `* Added Alias ${newcmd} for Customcommand ${res}`);
+    logger.info(`* Added Alias ${newcmd} for Customcommand ${res}`);
 }

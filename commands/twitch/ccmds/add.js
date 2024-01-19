@@ -35,5 +35,5 @@ export async function run(client, target, context, msg, self, args) {
     }
     await client.clients.db.newCcmd(target.replace(/#+/g, ""), newcmd, res, permissions.user);
     await client.say(target, `${user}, der Command ${newcmd} wurde hinzugefügt.`);
-    logger.log("command", `* Added Customcommand ${newcmd}`);
+    logger.info(`* Added Customcommand ${newcmd}`);
 }
