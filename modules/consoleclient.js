@@ -39,7 +39,7 @@ export class ConsoleClient extends EventEmitter {
         const completer = _completer.bind(this);
         this.rl = createInterface({ input: process.stdin, output: process.stdout, prompt: "", completer });
         this.write = this.rl.write.bind(this.rl);
-        logger.log("verbose", "Listening to Console Commands");
+        logger.log("debug", "Listening to Console Commands");
         this.rl.on("line", (line) => this.online(line));
         this.rl.on("SIGINT", () => (this.stopping ? null : this.clients.stop()));
         this.rl.on("SIGCONT", () => (this.stopping ? null : this.clients.stop()));

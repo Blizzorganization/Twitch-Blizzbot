@@ -205,23 +205,23 @@ async function handleCommand(client, target, context, msg, self, args) {
         const dbCommandState = await client.clients.db.resolveCommand(target, commandName);
         if (dbCommandState) {
             if (dbCommandState.enabled === false) {
-                logger.info("Command disabled via database.");
+                logger.debug("Command disabled via database.");
                 return;
             }
             if (dbCommandState.permission === -1) cmdPerm = cmd.perm;
         }
         if (cmd.perm && userPermission < cmdPerm) {
             if (!cmd.silent) await client.say(target, "Du hast keine Rechte");
-            logger.info("Permission requirements of the user not met.");
+            logger.error("Permission requirements of the user not met.");
             return;
         }
         if (!userHasModPermission && timeSinceLastExecution > 1000 * client.config.Cooldown) {
-            logger.info("Cooldown hit!");
+            logger.debug("Cooldown hit!");
             return;
         }
         try {
             await cmd.run(client, target, context, msg, self, args);
-            logger.info(`* Executed ${commandName} command`);
+            logger.debug(`* Executed ${commandName} command`);
         } catch (e) {
             /** @type {Error} */
             let errorObject;
@@ -244,13 +244,13 @@ async function handleCommand(client, target, context, msg, self, args) {
             return;
         }
         if (!userHasModPermission && timeSinceLastExecution <= 1000 * client.config.Cooldown) {
-            logger.info("Cooldown hit!");
+            logger.debug("Cooldown hit!");
             return;
         }
 
         response = await counters(client, ccmd.response, target);
         await client.say(target, response);
-        logger.info(`* Executed ${commandName} Customcommand`);
+        logger.debug(`* Executed ${commandName} Customcommand`);
 
         return;
     }
@@ -262,10 +262,10 @@ async function handleCommand(client, target, context, msg, self, args) {
         return;
     }
     if (!userHasModPermission && timeSinceLastExecution <= 1000 * client.config.Cooldown) {
-        logger.info("Cooldown hit");
+        logger.debug("Cooldown hit");
         return;
     }
     response = await counters(client, alias.response, target);
     await client.say(target, response);
-    logger.info(`* Executed ${alias.command} caused by alias ${alias.alias}`);
+    logger.debug(`* Executed ${alias.command} caused by alias ${alias.alias}`);
 }

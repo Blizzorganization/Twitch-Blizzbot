@@ -23,7 +23,7 @@ export const logger = winston.createLogger({
             maxFiles: "14d",
         }),
         new winston.transports.Console({
-            level: "debug",
+            level: "info",
             format: winston.format.combine(
                 winston.format.colorize({
                     level: true,
