@@ -8,7 +8,7 @@ import { TwitchClient } from "twitch-blizzbot/twitchclient";
 import { createConfig } from "./setup.js";
 
 // eslint-disable-next-line no-console
-console.log("starting Twitch Blizzbot");
+console.info("starting Twitch Blizzbot");
 if (process.argv0.length >= 18) {
     process.title = `Twitch-Blizzbot@${JSON.parse(readFileSync("./package.json", "utf8")).version}`;
 }

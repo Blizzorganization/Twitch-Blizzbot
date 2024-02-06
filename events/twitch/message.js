@@ -18,7 +18,6 @@ const counterTest = new RegExp(/\{(.*?)\}/g);
  * @param {boolean} self
  */
 export async function event(client, target, context, msg, self) {
-    logger.log("silly", `received message: ${msg}`);
     switch (target[0]) {
         case "#":
             {

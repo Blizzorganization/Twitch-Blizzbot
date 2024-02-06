@@ -1,5 +1,4 @@
 import { logger } from "twitch-blizzbot/logger";
-import { run as runRaidCommand } from "commands/twitch/commands/raid.js";
 
 /**
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
@@ -12,5 +11,4 @@ export async function event(client, channel, username, viewers) {
     logger.info(`${username} raid ${viewers} viewer!`);
     if (viewers < 10) return;
     await client.say(channel, `/me ${username} Raidet mit ${viewers} Zuschauer!`);
-    if (viewers > 60) await runRaidCommand(client, channel);
 }

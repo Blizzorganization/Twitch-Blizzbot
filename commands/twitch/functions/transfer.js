@@ -16,7 +16,7 @@ export const alias = ["tf"];
  * @returns {Promise<void>}
  */
 export async function run(client, target, context, msg, self, args) {
-    if (!args || !(args.length == 0)) {
+    if (!args || args.length === 0) {
         await client.say(
             target,
             "Du musst angeben, welcher Befehl zwischen Nutzerbefehl und Moderationsbefehl gewechselt werden soll.",
