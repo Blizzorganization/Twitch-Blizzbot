@@ -8,7 +8,8 @@ RUN yarn install --prod --frozen-lockfile
 COPY commands ./commands
 COPY events ./events
 COPY modules ./modules
-COPY bot.js bot.js
+COPY bot.js setup.js ./
+
 
 USER node
 
