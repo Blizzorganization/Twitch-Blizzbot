@@ -32,6 +32,11 @@ export async function run(client, target, context, msg, self, args) {
         await client.say(target, "Diesen Command kenne ich nicht.");
         return;
     }
+    const resolvedAlias = await client.clients.db.resolveAlias(target, newcmd);
+    if (!!(resolvedAlias)) {
+        await client.say(target, `Diesen Alias ist bereits vergeben für ${resolvedAlias?.command}.`);
+        return;
+    }
     await client.clients.db.newAlias(target.replace(/#+/g, ""), newcmd, res);
     await client.say(target, `${user}, der Alias ${newcmd} für ${res} wurde hinzugefügt.`);
     logger.info(`* Added Alias ${newcmd} for Customcommand ${res}`);

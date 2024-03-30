@@ -26,10 +26,10 @@ export async function run(client, target, context, msg, self, args) {
         return;
     }
     const name = args.shift();
-    const counter = await client.clients.db.readCounter(target, name);
+    const countere = await client.clients.db.readCounter(target, name);
     const field = args.shift().toLowerCase();
     const value = args.shift();
-    if (!counter) {
+    if (typeof countere !== "number") {
         await client.say(target, `Ich kenne keinen Zähler ${name}.`);
         return;
     }

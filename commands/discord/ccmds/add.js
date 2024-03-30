@@ -27,6 +27,13 @@ export async function run(client, message, args) {
         await message.reply({ content: `Der Command existiert bereits` });
         return;
     }
+    const existingAlias = await client.clients.db.resolveAlias(twchannel.replace(/#+/g, ""), newcmd);
+    if (existingAlias) {
+        await message.reply({ content: `Der Command existiert bereits` });
+        logger.info(`* Tried to create a custom command "${newcmd}" but there already was an alias.`)
+        return;
+    }
+
     await client.clients.db.newCcmd(twchannel, newcmd, res, permissions.user);
     await message.reply({ content: `Der Command ${newcmd} wurde hinzugefügt.` });
     logger.info(`* Added Customcommand ${newcmd}`);

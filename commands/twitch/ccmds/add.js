@@ -33,6 +33,13 @@ export async function run(client, target, context, msg, self, args) {
         await client.say(target, `${user}, der Command existiert bereits`);
         return;
     }
+    const existingAlias = await client.clients.db.resolveAlias(target.replace(/#+/g, ""), newcmd);
+    if (existingAlias) {
+        await client.say(target, `${user}, der Command existiert bereits`);
+        logger.info(`* Tried to create a custom command "${newcmd}" but there already was an alias.`)
+        return;
+    }
+
     await client.clients.db.newCcmd(target.replace(/#+/g, ""), newcmd, res, permissions.user);
     await client.say(target, `${user}, der Command ${newcmd} wurde hinzugefügt.`);
     logger.info(`* Added Customcommand ${newcmd}`);

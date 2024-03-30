@@ -24,6 +24,12 @@ export async function run(client, message, args) {
         await message.reply({ content: "Diesen Befehl kenne ich nicht." });
         return;
     }
+    const resolvedAlias = await client.clients.db.resolveAlias(twchannel, newcmd);
+    if (!!(resolvedAlias)) {
+        await message.reply({ content: `Diesen Alias ist bereits vergeben für ${resolvedAlias.command}.` });
+        return;
+    }
+
     await client.clients.db.newAlias(twchannel, newcmd, res);
     await message.reply({ content: `Der Alias ${newcmd} für ${res} wurde hinzugefügt.` });
     logger.info(`* Added Alias ${newcmd} for Customcommand ${res}`);
