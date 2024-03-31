@@ -26,7 +26,7 @@ export async function run(client, message, args) {
     }
     const resolvedAlias = await client.clients.db.resolveAlias(twchannel, newcmd);
     if (!!(resolvedAlias)) {
-        await message.reply({ content: `Diesen Alias ist bereits vergeben für ${resolvedAlias.command}.` });
+        await message.reply({ content: `Dieser Alias ist bereits vergeben für ${resolvedAlias.command}.` });
         return;
     }
 

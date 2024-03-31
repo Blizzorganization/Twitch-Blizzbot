@@ -34,7 +34,7 @@ export async function run(client, target, context, msg, self, args) {
     }
     const resolvedAlias = await client.clients.db.resolveAlias(target, newcmd);
     if (!!(resolvedAlias)) {
-        await client.say(target, `Diesen Alias ist bereits vergeben für ${resolvedAlias?.command}.`);
+        await client.say(target, `Dieser Alias ist bereits vergeben für ${resolvedAlias?.command}.`);
         return;
     }
     await client.clients.db.newAlias(target.replace(/#+/g, ""), newcmd, res);
