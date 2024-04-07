@@ -27,4 +27,3 @@ export async function run(client, target) {
     }
     await client.say(target, `Folgende Aliase sind hinterlegt: ${mappedStrings.join(" | ")}`);
 }
-// eval clients.twitch.commands.get("aliase").run({clients, say: console.log}, "a")

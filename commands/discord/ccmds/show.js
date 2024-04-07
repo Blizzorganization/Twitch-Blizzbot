@@ -20,6 +20,11 @@ export async function run(client, message, args) {
     if (commandName.startsWith("!")) commandName = commandName.replace("!", "");
     const ccmd = await client.clients.db.getCcmd(twChannel, `!${commandName}`);
     if (!ccmd) {
+        const alias = await client.clients.db.resolveAlias(twChannel, `!${commandName}`);
+        if (alias) {
+            await message.reply(`Der Command !${commandName} ist ein Alias von ${alias.command}.`);
+            return;
+        }
         await message.reply("Einen solchen Command gibt es nicht.");
         return;
     }

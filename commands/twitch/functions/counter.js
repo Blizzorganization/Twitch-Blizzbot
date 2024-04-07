@@ -5,7 +5,7 @@ export const help = false;
 export const perm = permissions.mod;
 export const alias = [""];
 /**
- * @name counter 
+ * @name counter
  * @namespace TwitchCommands
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
@@ -13,9 +13,9 @@ export const alias = [""];
  * @param {string} msg
  * @param {boolean} self
  * @param {string[]} args
- * 
+ *
  */
-export async function run(client, target,context, msg, self, args) {
+export async function run(client, target, context, msg, self, args) {
     const user = context["display-name"];
     if (args.length < 1) {
         await client.say(target, "Du musst angeben, Welche Counter du auslesen möchtest.");
