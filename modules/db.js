@@ -167,7 +167,6 @@ export class DB {
         const client = await this.db.connect();
         try {
             channel = channel.replace(/#+/g, "");
-            // @ts-ignore
             await client.query(statements.channels.newChannel, [channel, true]).catch((e) => {
                 throw e;
             });
@@ -277,7 +276,6 @@ export class DB {
     async newCounter(channel, name, inc = 1, defaultVal = 0) {
         try {
             channel = channel.replace(/#+/g, "");
-            // @ts-ignore
             await this.db.query(statements.counters.newCounter, [channel, name, defaultVal, inc]);
         } catch (e) {
             logger.error(e);
@@ -322,7 +320,6 @@ export class DB {
      */
     async setCounter(channel, name, val) {
         channel = channel.replace(/#+/g, "");
-        // @ts-ignore
         await this.db.query(statements.counters.setCounter, [val, name, channel]).catch((e) => {
             logger.error(e);
         });
@@ -335,7 +332,6 @@ export class DB {
     async editCounter(channel, name, inc) {
         try {
             channel = channel.replace(/#+/g, "");
-            // @ts-ignore
             await this.db.query(statements.counters.editCounter, [inc, name, channel]);
         } catch (e) {
             logger.error(e);
@@ -378,13 +374,11 @@ export class DB {
      */
     async allCcmds(channel, permission = permissions.user) {
         channel = channel.replace(/#+/g, "");
-        // @ts-ignore
         const data = await this.db.query(statements.customCommands.getAllCommands, [channel, permission]).catch((e) => {
             logger.error(e);
         });
         if (!data) return;
         /** @type {import("../typings/dbtypes.js").CustomCommand[]} */
-        // @ts-ignore
         const rows = data.rows;
         return rows.map((row) => row.command);
     }
@@ -412,7 +406,6 @@ export class DB {
     async newCcmd(channel, commandname, response, perms) {
         channel = channel.replace(/#+/g, "");
         await this.db
-            // @ts-ignore
             .query(statements.customCommands.newCommand, [commandname, response, channel, perms])
             .catch((e) => {
                 logger.error(e);
@@ -431,7 +424,6 @@ export class DB {
                 await client.query("BEGIN");
                 for (const cmd of cmds) {
                     await client
-                        // @ts-ignore
                         .query(statements.customCommands.newCommand, [
                             cmd.command,
                             cmd.response,
@@ -503,7 +495,6 @@ export class DB {
                 return "no_such_command";
             }
             const newPerm = cmd.rows[0].permissions == permissions.user ? permissions.mod : permissions.user;
-            // @ts-ignore
             await client.query(statements.customCommands.changeCommandPermissions, [newPerm, commandname, channel]);
             return "ok";
         } catch (e) {
@@ -534,22 +525,18 @@ export class DB {
             const month = currentMonth();
             await (async (users) => {
                 await client.query("BEGIN");
-                // @ts-ignore
                 await client.query(statements.watchtime.watchtimeNew, [channel, users, month]).catch(async (e) => {
                     logger.error(`insert month ${e?.toString()}`);
                     await client.query("ROLLBACK");
                 });
-                // @ts-ignore
                 await client.query(statements.watchtime.watchtimeNew, [channel, users, "alltime"]).catch(async (e) => {
                     logger.error(`insert alltime ${e?.toString()}`);
                     await client.query("ROLLBACK");
                 });
-                // @ts-ignore
                 await client.query(statements.watchtime.watchtimeInc, [users, channel, month]).catch(async (e) => {
                     logger.error(`inc month ${e?.toString()}`);
                     await client.query("ROLLBACK");
                 });
-                // @ts-ignore
                 await client.query(statements.watchtime.watchtimeInc, [users, channel, "alltime"]).catch(async (e) => {
                     logger.error(`inc alltime ${e?.toString()}`);
                     await client.query("ROLLBACK");
@@ -600,13 +587,11 @@ export class DB {
             await (async (users) => {
                 await client.query("BEGIN");
                 const usernames = users.map((u) => u.user);
-                // @ts-ignore
                 await client.query(statements.watchtime.watchtimeNew, [channel, usernames, month]).catch((e) => {
                     throw e;
                 });
                 for (const user of users) {
                     await client
-                        // @ts-ignore
                         .query(statements.watchtime.watchtimeIncBy, [user.user, channel, month, user.watchtime])
                         .catch((e) => {
                             throw e;
@@ -635,13 +620,11 @@ export class DB {
         if (!(typeof max == "number")) throw new TypeError("You have to select how many entries you need as a number.");
         if (!(typeof page == "number")) throw new TypeError("You need to supply a number as page");
         const data = await this.db
-            // @ts-ignore
             .query(statements.watchtime.watchtimeList, [month, channel, max, (page - 1) * max])
             .catch((e) => {
                 logger.error(e);
             });
         if (!data) return null;
-        // @ts-ignore
         return data.rows;
     }
     /**
@@ -701,7 +684,6 @@ export class DB {
     async newBlacklistWord(channel, word, action) {
         try {
             channel = channel.replace(/#+/g, "");
-            // @ts-ignore
             await this.db.query(statements.blacklist.newBlacklistEntry, [channel, word, action]);
         } catch (e) {
             logger.error(e);
@@ -715,7 +697,6 @@ export class DB {
     async newBlacklistWords(channel, words, action) {
         try {
             channel = channel.replace(/#+/g, "");
-            // @ts-ignore
             await this.db.query(statements.blacklist.newBlacklistEntries, [channel, words, action]);
         } catch (e) {
             logger.error(e);
@@ -769,7 +750,6 @@ export class DB {
      */
     async updateCommandEnabled(channel, command, enabled) {
         channel = channel.replace(/#+/, "");
-        // @ts-ignore
         await this.db.query(statements.commands.updateCommandEnabled, [enabled, channel, command]).catch((e) => {
             logger.error(e);
         });
@@ -782,7 +762,6 @@ export class DB {
     async updateCommandPermission(channel, command, permission) {
         channel = channel.replace(/#+/, "");
         try {
-            // @ts-ignore
             await this.db.query(statements.commands.updateCommandPermission, [permission, channel, command]);
         } catch (e) {
             logger.error(e);
@@ -797,7 +776,6 @@ export class DB {
     async newCommand(channel, command, enabled, permission) {
         channel = channel.replace(/#+/, "");
         try {
-            // @ts-ignore
             await this.db.query(statements.commands.newCommand, [channel, command, enabled, permission]);
         } catch (e) {
             logger.error(e);

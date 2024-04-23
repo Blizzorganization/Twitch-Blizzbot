@@ -13,7 +13,6 @@ export const alias = [""];
  * @param {string} msg
  * @param {boolean} self
  * @param {string[]} args
- *
  */
 export async function run(client, target, context, msg, self, args) {
     const user = context["display-name"];

@@ -192,12 +192,13 @@ function permittedlink(client, url) {
  * @returns {Promise<void>}
  */
 async function handleCommand(client, target, context, msg, self, args) {
-    logger.debug(`Trying to execute command ${args[0]}`);
+    const commandName = args.shift().toLowerCase().slice(1);
+    if (commandName === "!") return;
+    logger.debug(`Trying to execute command ${commandName}`);
     const userPermission = hasPerm(client, context);
     const userHasModPermission = userPermission >= permissions.mod;
     const timeSinceLastExecution = Date.now() - client.cooldowns.get(target.replace("#", ""));
 
-    const commandName = args.shift().toLowerCase().slice(1);
     const cmd = client.commands.get(commandName);
     if (cmd) {
         let cmdPerm = cmd.perm;
