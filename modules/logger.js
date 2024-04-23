@@ -6,9 +6,7 @@ import "winston-daily-rotate-file";
 if (!existsSync("./logs")) mkdirSync("./logs");
 export const logger = winston.createLogger({
     level: "silly",
-    format: winston.format.prettyPrint({
-        colorize: true,
-    }),
+    format: winston.format.prettyPrint({ colorize: true }),
     transports: [
         new winston.transports.DailyRotateFile({
             createSymlink: true,

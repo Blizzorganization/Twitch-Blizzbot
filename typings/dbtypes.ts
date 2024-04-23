@@ -21,7 +21,7 @@ export interface Watchtime {
     channel: string;
     viewer: string;
     watchtime: number;
-    month: "alltime" | `${number}-${number}`;
+    month: "alltime" | `${number}`;
 }
 export interface Alias {
     alias: string;
