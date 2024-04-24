@@ -119,6 +119,10 @@ const EnvConfigSchema = z
         },
     }));
 
+/**
+ * parse config from configs/config.json
+ * @returns {unknown}
+ */
 export function parseConfig() {
     if (existsSync("configs/config.json")) {
         let configJson;
@@ -136,6 +140,10 @@ export function parseConfig() {
     return parseEnvConfig();
 }
 
+/**
+ * Parse configuration from environement
+ * @returns {z.infer<typeof EnvConfigSchema>}
+ */
 function parseEnvConfig() {
     const cfg = EnvConfigSchema.parse(process.env);
     if (cfg.useDiscord && !cfg.discord)

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Collection } from "discord.js";
 import EventEmitter from "events";
 import { createInterface } from "readline";
@@ -6,7 +5,6 @@ import { loadCommands } from "./functions.js";
 import { logger } from "./logger.js";
 /**
  * ConsoleClient Class
- *
  * @class
  * @property {import("readline").Interface} rl readline Instance
  * @property {import("twitch-blizzbot/clients").Clients} clients Access to the other clients
@@ -16,9 +14,8 @@ export class ConsoleClient extends EventEmitter {
     /**
      */
     constructor() {
-        // @ts-ignore
         super();
-        /** @type {import("./clients").Clients} */
+        /** @type {import("./clients.js").Clients} */
         this.clients = undefined;
         this.stopping = false;
         this.commands = new Collection();
@@ -26,65 +23,62 @@ export class ConsoleClient extends EventEmitter {
         loadCommands(this.commands, "commands/console/basic");
         loadCommands(this.commands, "commands/console/ccmd");
         const commands = this.commands;
-        const cc = this;
         /**
          * @param {string} line
          * @returns {[string[], string]} the completion
          */
-        function completer(line) {
+        function _completer(line) {
             const completions = commands.map((val, key) => key);
             const hits = completions.filter((c) => c.startsWith(line) || line.startsWith(c));
             if (line.startsWith(`${hits[0]} `)) {
-                return commands.get(hits[0]).completer(cc.clients, line);
+                return commands.get(hits[0]).completer(this.clients, line);
             }
             // Show all completions if none found
             return [hits.length ? hits : completions, line];
         }
-        // @ts-expect-error
+        const completer = _completer.bind(this);
         this.rl = createInterface({ input: process.stdin, output: process.stdout, prompt: "", completer });
-        logger.log("verbose", "Listening to Console Commands");
+        this.write = this.rl.write.bind(this.rl);
+        logger.log("debug", "Listening to Console Commands");
         this.rl.on("line", (line) => this.online(line));
         this.rl.on("SIGINT", () => (this.stopping ? null : this.clients.stop()));
         this.rl.on("SIGCONT", () => (this.stopping ? null : this.clients.stop()));
         this.rl.on("SIGTSTP", () => (this.stopping ? null : this.clients.stop()));
         this.rl.on("close", () => (this.stopping ? null : this.clients.stop()));
 
-        try {
-            const pidu = require("pidusage");
-            this.processStats = setInterval(
-                () =>
-                    pidu(process.pid, (err, data) =>
-                        logger.verbose(
-                            `cpu: ${Math.round(data.cpu * 100) / 100}%; memory: ${
-                                Math.round((data.memory / 1024 / 1024) * 100) / 100
-                            }MB`,
-                        ),
-                    ),
-                10000,
-            );
-            pidu(process.pid, (err, data) =>
-                logger.log(
-                    "verbose",
-                    `cpu: ${Math.round(data.cpu * 100) / 100}%; memory: ${
-                        Math.round((data.memory / 1024 / 1024) * 100) / 100
-                    }MB`,
-                ),
-            );
-        } catch (e) {
-            logger.silly("Process metrics are not collected.");
-        }
+        this.initProcessStats().catch(() => {
+            logger.info("Process metrics are not collected.");
+        });
     }
     /**
      *
-     * @param {string|Buffer} data
-     * @param {import("readline").Key} key
      */
-    write(data, key) {
-        this.rl.write(data, key);
+    async initProcessStats() {
+        const { default: pidu } = await import("pidusage");
+        this.processStats = setInterval(async () => {
+            await this.collectMetrics(pidu);
+        }, 10000);
+        // eslint-disable-next-line no-empty-function
+        this.collectMetrics(pidu).catch(() => {});
     }
+
+    /**
+     *
+     * @param {import("pidusage")} pidu
+     * @returns {Promise<void>}
+     */
+    async collectMetrics(pidu) {
+        const data = await pidu(process.pid).catch((err) => {
+            logger.error("Failed to read pidusage: ", err);
+        });
+        if (!data) return;
+        const cpuUsage = Math.round(data.cpu * 100) / 100;
+        const memoryUsage = Math.round((data.memory / 1024 / 1024) * 100) / 100;
+        logger.verbose(`cpu: ${cpuUsage}%; memory: ${memoryUsage}MB`);
+    }
+
     /**
      * method for parsing a line from readline
-     *
      * @param {string} line
      */
     online(line) {
@@ -104,6 +98,7 @@ export class ConsoleClient extends EventEmitter {
     async stop() {
         this.stopping = true;
         if (this.processStats) clearInterval(this.processStats);
-        return this.rl.close();
+        this.rl.close();
+        return;
     }
 }

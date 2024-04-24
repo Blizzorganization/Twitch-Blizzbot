@@ -1,5 +1,4 @@
-import { REST } from "@discordjs/rest";
-import { Routes } from "discord-api-types/v10";
+import { REST, Routes } from "discord.js";
 import { logger } from "./logger.js";
 
 /**
@@ -9,7 +8,7 @@ import { logger } from "./logger.js";
 export default async function loadSlash(client, guildid) {
     const commands = client.slashcommands.map(mapCommand);
 
-    const rest = new REST({ version: "9" }).setToken(client.token);
+    const rest = new REST({ version: "10" }).setToken(client.token);
     try {
         logger.debug("Started refreshing application (/) commands.");
 

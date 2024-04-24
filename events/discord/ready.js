@@ -6,7 +6,7 @@ import { logger } from "twitch-blizzbot/logger";
  *
  * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  */
-export function event(client) {
+export async function event(client) {
     logger.info("Discord connected.");
     const blchannel = client.channels.resolve(client.config.channels.blacklist);
     if (!blchannel) throw new CustomError("UnknownChannelError", "Discord Blacklist Channel ID could not be resolved.");
@@ -43,5 +43,5 @@ export function event(client) {
         );
     }
     client.started = true;
-    client.clients.db.newDiscordConnection(client.user, client.clients.twitch.config.identity.username);
+    await client.clients.db.newDiscordConnection(client.user, client.clients.twitch.config.identity.username);
 }

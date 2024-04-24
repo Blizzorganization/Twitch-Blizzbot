@@ -7,10 +7,11 @@ export const adminOnly = true;
  * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
  * @param {string[]} args
+ * @returns {Promise<void>}
  */
 export async function run(client, message, args) {
     if (!args || args.length == 0) {
-        message.channel.send({ content: "Du musst angeben, was du blockieren willst!" });
+        await message.channel.send({ content: "Du musst angeben, was du blockieren willst!" });
         return;
     }
     let action = parseInt(args.shift());
@@ -22,7 +23,7 @@ export async function run(client, message, args) {
         channel: client.config.watchtimechannel,
     });
     await client.clients.db.newBlacklistWord(client.config.watchtimechannel, blword, action);
-    message.channel.send(
+    await message.channel.send(
         `"${blword}" wurde in die "${action}" Blacklist von ${client.config.watchtimechannel} eingetragen.`,
     );
     logger.info(`* Added "${blword}" to the ${action} Blacklist of ${client.config.watchtimechannel}`);

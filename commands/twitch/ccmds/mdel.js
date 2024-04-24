@@ -14,14 +14,24 @@ export const alias = [];
  * @param {string} msg
  * @param {boolean} self
  * @param {string[]} args
+ * @returns {Promise<void>}
  */
 export async function run(client, target, context, msg, self, args) {
     const user = context["display-name"];
-    if (args.length == 0) return client.say(target, "Du musst einen Befehl angeben, der gelöscht werden soll.");
+    if (args.length == 0) {
+        await client.say(target, "Du musst einen Mod-Command angeben, der gelöscht werden soll.");
+        return;
+    }
     const cmd = await client.clients.db.getCcmd(target, args[0]);
-    if (!cmd) return client.say(target, `Ich kenne keinen Befehl ${args[0]}.`);
-    if (cmd.permissions !== permissions.mod) return client.say(target, `${args[0]} ist kein Mod Only Customcommand.`);
+    if (!cmd) {
+        await client.say(target, `Ich kenne keinen Command ${args[0]}.`);
+        return;
+    }
+    if (cmd.permissions !== permissions.mod) {
+        await client.say(target, `${args[0]} ist kein Mod Only Customcommand.`);
+        return;
+    }
     await client.clients.db.delCcmd(target.replace(/#+/g, ""), args[0]);
-    client.say(target, `${user}, der Mod-Command ${args[0]} wurde gelöscht.`);
-    logger.log("command", `* Deleted Customcommand ${args[0]}`);
+    await client.say(target, `${user}, der Mod-Command ${args[0]} wurde gelöscht.`);
+    logger.info(`* Deleted Customcommand ${args[0]}`);
 }

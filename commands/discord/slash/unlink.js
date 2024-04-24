@@ -12,7 +12,7 @@ export const data = new SlashCommandBuilder()
  */
 export async function execute(interaction) {
     /** @type {import("twitch-blizzbot/discordclient").DiscordClient}*/
-    // @ts-ignore
+    // @ts-expect-error -- Interaction is created by the DiscordClient and therefor references it
     const client = interaction.client;
     const previous = await client.clients.db.getDiscordConnection(interaction.user);
     if (!previous) {

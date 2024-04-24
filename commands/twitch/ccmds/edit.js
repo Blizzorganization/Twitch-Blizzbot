@@ -14,16 +14,26 @@ export const alias = [];
  * @param {string} msg
  * @param {boolean} self
  * @param {string[]} args
+ * @returns {Promise<void>}
  */
 export async function run(client, target, context, msg, self, args) {
     const user = context["display-name"];
-    if (!args || args.length == 0) return client.say(target, "Welchen Befehl möchtest du bearbeiten?");
+    if (!args || args.length == 0) {
+        await client.say(target, "Welchen Command möchtest du bearbeiten?");
+        return;
+    }
     const cmd = await client.clients.db.getCcmd(target, args[0]);
-    if (!cmd) return client.say(target, `Ich kenne keinen Befehl ${args[0]}.`);
-    if (cmd.permissions !== permissions.user) return client.say(target, `${args[0]} ist kein Nutzer Customcommand.`);
+    if (!cmd) {
+        await client.say(target, `Ich kenne keinen Befehl ${args[0]}.`);
+        return;
+    }
+    if (cmd.permissions !== permissions.user) {
+        await client.say(target, `${args[0]} ist kein Nutzer Customcommand.`);
+        return;
+    }
     const newcmd = args.shift().toLowerCase();
     const res = args.join(" ");
     await client.clients.db.editCcmd(target.replace(/#+/g, ""), newcmd, res);
-    client.say(target, `${user}, der Command ${newcmd} wurde editiert.`);
-    logger.log("command", `* Edited Customcommand ${newcmd}`);
+    await client.say(target, `${user}, der Command ${newcmd} wurde editiert.`);
+    logger.info(`* Edited Customcommand ${newcmd}`);
 }

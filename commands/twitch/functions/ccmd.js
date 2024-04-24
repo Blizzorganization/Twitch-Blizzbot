@@ -15,7 +15,7 @@ export async function run(client, target) {
     if (coms.length > 0) {
         appHelp = `Es sind folgende Mod-Commands hinterlegt: ${coms.join(", ")}`;
     } else {
-        appHelp = "Es sind keine Commands hinterlegt.";
+        appHelp = "Es sind keine Mod-Commands hinterlegt.";
     }
-    client.say(target, appHelp);
+    await client.say(target, appHelp);
 }

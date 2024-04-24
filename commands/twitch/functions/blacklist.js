@@ -1,6 +1,4 @@
-import { ButtonBuilder } from "discord.js";
-import { ButtonStyle } from "discord.js";
-import { ActionRowBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import { permissions } from "twitch-blizzbot/constants";
 import { getTable } from "twitch-blizzbot/functions";
 import { logger } from "twitch-blizzbot/logger";

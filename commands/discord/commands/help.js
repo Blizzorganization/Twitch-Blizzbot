@@ -6,8 +6,9 @@ export const adminOnly = false;
  * @namespace DiscordCommands
  * @param  {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param  {import("discord.js").Message} message
+ * @returns {Promise<void>}
  */
-export function run(client, message) {
+export async function run(client, message) {
     const embed = new EmbedBuilder()
         .setColor(0xedbc5d)
         .setThumbnail(client.user.avatarURL({ extension: "png" }))
@@ -23,5 +24,5 @@ export function run(client, message) {
             { name: "!unlink", value: "Entfernt die Verbindung zu deinem Twitch Account" },
         );
 
-    message.channel.send({ embeds: [embed] });
+    await message.channel.send({ embeds: [embed] });
 }

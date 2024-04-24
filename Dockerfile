@@ -1,16 +1,17 @@
 FROM node:20 as production
 WORKDIR /app
-COPY package.json pnpm-lock.yaml ./
+COPY package.json yarn.lock ./
 RUN npm pkg delete scripts.prepare
 RUN corepack enable
-RUN pnpm install --frozen-lockfile --prod
+RUN yarn install --prod --frozen-lockfile
 
 COPY commands ./commands
 COPY events ./events
 COPY modules ./modules
-COPY bot.js bot.js
+COPY bot.js setup.js ./
+
 
 USER node
 
 
-CMD ["pnpm", "start"]
+CMD ["yarn", "start"]

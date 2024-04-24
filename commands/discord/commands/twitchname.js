@@ -1,4 +1,5 @@
 import { EmbedBuilder } from "discord.js";
+import fetch from "node-fetch";
 import { time } from "twitch-blizzbot/functions";
 
 export const alias = ["twitchnamen", "twname"];
@@ -8,6 +9,7 @@ export const adminOnly = false;
  * @namespace DiscordCommands
  * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
+ * @returns {Promise<void>}
  */
 export async function run(client, message) {
     const dcuser = message.mentions.users.first() || message.author;
@@ -31,5 +33,5 @@ export async function run(client, message) {
             { name: "__Folgt schon__", value: fage },
         );
 
-    message.channel.send({ embeds: [embed] });
+    await message.channel.send({ embeds: [embed] });
 }

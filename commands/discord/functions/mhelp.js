@@ -5,8 +5,9 @@ export const adminOnly = true;
  * @namespace DiscordCommands
  * @param  {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param  {import("discord.js").Message} message
+ * @returns {Promise<void>}
  */
-export function run(client, message) {
+export async function run(client, message) {
     const embed = new EmbedBuilder()
         .setColor(0xedbc5d)
         .setThumbnail(client.user.avatarURL({ extension: "png" }))
@@ -24,5 +25,5 @@ export function run(client, message) {
             { name: "!mtime", value: "Zeigt an wie vie Zeit der Nutzer im Stream  verbracht hat" },
         );
 
-    message.channel.send({ embeds: [embed] });
+    await message.channel.send({ embeds: [embed] });
 }

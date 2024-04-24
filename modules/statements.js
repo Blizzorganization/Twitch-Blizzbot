@@ -59,6 +59,12 @@ export const statements = {
             WHERE command = $2
             AND channel = $3;
         `,
+        renameCommand: `
+        UPDATE customcommands
+        SET command = $1
+        WHERE command = $2
+        AND channel = $3;
+    `,
         deleteCommand: `
             DELETE FROM customcommands
             WHERE command = $1
@@ -193,6 +199,12 @@ export const statements = {
             FROM aliases
             WHERE channel = $1;
         `,
+        findRelated: `
+            SELECT *
+            FROM aliases
+            WHERE channel = $1
+            AND command = $2;
+        `,
     },
     blacklist: {
         newBlacklistEntry: `
@@ -201,7 +213,19 @@ export const statements = {
             ON CONFLICT
             DO NOTHING;
         `,
-        saveBlacklist: `
+        newBlacklistEntries: `
+            INSERT INTO blacklist(channel, blword, action)
+            VALUES ($1, unnest($2), $3)
+            ON CONFLICT
+            DO NOTHING
+            RETURNING *;
+            `,
+        removeBlacklistEntry: `
+            DELETE FROM blacklist
+            WHERE channel = $1
+            AND blword = $2;
+        `,
+        updateBlacklistEntry: `
             UPDATE blacklist
             SET action = $3
             WHERE channel = $1

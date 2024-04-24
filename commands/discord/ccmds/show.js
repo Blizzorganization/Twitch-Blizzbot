@@ -13,16 +13,37 @@ export const alias = ["view"];
 export async function run(client, message, args) {
     const twChannel = client.config.watchtimechannel;
     if (args.length < 1) {
-        message.reply("Du musst einen Command angeben.");
+        await message.reply("Du musst einen Command angeben.");
         return;
     }
     let commandName = args.shift();
     if (commandName.startsWith("!")) commandName = commandName.replace("!", "");
     const ccmd = await client.clients.db.getCcmd(twChannel, `!${commandName}`);
     if (!ccmd) {
-        message.reply("Einen solchen Command gibt es nicht.");
+        const resolvedAlias = await client.clients.db.resolveAlias(twChannel, `!${commandName}`);
+        if (resolvedAlias) {
+            await message.reply(`Der Command !${commandName} ist ein Alias von ${resolvedAlias.command}.`);
+            return;
+        }
+        await message.reply("Einen solchen Command gibt es nicht.");
         return;
     }
-    message.reply({ content: ccmd.response, embeds: [new EmbedBuilder().setDescription("CCMD")] });
-    logger.log("command", `* Viewed Command !${commandName}`);
+    const aliases = await client.clients.db.findRelatedAliases(twChannel, `!${commandName}`);
+
+    // embed building
+    const embed = new EmbedBuilder()
+        .setColor(0xedbc5d)
+        .setThumbnail(client.user.avatarURL({ extension: "png" }))
+        .setTitle("**__Command-Info:__**");
+
+    // embed components
+    embed.addFields([{ name: `!${commandName}`, value: ccmd.response }]);
+    embed.addFields({
+        name: "Aliase:",
+        value: new Intl.ListFormat("de-DE").format(aliases) || "Es sind keine Aliase zu diesem Befehl vorhanden",
+    });
+    embed.setFooter({ text: "CCMD" });
+
+    await message.channel.send({ embeds: [embed] });
+    logger.info(`* Viewed Command !${commandName}`);
 }

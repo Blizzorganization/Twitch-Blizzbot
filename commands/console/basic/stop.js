@@ -10,6 +10,7 @@ export async function run(clients) {
 /**
  * @param  {import("twitch-blizzbot/clients").Clients} clients
  * @param  {string} line
+ * @returns {[string[], string]} the completion
  */
 export function completer(clients, line) {
     return [["stop"], line];

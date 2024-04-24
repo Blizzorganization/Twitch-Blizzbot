@@ -8,7 +8,6 @@ import { logger } from "./logger.js";
  */
 /**
  * load commands
- *
  * @param {Map} commandmap a Map to store commands for execution
  * @param {string} commanddir path to command directory relative to project root
  * @param {string[]} helplist
@@ -23,7 +22,7 @@ export function loadCommands(commandmap, commanddir, helplist = []) {
                 if (!file.endsWith(".js")) return;
                 const command = file.split(".")[0];
                 const props = await import(`../${commanddir}/${command}.js`);
-                logger.log("command", `Attempting to load Command ${command}`);
+                logger.debug(`Attempting to load Command ${command}`);
                 commandmap.set(command, props);
                 if (props.help) helplist.push(command);
                 if (!props.alias) return;
@@ -37,9 +36,9 @@ export function loadCommands(commandmap, commanddir, helplist = []) {
     }
 }
 /**
- *
+ * @template {import("./discordclient.js").DiscordClient |import("./twitchclient.js").TwitchClient} EE
  * @param {string} eventdir Event directory relative to project root
- * @param {import("./discordclient").DiscordClient | import("./twitchclient").TwitchClient} eventemitter an EventEmitter
+ * @param {EE} eventemitter an EventEmitter
  * @example loadEvents("events/twitch", client)
  * @throws {CustomError} missing command directory
  */
@@ -52,7 +51,7 @@ export function loadEvents(eventdir, eventemitter) {
                 if (!file.endsWith(".js")) return;
                 const eventname = file.split(".")[0];
                 const { event } = await import(`../${eventdir}/${eventname}.js`);
-                // @ts-ignore
+                // @ts-expect-error -- don't mix event emitters!
                 eventemitter.on(eventname, event.bind(null, eventemitter));
             });
         });
@@ -104,7 +103,6 @@ const ts = new Transform({
         cb(null, chunk);
     },
 });
-// @ts-ignore
 const con = new Console({ stdout: ts });
 /**
  * @param  {object | Array} data tabular Data
@@ -138,5 +136,7 @@ export function time(str) {
         .replace("for", "seit")
         .replace("is not following", "ist kein Follower von")
         .replace("does not follow", "ist kein Follower von")
-        .replace("404 Page Not Found", "Keine Informationen");
+        .replace("404 Page Not Found", "Keine Informationen")
+        .replace("User not found", "Finde keinen User mit dem Namen")
+        .replace("A user cannot follow themself", "man kann sich nicht selber folgen");
 }

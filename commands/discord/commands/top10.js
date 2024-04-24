@@ -59,8 +59,8 @@ export async function run(client, message, args) {
         await reaction.remove();
         await outmsg.react(reaction.emoji.name);
     });
-    coll.on("end", () => {
-        outmsg.edit({
+    coll.on("end", async () => {
+        await outmsg.edit({
             content: "Die Zeit ist abgelaufen, wenn du erneut abfragen möchtest, so frage erneut an.",
             embeds: outmsg.embeds,
         });

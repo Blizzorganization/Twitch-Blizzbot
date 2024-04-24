@@ -4,21 +4,20 @@ import slashsetup from "./slashsetup.js";
 
 /**
  * a class containing all client objects
- *
  * @class Clients
  */
 export class Clients {
     /**
-     * @param  {import("../typings/config").config} config
+     * @param  {import("../typings/config.js").config} config
      */
     constructor(config) {
         this.loadSlash = slashsetup;
         this.config = config;
-        /** @type {import("./twitchclient").TwitchClient}*/
+        /** @type {import("./twitchclient.js").TwitchClient}*/
         this.twitch = undefined;
-        /** @type {import("./consoleclient").ConsoleClient}*/
+        /** @type {import("./consoleclient.js").ConsoleClient}*/
         this.console = undefined;
-        /** @type {import("./discordclient").DiscordClient}*/
+        /** @type {import("./discordclient.js").DiscordClient}*/
         this.discord = undefined;
         this.db = new DB(config.db);
         this.db.clients = this;

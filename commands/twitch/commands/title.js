@@ -1,3 +1,4 @@
+import fetch from "node-fetch";
 import { permissions } from "twitch-blizzbot/constants";
 
 export const help = true;
@@ -13,5 +14,5 @@ export async function run(client, target) {
     const resp = await fetch(`https://decapi.me/twitch/title/${target.slice(1)}`);
     const title = await resp.text();
 
-    client.say(target, `Der Titel des Streams lautet: ${title}`);
+    await client.say(target, `Der Titel des Streams lautet: ${title}`);
 }

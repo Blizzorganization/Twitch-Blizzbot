@@ -6,6 +6,8 @@ import Util from "util";
 global.util = Util;
 global.fs = fs;
 /**
+ * @name dbinfo
+ * @namespace ConsoleCommands
  * @param {import("twitch-blizzbot/clients").Clients} clients
  */
 export async function run(clients) {
@@ -35,8 +37,9 @@ export async function run(clients) {
     logger.info(`\n${getTable({ size, lines })}`);
 }
 /**
- * @param  {import("../../../modules/clients").Clients} clients
+ * @param  {import("twitch-blizzbot/clients").Clients} clients
  * @param  {string} line
+ * @returns {[string[], string]} the completion
  */
 export function completer(clients, line) {
     // eslint-disable-next-line no-sparse-arrays

@@ -8,6 +8,7 @@ export const adminOnly = true;
  * @param {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param {import("discord.js").Message} message
  * @param {string[]} args
+ * @returns {Promise<void>}
  */
 export async function run(client, message, args) {
     let user = "";
@@ -16,7 +17,7 @@ export async function run(client, message, args) {
         if (dbuser) {
             user = dbuser;
         } else {
-            message.channel.send("Du musst einen Nutzer angeben.");
+            await message.channel.send("Du musst einen Nutzer angeben.");
             return;
         }
     }
@@ -27,7 +28,8 @@ export async function run(client, message, args) {
         }
     }
     if (user == "") {
-        return message.channel.send("Du musst angeben, für welchen Account du die Watchtime abfragen möchtest.");
+        await message.channel.send("Du musst angeben, für welchen Account du die Watchtime abfragen möchtest.");
+        return;
     }
     const watchtime = await client.clients.db.getWatchtime(channel, user, currentMonth());
     const maxWatchtime = await client.clients.db.getWatchtime(
@@ -35,7 +37,10 @@ export async function run(client, message, args) {
         client.clients.twitch.getUsername(),
         currentMonth(),
     );
-    if (!watchtime) return message.channel.send("Diesen Nutzer kenne ich nicht.");
+    if (!watchtime) {
+        await message.channel.send("Diesen Nutzer kenne ich nicht.");
+        return;
+    }
     const embed = new EmbedBuilder()
         .setColor(0xedbc5d)
         .setThumbnail(client.user.avatarURL({ extension: "png" }))
@@ -46,5 +51,5 @@ export async function run(client, message, args) {
             { name: "Von der registrierten Zeit", value: `${Math.round((1000 * watchtime) / maxWatchtime) / 10}%` },
         );
 
-    message.channel.send({ embeds: [embed] });
+    await message.channel.send({ embeds: [embed] });
 }

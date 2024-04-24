@@ -1,3 +1,4 @@
+import fetch from "node-fetch";
 import { permissions } from "twitch-blizzbot/constants";
 
 export const help = true;
@@ -16,7 +17,7 @@ export const alias = ["emotes"];
  */
 export async function run(client, target, context, msg, self, args) {
     if (!args || args.length == 0) {
-        client.say(target, "Zur Auswahl stehen: sub | bttv");
+        await client.say(target, "Zur Auswahl stehen: sub | bttv");
         return;
     }
     // subscriber Emotes
@@ -28,9 +29,9 @@ export async function run(client, target, context, msg, self, args) {
                 const subEmoteRequest = await fetch(`https://decapi.me/twitch/subscriber_emotes/${target.slice(1)}`);
                 const subEmotes = await subEmoteRequest.text();
                 if (subEmotes === "This channel does not have any subscriber emotes.") {
-                    client.say(target, "Auf diesem Kanal sind keine Sub-Emotes verfügbar");
+                    await client.say(target, "Auf diesem Kanal sind keine Sub-Emotes verfügbar");
                 } else {
-                    client.say(
+                    await client.say(
                         target,
                         `Auf dem Kanal ${target.slice(
                             1,
@@ -46,9 +47,9 @@ export async function run(client, target, context, msg, self, args) {
                 const bttvRequest = await fetch(`https://decapi.me/bttv/emotes/${target.slice(1)}`);
                 const bttvEmotes = await bttvRequest.text();
                 if (bttvEmotes === `Unable to retrieve BetterTTV details for channel: ${target.slice(1)}`) {
-                    client.say(target, "Auf diesem Kanal sind keine BTTV-Emotes verfügbar");
+                    await client.say(target, "Auf diesem Kanal sind keine BTTV-Emotes verfügbar");
                 } else {
-                    client.say(
+                    await client.say(
                         target,
                         `Auf dem Kanal ${target.slice(1)} sind folgende BTTV-Emotes vorhanden: ${bttvEmotes}`,
                     );
@@ -56,7 +57,7 @@ export async function run(client, target, context, msg, self, args) {
             }
             break;
         default:
-            client.say(target, "Zur Auswahl stehen: sub | bttv");
+            await client.say(target, "Zur Auswahl stehen: sub | bttv");
             break;
     }
 }

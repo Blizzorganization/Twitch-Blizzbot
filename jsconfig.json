@@ -1,53 +1,49 @@
 {
-  "compilerOptions": {
-    "module": "ESNEXT",
-    "moduleResolution": "node",
-    "strictFunctionTypes": true,
-    "baseUrl": ".",
-    "paths": {
-      "twitch-blizzbot/functions": [
-        "./modules/functions.js"
-      ],
-      "twitch-blizzbot/consoleclient": [
-        "./modules/consoleclient.js"
-      ],
-      "twitch-blizzbot/discordclient": [
-        "./modules/discordclient.js"
-      ],
-      "twitch-blizzbot/twitchclient": [
-        "./modules/twitchclient.js"
-      ],
-      "twitch-blizzbot/constants": [
-        "./modules/constants.js"
-      ],
-      "twitch-blizzbot/clients": [
-        "./modules/clients.js"
-      ],
-      "twitch-blizzbot/logger": [
-        "./modules/logger.js"
-      ],
-      "twitch-blizzbot/CustomError": [
-        "./modules/CustomError.js"
-      ],
-      "twitch-blizzbot/slashsetup": [
-        "./modules/slashsetup.js"
-      ]
+    "compilerOptions": {
+        "moduleResolution": "node16",
+        "lib": ["es2022"],
+        "module": "Node16",
+        "target": "ES2022",
+        "strictFunctionTypes": true,
+        "baseUrl": ".",
+        "paths": {
+            "twitch-blizzbot/functions": [
+                "./modules/functions.js"
+            ],
+            "twitch-blizzbot/consoleclient": [
+                "./modules/consoleclient.js"
+            ],
+            "twitch-blizzbot/discordclient": [
+                "./modules/discordclient.js"
+            ],
+            "twitch-blizzbot/twitchclient": [
+                "./modules/twitchclient.js"
+            ],
+            "twitch-blizzbot/constants": [
+                "./modules/constants.js"
+            ],
+            "twitch-blizzbot/clients": [
+                "./modules/clients.js"
+            ],
+            "twitch-blizzbot/logger": [
+                "./modules/logger.js"
+            ],
+            "twitch-blizzbot/CustomError": [
+                "./modules/CustomError.js"
+            ],
+            "twitch-blizzbot/slashsetup": [
+                "./modules/slashsetup.js"
+            ],
+        },
+        "checkJs": true,
+        "allowJs": true
     },
-    "checkJs": true,
-    "allowJs": true,
-    "skipLibCheck": true
-  },
-  "include": [
-    "modules/*",
-    "commands/**/*",
-    "events/**/*",
-    "bot.js",
-    "typings/*.d.ts",
-    "package.json"
-  ],
-  "exclude": [
-    "modules/abstractDb.js",
-    "node_modules/**/*",
-    "node_modules/pidusage/lib/stats.js"
-  ]
+    "include": [
+        "modules/*",
+        "commands/**/*",
+        "events/**/*",
+        "bot.js",
+        "typings/*",
+        "package.json"
+    ]
 }

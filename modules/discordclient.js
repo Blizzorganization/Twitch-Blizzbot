@@ -1,8 +1,8 @@
-import { Client, Collection, IntentsBitField, TextChannel } from "discord.js";
+import { Client, Collection, GatewayIntentBits, TextChannel } from "discord.js";
 import { loadCommands, loadEvents } from "./functions.js";
 import { logger } from "./logger.js";
 /**
- * @typedef {object} config
+ * @typedef {object} Config
  * @property {string} token
  * @property {string} prefix
  * @property {string} watchtimechannel
@@ -16,10 +16,9 @@ import { logger } from "./logger.js";
 
 /**
  * Discord Client
- *
  * @class DiscordClient
  * @augments Client
- * @property {config} config
+ * @property {Config} config
  * @property {Collection} commands
  * @property {string[]} helplist
  * @property {import("./clients").Clients} clients
@@ -30,16 +29,16 @@ import { logger } from "./logger.js";
 export class DiscordClient extends Client {
     /**
      * https://github.com/Blizzor/Twitch-Blizzbot.wiki.git
-     *
-     * @param {config} config discord part of the config file
+     * @param {Config} config discord part of the config file
      */
     constructor(config) {
         super({
             intents: [
-                IntentsBitField.Flags.Guilds,
-                IntentsBitField.Flags.GuildMessages,
-                IntentsBitField.Flags.GuildMembers,
-                IntentsBitField.Flags.GuildMessageReactions,
+                GatewayIntentBits.Guilds,
+                GatewayIntentBits.GuildMessages,
+                GatewayIntentBits.GuildMembers,
+                GatewayIntentBits.GuildMessageReactions,
+                GatewayIntentBits.MessageContent,
             ],
         });
         this.commands = new Collection();
@@ -55,7 +54,7 @@ export class DiscordClient extends Client {
         /** @type {import("discord.js").TextChannel} */
         this.commandchannel = undefined;
         this.started = false;
-        /** @type {import("./clients").Clients} */
+        /** @type {import("./clients.js").Clients} */
         this.clients = undefined;
         loadCommands(this.commands, "commands/discord/commands");
         loadCommands(this.commands, "commands/discord/functions");
@@ -63,7 +62,9 @@ export class DiscordClient extends Client {
         loadCommands(this.commands, "commands/discord/ccmds");
         loadEvents("events/discord", this);
         logger.info("logging in");
-        this.login(config.token);
+        this.login(config.token).catch(() => {
+            logger.error("Failed to login.");
+        });
     }
     /**
      * changes the channel topics of the blacklist, relay and status channels
@@ -92,20 +93,22 @@ export class DiscordClient extends Client {
         }
         // eslint-disable-next-line no-unused-vars
         const commandchannel = await this.channels.fetch(this.config.channels.adminCommands);
-        if (adminchannel instanceof TextChannel) {
-            this.adminchannel = adminchannel;
-            await this.adminchannel.setTopic(":green_circle: Commands für den Twitch-Bot.");
+        if (commandchannel instanceof TextChannel) {
+            this.commandchannel = commandchannel;
+            await this.commandchannel.setTopic(":green_circle: Commands für den Twitch-Bot.");
         } else {
-            logger.error("Admin channel is not a Guild Text Channel.");
+            logger.error("Command channel is not a Guild Text Channel.");
         }
     }
     /**
      * stops the discord Client
      */
     async stop() {
-        this.blchannel?.setTopic(":red_circle: Bot Offline");
-        this.commandchannel?.setTopic(":red_circle: Bot Offline");
-        this.relaychannel?.setTopic(":red_circle: Bot Offline");
+        await Promise.allSettled([
+            this.blchannel?.setTopic(":red_circle: Bot Offline"),
+            this.commandchannel?.setTopic(":red_circle: Bot Offline"),
+            this.relaychannel?.setTopic(":red_circle: Bot Offline"),
+        ]);
         logger.log("debug", "set status to offline");
         setTimeout(() => this.destroy(), 500);
         logger.info("disconnected from discord");

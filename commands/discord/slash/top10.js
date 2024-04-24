@@ -1,16 +1,16 @@
-import { ButtonStyle } from "discord.js";
-import { ActionRowBuilder, ButtonBuilder, EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, SlashCommandBuilder } from "discord.js";
 import { calcWatchtime } from "twitch-blizzbot/functions";
 
 export const data = new SlashCommandBuilder().setName("top10").setDescription("Watchtime Ranking").toJSON();
 /**
  * @name watchtimechannel
  * @namespace DiscordCommands
- * @param  {import("discord.js").ChatInputCommandInteraction} interaction
+ * @param {import("discord.js").ChatInputCommandInteraction} interaction
+ * @returns {Promise<void>}
  */
 export async function execute(interaction) {
     /** @type {import("twitch-blizzbot/discordclient").DiscordClient}*/
-    // @ts-ignore
+    // @ts-expect-error -- Interaction is created by the DiscordClient and therefor references it
     const client = interaction.client;
     const channel = client.config.watchtimechannel;
     const page = 1;

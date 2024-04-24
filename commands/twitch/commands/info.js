@@ -1,3 +1,4 @@
+import fetch from "node-fetch";
 import { permissions } from "twitch-blizzbot/constants";
 
 export const help = true;
@@ -17,8 +18,13 @@ export async function run(client, target) {
     const follow = await followrequest.text();
     const subrequest = await fetch(`https://decapi.me/twitch/subcount/${target.slice(1)}`);
     const sub = await subrequest.text();
+    const pointsrequest = await fetch(`https://decapi.me/twitch/subpoints/${target.slice(1)}`);
+    const points = await pointsrequest.text();
     if (viewer == `${target.slice(1)} is offline`) {
         viewer = "0";
     }
-    client.say(target, `${target.slice(1)} hat zur Zeit ${follow} Follower und ${sub} Subscriber`);
+    await client.say(
+        target,
+        `${target.slice(1)} hat zur Zeit ${follow} Follower, ${sub} Subscriber und ${points} Subpoints`,
+    );
 }

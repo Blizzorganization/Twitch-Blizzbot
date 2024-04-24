@@ -36,6 +36,6 @@ export async function run(client, target, context, msg, self, args) {
         isNaN(parseInt(increase)) ? undefined : parseInt(increase),
         isNaN(parseInt(defaultVal)) ? undefined : parseInt(defaultVal),
     );
-    client.say(target, `${user}, der Zähler ${cname} wurde hinzugefügt.`);
-    logger.log("command", `* Added Counter ${cname}`);
+    await client.say(target, `${user}, der Zähler ${cname} wurde hinzugefügt.`);
+    logger.info(`* Added Counter ${cname}`);
 }

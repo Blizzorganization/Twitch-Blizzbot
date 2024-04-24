@@ -1,0 +1,17 @@
+#don't commit the dependencies
+node_modules/
+TODO.todo
+
+#don't commit json files and txt
+configs/*
+!configs/example-config.json
+
+#don't commit documentation
+docs/
+zdocs/
+
+#don't commit developer storage file
+backup/
+channellogs/
+data/
+logs

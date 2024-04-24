@@ -2,7 +2,7 @@ import { permissions } from "twitch-blizzbot/constants";
 
 export const help = false;
 export const perm = permissions.mod;
-export const alias = ["counter"];
+export const alias = [""];
 /**
  * @name help
  * @namespace TwitchCommands
@@ -18,5 +18,5 @@ export async function run(client, target) {
     } else {
         appHelp = "Es sind keine Zähler hinterlegt.";
     }
-    client.say(target, appHelp);
+    await client.say(target, appHelp);
 }

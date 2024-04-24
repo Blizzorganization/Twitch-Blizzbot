@@ -7,4 +7,3 @@ configs/*
 logs/**/*
 *.json
 *.md
-pnpm-lock.yaml
