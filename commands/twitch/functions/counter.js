@@ -1,6 +1,6 @@
 import { permissions } from "twitch-blizzbot/constants";
-
 import { logger } from "twitch-blizzbot/logger";
+
 export const help = false;
 export const perm = permissions.mod;
 export const alias = [""];

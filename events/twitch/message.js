@@ -211,6 +211,7 @@ async function handleCommand(client, target, context, msg, self, args) {
             if (dbCommandState.permission === -1) cmdPerm = cmd.perm;
         }
         if (cmd.perm && userPermission < cmdPerm) {
+            if (commandName === "!") return;
             if (!cmd.silent) await client.say(target, "Du hast keine Rechte");
             logger.error("Permission requirements of the user not met.");
             return;
@@ -258,6 +259,7 @@ async function handleCommand(client, target, context, msg, self, args) {
     if (!alias) return;
 
     if (alias.permissions > userPermission) {
+        if (commandName === "!") return;
         await client.say(target, "Du hast keine Rechte");
         return;
     }
