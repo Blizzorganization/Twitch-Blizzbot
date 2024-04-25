@@ -212,7 +212,7 @@ async function handleInternalCommand(client, target, context, msg, self, args, c
         logger.error("Permission requirements of the user not met.");
         return true;
     }
-    if (!userHasModPermission && timeSinceLastExecution > 1000 * client.config.Cooldown) {
+    if (!userHasModPermission && timeSinceLastExecution <= 1000 * client.config.Cooldown) {
         logger.debug("Cooldown hit!");
         return true;
     }
