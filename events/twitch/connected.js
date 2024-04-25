@@ -10,7 +10,7 @@ import { logger } from "twitch-blizzbot/logger";
 export async function event(client, addr, port) {
     logger.info(`* Connected to ${addr}:${port}`);
     client.started = true;
-    for (const channel of client.config.channels) {
+    for (const channel of client.config.channels ?? []) {
         await client.clients.db.newChannel(channel);
     }
     await client.clients.db.loadBlacklist();
@@ -49,7 +49,7 @@ export async function event(client, addr, port) {
 }
 /**
  *
- * @param {import("../../modules/twitchclient.js").TwitchClient} client
+ * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @returns {Promise<void>}
  */
 async function runAutomessage(client) {

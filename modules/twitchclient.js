@@ -44,6 +44,7 @@ export class TwitchClient extends Client {
         /** @type {ReturnType<typeof setInterval>|undefined} */
         this.automessage = undefined;
         /** @type {import("./clients.js").Clients}*/
+        // @ts-expect-error -- set externally
         this.clients = undefined;
         /** @type {Record<string, import("../typings/dbtypes.js").Blacklist[]>}*/
         this.blacklist = undefined;
