@@ -4,7 +4,7 @@
         "lib": ["es2022"],
         "module": "Node16",
         "target": "ES2022",
-        "strictFunctionTypes": true,
+        "strict": true,
         "baseUrl": ".",
         "paths": {
             "twitch-blizzbot/functions": [

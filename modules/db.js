@@ -741,6 +741,7 @@ export class DB {
             return data?.rows[0] ?? null;
         } catch (e) {
             logger.error(e);
+            return null;
         }
     }
     /**

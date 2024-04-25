@@ -50,7 +50,7 @@ async function counters(client, response, target) {
     const possibleCounters = response.match(counterTest);
     if (!possibleCounters || possibleCounters.length <= 0) return response;
     for (const pc of possibleCounters) {
-        if (!pc.startsWith("{counter:")) return;
+        if (!pc.startsWith("{counter:")) continue;
         const counter = pc.replace("{counter:", "").replace("}", "");
         const cdata = await client.clients.db.getCounter(target, counter);
         if (cdata) response = response.replace(pc, cdata.toString());
@@ -180,6 +180,112 @@ function hasPerm(client, ctx) {
 function permittedlink(client, url) {
     return client.permittedlinks.some((purl) => url.includes(purl));
 }
+/**
+ *
+ * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
+ * @param {string} target
+ * @param {import("tmi.js").ChatUserstate} context
+ * @param {string} msg
+ * @param {boolean} self
+ * @param {string[]} args
+ * @param {string} commandName
+ * @param {number} userPermission
+ * @returns {Promise<boolean>} whether there was a command.
+ */
+async function handleInternalCommand(client, target, context, msg, self, args, commandName, userPermission) {
+    const userHasModPermission = userPermission >= permissions.mod;
+    const timeSinceLastExecution = Date.now() - client.cooldowns.get(target.replace("#", ""));
+    const cmd = client.commands.get(commandName);
+    if (!cmd) return false;
+    let cmdPerm = cmd.perm;
+    const dbCommandState = await client.clients.db.resolveCommand(target, commandName);
+    if (dbCommandState) {
+        if (dbCommandState.enabled === false) {
+            logger.debug("Command disabled via database.");
+            return true;
+        }
+        if (dbCommandState.permission === -1) cmdPerm = cmd.perm;
+    }
+    if (cmd.perm && userPermission < cmdPerm) {
+        if (commandName === "!") return true;
+        if (!cmd.silent) await client.say(target, "Du hast keine Rechte");
+        logger.error("Permission requirements of the user not met.");
+        return true;
+    }
+    if (!userHasModPermission && timeSinceLastExecution > 1000 * client.config.Cooldown) {
+        logger.debug("Cooldown hit!");
+        return true;
+    }
+    try {
+        await cmd.run(client, target, context, msg, self, args);
+        logger.debug(`* Executed ${commandName} command`);
+        return true;
+    } catch (e) {
+        /** @type {Error} */
+        let errorObject;
+        if (e && e instanceof Error) {
+            errorObject = e;
+        } else {
+            errorObject = new Error(e);
+        }
+        logger.error(`* Execution of command ${commandName} failed: ${errorObject.message}`);
+        return true;
+    } finally {
+        client.cooldowns.set(target.replace("#", ""), Date.now());
+    }
+}
+
+/**
+ *
+ * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
+ * @param {string} target
+ * @param {import("tmi.js").ChatUserstate} context
+ * @param {string} msg
+ * @param {boolean} self
+ * @param {string[]} args
+ * @param {string} commandName
+ * @param {number} userPermission
+ * @returns {Promise<boolean>} whether there was a command.
+ */
+async function handleCustomCommand(client, target, context, msg, self, args, commandName, userPermission) {
+    const ccmd = await client.clients.db.getCcmd(target, `!${commandName}`);
+    const timeSinceLastExecution = Date.now() - client.cooldowns.get(target.replace("#", ""));
+    const userHasModPermission = userPermission >= permissions.mod;
+
+    /** @type {string} */
+    let response;
+    if (ccmd) {
+        if (ccmd.permissions > userPermission) {
+            await client.say(target, "Du hast keine Rechte für diesen Command");
+            return true;
+        }
+        if (!userHasModPermission && timeSinceLastExecution <= 1000 * client.config.Cooldown) {
+            logger.debug("Cooldown hit!");
+            return true;
+        }
+
+        response = await counters(client, ccmd.response, target);
+        await client.say(target, response);
+        logger.debug(`* Executed Custom Command ${commandName}`);
+
+        return true;
+    }
+    const alias = await client.clients.db.resolveAlias(target, `!${commandName}`);
+    if (!alias) return false;
+
+    if (alias.permissions > userPermission) {
+        await client.say(target, "Du hast keine Rechte");
+        return true;
+    }
+    if (!userHasModPermission && timeSinceLastExecution <= 1000 * client.config.Cooldown) {
+        logger.debug("Cooldown hit");
+        return true;
+    }
+    response = await counters(client, alias.response, target);
+    await client.say(target, response);
+    logger.debug(`* Executed Custom Command ${alias.command} caused by Alias ${alias.alias}`);
+    return true;
+}
 
 /**
  *
@@ -192,82 +298,33 @@ function permittedlink(client, url) {
  * @returns {Promise<void>}
  */
 async function handleCommand(client, target, context, msg, self, args) {
-    const commandName = args.shift().toLowerCase().slice(1);
-    if (commandName === "!") return;
-    logger.debug(`Trying to execute command ${commandName}`);
+    const commandName = args.shift()?.toLowerCase().slice(1);
+    if (!commandName || commandName === "") return;
+    logger.debug(`Trying to execute command ${commandName} for ${context.username}`);
     const userPermission = hasPerm(client, context);
-    const userHasModPermission = userPermission >= permissions.mod;
-    const timeSinceLastExecution = Date.now() - client.cooldowns.get(target.replace("#", ""));
 
-    const cmd = client.commands.get(commandName);
-    if (cmd) {
-        let cmdPerm = cmd.perm;
-        const dbCommandState = await client.clients.db.resolveCommand(target, commandName);
-        if (dbCommandState) {
-            if (dbCommandState.enabled === false) {
-                logger.debug("Command disabled via database.");
-                return;
-            }
-            if (dbCommandState.permission === -1) cmdPerm = cmd.perm;
-        }
-        if (cmd.perm && userPermission < cmdPerm) {
-            if (commandName === "!") return;
-            if (!cmd.silent) await client.say(target, "Du hast keine Rechte");
-            logger.error("Permission requirements of the user not met.");
-            return;
-        }
-        if (!userHasModPermission && timeSinceLastExecution > 1000 * client.config.Cooldown) {
-            logger.debug("Cooldown hit!");
-            return;
-        }
-        try {
-            await cmd.run(client, target, context, msg, self, args);
-            logger.debug(`* Executed ${commandName} command`);
-        } catch (e) {
-            /** @type {Error} */
-            let errorObject;
-            if (e && e instanceof Error) {
-                errorObject = e;
-            } else {
-                errorObject = new Error(e);
-            }
-            logger.error(`* Execution of command ${commandName} failed: ${errorObject.message}`);
-        }
-        client.cooldowns.set(target.replace("#", ""), Date.now());
-        return;
-    }
+    const executedCommand = await handleInternalCommand(
+        client,
+        target,
+        context,
+        msg,
+        self,
+        args,
+        commandName,
+        userPermission,
+    );
+    if (executedCommand) return;
     logger.debug("Command not found - looking for a customcommand");
-    const ccmd = await client.clients.db.getCcmd(target, `!${commandName}`);
-    let response;
-    if (ccmd) {
-        if (ccmd.permissions > userPermission) {
-            await client.say(target, "Du hast keine Rechte für diesen Command");
-            return;
-        }
-        if (!userHasModPermission && timeSinceLastExecution <= 1000 * client.config.Cooldown) {
-            logger.debug("Cooldown hit!");
-            return;
-        }
-
-        response = await counters(client, ccmd.response, target);
-        await client.say(target, response);
-        logger.debug(`* Executed ${commandName} Customcommand`);
-
-        return;
-    }
-    const alias = await client.clients.db.resolveAlias(target, `!${commandName}`);
-    if (!alias) return;
-
-    if (alias.permissions > userPermission) {
-        if (commandName === "!") return;
-        await client.say(target, "Du hast keine Rechte");
-        return;
-    }
-    if (!userHasModPermission && timeSinceLastExecution <= 1000 * client.config.Cooldown) {
-        logger.debug("Cooldown hit");
-        return;
-    }
-    response = await counters(client, alias.response, target);
-    await client.say(target, response);
-    logger.debug(`* Executed ${alias.command} caused by alias ${alias.alias}`);
+    const executedCustomCommand = await handleCustomCommand(
+        client,
+        target,
+        context,
+        msg,
+        self,
+        args,
+        commandName,
+        userPermission,
+    );
+    if (executedCustomCommand) return;
+    logger.debug(`Did not find a command or customcommand for ${commandName}`);
 }
