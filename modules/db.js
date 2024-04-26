@@ -1,10 +1,12 @@
+import { eq } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/node-postgres";
 import _ from "lodash";
 import pg from "pg";
 import { permissions } from "./constants.js";
+import { streamers } from "./db/schema/streamer.js";
 import { currentMonth } from "./functions.js";
 import { logger } from "./logger.js";
 import { statements } from "./statements.js";
-import { drizzle } from "drizzle-orm/node-postgres";
 /**
  * @typedef watchtimeuser
  * @property {string} viewer
@@ -166,29 +168,18 @@ export class DB {
      * @param {string} channel
      */
     async newChannel(channel) {
-        const client = await this.db.connect();
-        try {
-            channel = channel.replace(/#+/g, "");
-            await client.query(statements.channels.newChannel, [channel, true]).catch((e) => {
-                throw e;
-            });
-        } catch (e) {
-            logger.error(e);
-        } finally {
-            client.release();
-        }
+        channel = channel.replace(/#+/g, "");
+        await this.drizzle.insert(streamers).values({ name: channel, automessage: true });
     }
     /**
-     * add a new channel to the database
+     * retrieve a new channel from the database
      * @param {string} channel
-     * @returns {Promise<import("../typings/dbtypes.js").streamer>} the config of the channel
+     * @returns {Promise<streamers["$inferSelect"]|null>} the config of the channel
      */
     async getChannel(channel) {
-        const data = await this.db.query(statements.channels.getChannel, [channel]).catch((e) => {
-            logger.error(e);
-        });
+        const data = await this.drizzle.select().from(streamers).where(eq(streamers.name, channel));
         if (!data) return null;
-        return data.rows.length == 0 ? null : data.rows[0];
+        return data.length == 0 ? null : data[0];
     }
     // #region Aliases
     /**
