@@ -39,7 +39,7 @@
         "allowJs": true
     },
     "include": [
-        "modules/*",
+        "modules/**/*",
         "commands/**/*",
         "events/**/*",
         "bot.js",

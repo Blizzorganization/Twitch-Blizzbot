@@ -776,6 +776,11 @@ doctrine@^3.0.0:
   dependencies:
     esutils "^2.0.2"
 
+drizzle-orm@^0.30.9:
+  version "0.30.9"
+  resolved "https://registry.yarnpkg.com/drizzle-orm/-/drizzle-orm-0.30.9.tgz#c5a4b6f4240bab99f54bf189a3ff2af4d97fdec8"
+  integrity sha512-VOiCFsexErmgqvNCOmbzmqDCZzZsHoz6SkWAjTFxsTr1AllKDbDJ2+GgedLXsXMDgpg/ljDG1zItIFeZtiO2LA==
+
 enabled@2.0.x:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/enabled/-/enabled-2.0.0.tgz#f9dd92ec2d6f4bbc0d5d1e64e21d61cd4665e7c2"

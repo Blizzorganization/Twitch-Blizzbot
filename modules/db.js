@@ -4,6 +4,7 @@ import { permissions } from "./constants.js";
 import { currentMonth } from "./functions.js";
 import { logger } from "./logger.js";
 import { statements } from "./statements.js";
+import { drizzle } from "drizzle-orm/node-postgres";
 /**
  * @typedef watchtimeuser
  * @property {string} viewer
@@ -17,11 +18,11 @@ const { Pool } = pg;
  * @class DB
  */
 export class DB {
+    #doingWatchtime = false;
     /**
      * @param {import("../typings/dbtypes.js").Config} config
      */
     constructor(config) {
-        this.doingWatchtime = false;
         this.db = new Pool(config);
         this.dbname = config.database;
         /** @type {import("./clients.js").Clients}*/
@@ -29,6 +30,7 @@ export class DB {
         this.ensureTables().catch((e) => {
             logger.error("Failed to ensure tables: ", e);
         });
+        this.drizzle = drizzle(this.db);
     }
     /**
      * initializes the Database
@@ -512,11 +514,11 @@ export class DB {
      * @param {string[]} chatters List of Users to add Watchtime to
      */
     async watchtime(channel, chatters) {
-        if (this.doingWatchtime) {
+        if (this.#doingWatchtime) {
             logger.error(`watchtime already in progress at ${new Date().toLocaleTimeString()}`);
             return;
         }
-        this.doingWatchtime = true;
+        this.#doingWatchtime = true;
         const client = await this.db.connect();
         try {
             const started = new Date();
@@ -554,7 +556,7 @@ export class DB {
             logger.error(e?.toString());
         } finally {
             client.release();
-            this.doingWatchtime = false;
+            this.#doingWatchtime = false;
         }
     }
     /**
