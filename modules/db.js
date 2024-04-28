@@ -614,7 +614,7 @@ export class DB {
      * @param {string} twitchname twitch username
      */
     async newDiscordConnection(user, twitchname) {
-        await this.drizzle.insert(userlink).values({ discordid: user.id, twitchname });
+        await this.drizzle.insert(userlink).values({ discordid: user.id, twitchname }).onConflictDoNothing();
     }
     /**
      * @param  {import("discord.js").User} user
