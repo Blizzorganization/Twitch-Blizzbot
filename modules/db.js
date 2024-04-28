@@ -1,12 +1,18 @@
-import { eq } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import _ from "lodash";
 import pg from "pg";
 import { permissions } from "./constants.js";
+import { aliases } from "./db/schema/aliases.js";
+import { blacklist } from "./db/schema/blacklist.js";
+import { commands } from "./db/schema/commands.js";
+import { counters } from "./db/schema/counters.js";
+import { customcommands } from "./db/schema/customcommands.js";
 import { streamers } from "./db/schema/streamer.js";
+import { userlink } from "./db/schema/userlink.js";
+import { watchtime } from "./db/schema/watchtime.js";
 import { currentMonth } from "./functions.js";
 import { logger } from "./logger.js";
-import { statements } from "./statements.js";
 /**
  * @typedef watchtimeuser
  * @property {string} viewer
@@ -32,17 +38,24 @@ export class DB {
         this.ensureTables().catch((e) => {
             logger.error("Failed to ensure tables: ", e);
         });
-        this.drizzle = drizzle(this.db);
+        this.drizzle = drizzle(this.db, {
+            logger: {
+                logQuery(query, params) {
+                    logger.debug(
+                        `[DB] Executing query ${query} with params ${new Intl.ListFormat().format(params.map((p) => `${p}`))}`,
+                    );
+                },
+            },
+        });
     }
     /**
      * initializes the Database
      */
     async ensureTables() {
-        const client = await this.db.connect();
-        try {
+        await this.drizzle.transaction(async (tx) => {
             const tables = (
-                await client.query(
-                    "SELECT * FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema';",
+                await tx.execute(
+                    sql`SELECT * FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema';`,
                 )
             ).rows;
             logger.debug(`Existing databases: ${tables.map((t) => t.tablename).join(", ")}`);
@@ -147,14 +160,9 @@ export class DB {
             }
             for (const stmt of todoTables) {
                 logger.debug(`creating table ${stmt[0]}`);
-                await client.query(stmt[1]);
+                await tx.query(sql.raw(stmt[1]));
             }
-        } catch (e) {
-            logger.error(e);
-            throw e;
-        } finally {
-            client.release();
-        }
+        });
     }
     /**
      * stops the database
@@ -190,9 +198,14 @@ export class DB {
      */
     async newAlias(channel, name, command) {
         channel = channel.replace(/#+/g, "");
-        await this.db.query(statements.aliases.newAlias, [channel, name, command]).catch((e) => {
-            logger.error(e);
-        });
+        await this.drizzle
+            .insert(aliases)
+            .values({
+                channel,
+                command,
+                alias: name,
+            })
+            .onConflictDoNothing();
     }
     /**
      * @param {string} channel
@@ -201,15 +214,20 @@ export class DB {
      */
     async resolveAlias(channel, name) {
         channel = channel.replace(/#+/g, "");
-        try {
-            /** @type {import("pg").QueryResult<import("../typings/dbtypes.js").ResolvedAlias>} */
-            const data = await this.db.query(statements.aliases.resolveAlias, [name, channel]);
-            if (!data) return null;
-            const { rows } = data;
-            return data.rowCount == 0 ? null : rows[0];
-        } catch (e) {
-            logger.error(e);
-        }
+        const data = await this.drizzle
+            .select({
+                alias: aliases.alias,
+                command: aliases.command,
+                response: customcommands.response,
+                permissions: customcommands.permissions,
+            })
+            .from(aliases)
+            .leftJoin(
+                customcommands,
+                and(eq(aliases.command, customcommands.command), eq(aliases.channel, customcommands.channel)),
+            )
+            .where(and(eq(aliases.alias, name), eq(aliases.channel, channel)));
+        return data[0] ?? null;
     }
     /**
      * find Alias
@@ -218,15 +236,13 @@ export class DB {
      * @returns {Promise<string[]>} string returns
      */
     async findRelatedAliases(channel, command) {
-        try {
-            channel = channel.replace(/#+/g, "");
-            /** @type {import("pg").QueryResult<import("../typings/dbtypes.js").Alias>} */
-            const data = await this.db.query(statements.aliases.findRelated, [channel, command]);
-            const { rows } = data;
-            return rows.map((row) => row.alias);
-        } catch (e) {
-            logger.error(e);
-        }
+        channel = channel.replace(/#+/g, "");
+        const data = await this.drizzle
+            .select({ alias: aliases.alias })
+            .from(aliases)
+            .where(and(eq(aliases.channel, channel), eq(aliases.command, command)));
+        // @ts-expect-error -- this would be the necessary null check
+        return data.map((row) => row.alias).filter((v) => v !== null);
     }
     /**
      * delete an alias
@@ -234,29 +250,19 @@ export class DB {
      * @param {string} name Name of the Alias to delete
      */
     async deleteAlias(channel, name) {
-        try {
-            channel = channel.replace(/#+/g, "");
-            await this.db.query(statements.aliases.delAlias, [channel, name]);
-        } catch (e) {
-            logger.error(e);
-        }
+        channel = channel.replace(/#+/g, "");
+        await this.drizzle.delete(aliases).where(and(eq(aliases.channel, channel), eq(aliases.alias, name)));
     }
     /**
      * Get all existing aliases
      * @param {string} channel
-     * @returns {Promise<import("../typings/dbtypes.js").Alias[]>} List of all Aliases
+     * @returns {Promise<aliases["$inferSelect"][]>} List of all Aliases
      */
     async getAliases(channel) {
-        try {
-            channel = channel.replace(/#+/g, "");
-            /** @type {import("pg").QueryResult<import("../typings/dbtypes.js").Alias>} */
-            const data = await this.db.query(statements.aliases.getAliases, [channel]);
-            return data?.rows || [];
-        } catch (e) {
-            logger.error(e);
-        }
+        channel = channel.replace(/#+/g, "");
+        return await this.drizzle.select().from(aliases).where(eq(aliases.channel, channel));
     }
-    // #endregion aliasses
+    // #endregion aliases
 
     // #region counters
     /**
@@ -267,44 +273,36 @@ export class DB {
      * @param {number} [defaultVal] the starting value
      */
     async newCounter(channel, name, inc = 1, defaultVal = 0) {
-        try {
-            channel = channel.replace(/#+/g, "");
-            await this.db.query(statements.counters.newCounter, [channel, name, defaultVal, inc]);
-        } catch (e) {
-            logger.error(e);
-        }
+        channel = channel.replace(/#+/g, "");
+        await this.drizzle.insert(counters).values({ channel, cur: defaultVal, inc, name });
     }
     /**
      * read only, does NOT modify the value
      * @param {string} channel
      * @param {string} name
-     * @returns {Promise<number?>} value if exists
+     * @returns {Promise<number|null>} value if exists
      */
     async readCounter(channel, name) {
-        try {
-            channel = channel.replace(/#+/g, "");
-            /** @type {import("pg").QueryResult<Pick<import("../typings/dbtypes.js").Counter, "cur">>} */
-            const data = await this.db.query(statements.counters.getCounter, [name, channel]);
-            if (!data || data.rows.length === 0) return;
-            return data.rows[0].cur;
-        } catch (e) {
-            logger.error(e);
-        }
+        channel = channel.replace(/#+/g, "");
+        const data = await this.drizzle
+            .select({ cur: counters.cur })
+            .from(counters)
+            .where(and(eq(counters.name, name), eq(counters.channel, channel)));
+        return data[0]?.cur ?? null;
     }
     /**
      * @param  {string} channel
      * @param  {string} name
-     * @returns {Promise<number?>} the counter value
+     * @returns {Promise<number|null>} the counter value
      */
     async getCounter(channel, name) {
-        try {
-            channel = channel.replace(/#+/g, "");
-            /** @type {import("pg").QueryResult<Pick<import("../typings/dbtypes.js").Counter, "cur">>} */
-            const data = await this.db.query(statements.counters.incCounter, [name, channel]);
-            return data?.rows[0]?.cur;
-        } catch (e) {
-            logger.error(e);
-        }
+        channel = channel.replace(/#+/g, "");
+        const data = await this.drizzle
+            .update(counters)
+            .set({ cur: sql`${counters.cur} + ${counters.inc}` })
+            .where(and(eq(counters.channel, channel), eq(counters.name, name)))
+            .returning({ cur: counters.cur });
+        return data[0]?.cur;
     }
     /**
      * @param  {string} channel
@@ -313,9 +311,10 @@ export class DB {
      */
     async setCounter(channel, name, val) {
         channel = channel.replace(/#+/g, "");
-        await this.db.query(statements.counters.setCounter, [val, name, channel]).catch((e) => {
-            logger.error(e);
-        });
+        await this.drizzle
+            .update(counters)
+            .set({ cur: val })
+            .where(and(eq(counters.channel, channel), eq(counters.name, name)));
     }
     /**
      * @param  {string} channel
@@ -323,71 +322,60 @@ export class DB {
      * @param  {number} inc
      */
     async editCounter(channel, name, inc) {
-        try {
-            channel = channel.replace(/#+/g, "");
-            await this.db.query(statements.counters.editCounter, [inc, name, channel]);
-        } catch (e) {
-            logger.error(e);
-        }
+        channel = channel.replace(/#+/g, "");
+        await this.drizzle
+            .update(counters)
+            .set({ inc })
+            .where(and(eq(counters.channel, channel), eq(counters.name, name)));
     }
     /**
      * @param  {string} channel
      * @param  {string} name
      */
     async delCounter(channel, name) {
-        try {
-            channel = channel.replace(/#+/g, "");
-            await this.db.query(statements.counters.delCounter, [channel, name]);
-        } catch (e) {
-            logger.error(e.message);
-        }
+        channel = channel.replace(/#+/g, "");
+        await this.drizzle.delete(counters).where(and(eq(counters.channel, channel), eq(counters.name, name)));
     }
     /**
      * @param  {string} channel
-     * @returns {Promise<import("../typings/dbtypes.js").Counter[]>} a list of counters
+     * @returns {Promise<counters["$inferSelect"][]>} a list of counters
      */
     async allCounters(channel) {
-        try {
-            channel = channel.replace(/#+/g, "");
-            /** @type {import("pg").QueryResult<import("../typings/dbtypes.js").Counter>} */
-            const data = await this.db.query(statements.counters.allCounters, [channel]);
-            return data?.rows ?? [];
-        } catch (e) {
-            logger.error(e.message);
-        }
+        channel = channel.replace(/#+/g, "");
+        const data = await this.drizzle.select().from(counters).where(eq(counters.channel, channel));
+        return data;
     }
     // #endregion counters
 
     // #region Customcommands
     /**
      * get all customcommands
-     * @returns {Promise<string[]>} list of customcommands
      * @param {string} channel
      * @param {number} permission
+     * @returns {Promise<string[]|null>} list of customcommands
      */
     async allCcmds(channel, permission = permissions.user) {
         channel = channel.replace(/#+/g, "");
-        const data = await this.db.query(statements.customCommands.getAllCommands, [channel, permission]).catch((e) => {
-            logger.error(e);
-        });
-        if (!data) return;
-        /** @type {import("../typings/dbtypes.js").CustomCommand[]} */
-        const rows = data.rows;
-        return rows.map((row) => row.command);
+        const data = await this.drizzle
+            .select({ command: customcommands.command })
+            .from(customcommands)
+            .where(and(eq(customcommands.channel, channel), eq(customcommands.permissions, permission)));
+        if (!data) return null;
+        return data.map((row) => row.command);
     }
     /**
      * get response of customcommand
      * @param {string} channel
      * @param {string} commandname
-     * @returns {Promise<?import("../typings/dbtypes.js").CustomCommand>} response
+     * @returns {Promise<customcommands["$inferSelect"]|null>} response
      */
     async getCcmd(channel, commandname) {
         channel = channel.replace(/#+/g, "");
-        const data = await this.db.query(statements.customCommands.getCommand, [commandname, channel]).catch((e) => {
-            logger.error(e);
-        });
-        if (!data) return undefined;
-        return data.rows.length > 0 ? data.rows[0] : undefined;
+        const data = await this.drizzle
+            .select()
+            .from(customcommands)
+            .where(and(eq(customcommands.channel, channel), eq(customcommands.command, commandname)));
+        return data.length > 0 ? data[0] : null;
     }
     /**
      * Create new Customcommand/change its response
@@ -398,11 +386,15 @@ export class DB {
      */
     async newCcmd(channel, commandname, response, perms) {
         channel = channel.replace(/#+/g, "");
-        await this.db
-            .query(statements.customCommands.newCommand, [commandname, response, channel, perms])
-            .catch((e) => {
-                logger.error(e);
-            });
+        await this.drizzle
+            .insert(customcommands)
+            .values({
+                channel,
+                command: commandname,
+                permissions: perms,
+                response,
+            })
+            .onConflictDoNothing();
     }
     /**
      * @param  {import("../typings/dbtypes.js").CustomCommand[]} cmdData
@@ -410,32 +402,22 @@ export class DB {
      * @param  {"user"|"mod"} cmdType
      */
     async migrateCustomcommands(cmdData, channel, cmdType) {
-        const client = await this.db.connect();
-        try {
-            channel = channel.replace(/#+/, "");
+        channel = channel.replace(/#+/, "");
+        await this.drizzle.transaction(async (tx) => {
             await (async (cmds) => {
-                await client.query("BEGIN");
                 for (const cmd of cmds) {
-                    await client
-                        .query(statements.customCommands.newCommand, [
-                            cmd.command,
-                            cmd.response,
+                    await tx
+                        .insert(customcommands)
+                        .values({
                             channel,
-                            permissions[cmdType],
-                        ])
-                        .catch((e) => {
-                            throw e;
-                        });
+                            command: cmd.command,
+                            permissions: permissions[cmdType],
+                            response: cmd.response,
+                        })
+                        .onConflictDoNothing();
                 }
-                return await client.query("COMMIT").catch((e) => {
-                    throw e;
-                });
             })(cmdData);
-        } catch (e) {
-            logger.error(e);
-        } finally {
-            client.release();
-        }
+        });
     }
     /**
      * Edit a Customcommand/change its response
@@ -445,9 +427,10 @@ export class DB {
      */
     async editCcmd(channel, commandname, response) {
         channel = channel.replace(/#+/g, "");
-        await this.db.query(statements.customCommands.updateCommand, [response, commandname, channel]).catch((e) => {
-            logger.error(e);
-        });
+        await this.drizzle
+            .update(customcommands)
+            .set({ response })
+            .where(and(eq(customcommands.command, commandname), eq(customcommands.channel, channel)));
     }
     /**
      * Edit a Customcommand/change its name
@@ -457,9 +440,10 @@ export class DB {
      */
     async renameCCmd(channel, commandname, newName) {
         channel = channel.replace(/#+/g, "");
-        await this.db.query(statements.customCommands.renameCommand, [newName, commandname, channel]).catch((e) => {
-            logger.error(e);
-        });
+        await this.drizzle
+            .update(customcommands)
+            .set({ command: newName })
+            .where(and(eq(customcommands.channel, channel), eq(customcommands.command, commandname)));
     }
     /**
      * delete a Customcommand
@@ -468,9 +452,9 @@ export class DB {
      */
     async delCcmd(channel, commandname) {
         channel = channel.replace(/#+/g, "");
-        await this.db.query(statements.customCommands.deleteCommand, [commandname, channel]).catch((e) => {
-            logger.error(e);
-        });
+        await this.drizzle
+            .delete(customcommands)
+            .where(and(eq(customcommands.command, commandname), eq(customcommands.channel, channel)));
     }
     /**
      * transfers a customcommande to another permission level
@@ -479,22 +463,17 @@ export class DB {
      * @returns {Promise<"no_such_command"|"ok">}
      */
     async transferCmd(channel, commandname) {
-        const client = await this.db.connect();
-        try {
-            channel = channel.replace(/#+/g, "");
-            const cmd = await client.query(statements.customCommands.getCommandPermission, [commandname, channel]);
-
-            if (cmd?.rows?.length == 0) {
-                return "no_such_command";
-            }
-            const newPerm = cmd.rows[0].permissions == permissions.user ? permissions.mod : permissions.user;
-            await client.query(statements.customCommands.changeCommandPermissions, [newPerm, commandname, channel]);
-            return "ok";
-        } catch (e) {
-            logger.error(e);
-        } finally {
-            client.release();
-        }
+        const data = await this.drizzle
+            .select({ permissions: customcommands.permissions })
+            .from(customcommands)
+            .where(and(eq(customcommands.command, commandname), eq(customcommands.channel, channel)));
+        if (data.length === 0) return "no_such_command";
+        const newPerm = data[0].permissions === permissions.user ? permissions.mod : permissions.user;
+        await this.drizzle
+            .update(customcommands)
+            .set({ permissions: newPerm })
+            .where(and(eq(customcommands.command, commandname), eq(customcommands.channel, channel)));
+        return "ok";
     }
     // #endregion Customcommands
 
@@ -506,49 +485,34 @@ export class DB {
      */
     async watchtime(channel, chatters) {
         if (this.#doingWatchtime) {
-            logger.error(`watchtime already in progress at ${new Date().toLocaleTimeString()}`);
+            logger.warn(`watchtime already in progress at ${new Date().toLocaleTimeString()}`);
             return;
         }
         this.#doingWatchtime = true;
-        const client = await this.db.connect();
-        try {
+        await this.drizzle.transaction(async (tx) => {
             const started = new Date();
             logger.debug(`starting watchtime at ${started.toLocaleTimeString()}`);
             channel = channel.replace(/#+/, "");
             const month = currentMonth();
-            await (async (users) => {
-                await client.query("BEGIN");
-                await client.query(statements.watchtime.watchtimeNew, [channel, users, month]).catch(async (e) => {
-                    logger.error(`insert month ${e?.toString()}`);
-                    await client.query("ROLLBACK");
-                });
-                await client.query(statements.watchtime.watchtimeNew, [channel, users, "alltime"]).catch(async (e) => {
-                    logger.error(`insert alltime ${e?.toString()}`);
-                    await client.query("ROLLBACK");
-                });
-                await client.query(statements.watchtime.watchtimeInc, [users, channel, month]).catch(async (e) => {
-                    logger.error(`inc month ${e?.toString()}`);
-                    await client.query("ROLLBACK");
-                });
-                await client.query(statements.watchtime.watchtimeInc, [users, channel, "alltime"]).catch(async (e) => {
-                    logger.error(`inc alltime ${e?.toString()}`);
-                    await client.query("ROLLBACK");
-                });
-                client.query("COMMIT").catch((e) => {
-                    throw e;
-                });
-            })(chatters);
+            await tx
+                .insert(watchtime)
+                .values(chatters.map((viewer) => ({ channel, month, viewer, watchtime: 0 })))
+                .onConflictDoNothing();
+            await tx
+                .insert(watchtime)
+                .values(chatters.map((viewer) => ({ channel, month: "alltime", viewer, watchtime: 0 })))
+                .onConflictDoNothing();
+            await tx
+                .update(watchtime)
+                .set({ watchtime: sql`${watchtime.watchtime} + 1` })
+                .where(and(inArray(watchtime.viewer, chatters), inArray(watchtime.month, [month, "alltime"])));
             const endtime = new Date();
             logger.debug(
                 `finished watchtime at ${endtime.toLocaleTimeString()}
                 Took ${endtime.getTime() - started.getTime()}ms.`,
             );
-        } catch (e) {
-            logger.error(e?.toString());
-        } finally {
-            client.release();
-            this.#doingWatchtime = false;
-        }
+        });
+        this.#doingWatchtime = false;
     }
     /**
      * rename a watchtime user
@@ -558,9 +522,10 @@ export class DB {
      */
     async renameWatchtimeUser(channel, oldName, newName) {
         channel = channel.replace(/#+/g, "");
-        await this.db.query(statements.watchtime.renameWatchtimeUser, [channel, newName, oldName]).catch((e) => {
-            logger.error(e);
-        });
+        await this.drizzle
+            .update(watchtime)
+            .set({ viewer: newName })
+            .where(and(eq(watchtime.channel, channel), eq(watchtime.viewer, oldName)));
     }
     /**
      * @typedef old_watchtime
@@ -574,31 +539,28 @@ export class DB {
      * @param {string} month The month to add the watchtime at
      */
     async migrateWatchtime(channel, chatters, month) {
-        const client = await this.db.connect();
-        try {
-            channel = channel.replace(/#+/, "");
+        channel = channel.replace(/#+/, "");
+        await this.drizzle.transaction(async (tx) => {
             await (async (users) => {
-                await client.query("BEGIN");
                 const usernames = users.map((u) => u.user);
-                await client.query(statements.watchtime.watchtimeNew, [channel, usernames, month]).catch((e) => {
-                    throw e;
-                });
+                await tx
+                    .insert(watchtime)
+                    .values(usernames.map((username) => ({ channel, month, viewer: username, watchtime: 0 })))
+                    .onConflictDoNothing();
                 for (const user of users) {
-                    await client
-                        .query(statements.watchtime.watchtimeIncBy, [user.user, channel, month, user.watchtime])
-                        .catch((e) => {
-                            throw e;
-                        });
+                    await tx
+                        .update(watchtime)
+                        .set({ watchtime: sql`${watchtime.watchtime} + ${user.watchtime}` })
+                        .where(
+                            and(
+                                eq(watchtime.viewer, user.user),
+                                eq(watchtime.channel, channel),
+                                eq(watchtime.month, month),
+                            ),
+                        );
                 }
-                return await client.query("COMMIT").catch((e) => {
-                    throw e;
-                });
             })(chatters);
-        } catch (e) {
-            logger.error(e);
-        } finally {
-            client.release();
-        }
+        });
     }
     /**
      * get a top list of watchtime
@@ -612,28 +574,29 @@ export class DB {
         channel = channel.replace(/#+/g, "");
         if (!(typeof max == "number")) throw new TypeError("You have to select how many entries you need as a number.");
         if (!(typeof page == "number")) throw new TypeError("You need to supply a number as page");
-        const data = await this.db
-            .query(statements.watchtime.watchtimeList, [month, channel, max, (page - 1) * max])
-            .catch((e) => {
-                logger.error(e);
-            });
-        if (!data) return null;
-        return data.rows;
+        const data = await this.drizzle
+            .select({ viewer: watchtime.viewer, watchtime: watchtime.watchtime })
+            .from(watchtime)
+            .where(and(eq(watchtime.month, month.toString()), eq(watchtime.channel, channel)))
+            .orderBy((ob) => ob.watchtime)
+            .limit(max)
+            .offset((page - 1) * max);
+        return data.map(({ viewer, watchtime: wt }) => ({ viewer, watchtime: wt ?? 0 }));
     }
     /**
      * get Watchtime for User on Channel
      * @param {string} channel
      * @param {string} user
      * @param {string} [month]
-     * @returns {Promise<?number>} watchtime of the user
+     * @returns {Promise<number|null>} watchtime of the user
      */
     async getWatchtime(channel, user, month = "alltime") {
         channel = channel.replace("#", "");
-        const data = await this.db.query(statements.watchtime.getWatchtime, [user, channel, month]).catch((e) => {
-            logger.error(e);
-        });
-        if (!data) return null;
-        return data.rows.length > 0 ? data.rows[0].watchtime : undefined;
+        const data = await this.drizzle
+            .select({ watchtime: watchtime.watchtime })
+            .from(watchtime)
+            .where(and(eq(watchtime.viewer, user), eq(watchtime.channel, channel), eq(watchtime.month, month)));
+        return data.length > 0 ? data[0].watchtime : null;
     }
     // #endregion watchtime
     /**
@@ -642,11 +605,8 @@ export class DB {
      * @returns {Promise<string | null>} twitch username
      */
     async getDiscordConnection(user) {
-        const data = await this.db.query(statements.userlink.getDiscordConnection, [user.id]).catch((e) => {
-            logger.error(e);
-        });
-        if (!data) return null;
-        return data?.rows?.length > 0 ? data.rows[0].twitchname : null;
+        const data = await this.drizzle.select().from(userlink).where(eq(userlink.discordid, user.id));
+        return data.length > 0 ? data[0].twitchname : null;
     }
     /**
      * Set a twitch user to your discord user
@@ -654,19 +614,13 @@ export class DB {
      * @param {string} twitchname twitch username
      */
     async newDiscordConnection(user, twitchname) {
-        await this.db.query(statements.userlink.newDiscordConnection, [user.id, twitchname]).catch((e) => {
-            logger.error(e);
-        });
+        await this.drizzle.insert(userlink).values({ discordid: user.id, twitchname });
     }
     /**
      * @param  {import("discord.js").User} user
      */
     async deleteDiscordConnection(user) {
-        try {
-            await this.db.query(statements.userlink.deleteDiscordConnection, [user.id]);
-        } catch (e) {
-            logger.error(e);
-        }
+        await this.drizzle.delete(userlink).where(eq(userlink.discordid, user.id));
     }
     // #region blacklist
     /**
@@ -675,12 +629,8 @@ export class DB {
      * @param {number} action
      */
     async newBlacklistWord(channel, word, action) {
-        try {
-            channel = channel.replace(/#+/g, "");
-            await this.db.query(statements.blacklist.newBlacklistEntry, [channel, word, action]);
-        } catch (e) {
-            logger.error(e);
-        }
+        channel = channel.replace(/#+/g, "");
+        await this.drizzle.insert(blacklist).values({ action, blword: word, channel }).onConflictDoNothing();
     }
     /**
      * @param  {string} channel
@@ -688,54 +638,38 @@ export class DB {
      * @param  {number} action
      */
     async newBlacklistWords(channel, words, action) {
-        try {
-            channel = channel.replace(/#+/g, "");
-            await this.db.query(statements.blacklist.newBlacklistEntries, [channel, words, action]);
-        } catch (e) {
-            logger.error(e);
-        }
+        channel = channel.replace(/#+/g, "");
+        await this.drizzle.insert(blacklist).values(words.map((blword) => ({ blword, action, channel })));
     }
     /**
      * @param  {string} channel
      * @param  {string} word
      */
     async removeBlacklistWord(channel, word) {
-        try {
-            channel = channel.replace(/#+/g, "");
-            await this.db.query(statements.blacklist.removeBlacklistEntry, [channel, word]);
-        } catch (e) {
-            logger.error(e);
-        }
+        channel = channel.replace(/#+/g, "");
+        await this.drizzle.delete(blacklist).where(and(eq(blacklist.channel, channel), eq(blacklist.blword, word)));
     }
     /**
      * loads the blacklist into the client
      */
     async loadBlacklist() {
-        try {
-            const data = await this.db.query(statements.blacklist.loadBlacklist);
-            if (!data) return;
-            this.clients.twitch.blacklist = _.groupBy(data.rows, "channel");
-        } catch (e) {
-            logger.error(e);
-        }
+        const data = await this.drizzle.select().from(blacklist);
+        this.clients.twitch.blacklist = _.groupBy(data, "channel");
     }
     // #endregion
     // #region commands
     /**
      * @param {string} channel
      * @param {string} command
-     * @returns {Promise<import("../typings/dbtypes.js").Command|null>} the command if it exists in the database
+     * @returns {Promise<commands["$inferSelect"]|null>} the command if it exists in the database
      */
     async resolveCommand(channel, command) {
-        try {
-            channel = channel.replace(/#+/, "");
-            /** @type {import("pg").QueryResult<import("../typings/dbtypes.js").Command>} */
-            const data = await this.db.query(statements.commands.resolveCommand, [channel, command]);
-            return data?.rows[0] ?? null;
-        } catch (e) {
-            logger.error(e);
-            return null;
-        }
+        channel = channel.replace(/#+/, "");
+        const [data] = await this.drizzle
+            .select()
+            .from(commands)
+            .where(and(eq(commands.channel, channel), eq(commands.command, command)));
+        return data ?? null;
     }
     /**
      * @param {string} channel
@@ -744,9 +678,10 @@ export class DB {
      */
     async updateCommandEnabled(channel, command, enabled) {
         channel = channel.replace(/#+/, "");
-        await this.db.query(statements.commands.updateCommandEnabled, [enabled, channel, command]).catch((e) => {
-            logger.error(e);
-        });
+        await this.drizzle
+            .update(commands)
+            .set({ enabled })
+            .where(and(eq(commands.channel, channel), eq(commands.command, command)));
     }
     /**
      * @param {string} channel
@@ -755,11 +690,10 @@ export class DB {
      */
     async updateCommandPermission(channel, command, permission) {
         channel = channel.replace(/#+/, "");
-        try {
-            await this.db.query(statements.commands.updateCommandPermission, [permission, channel, command]);
-        } catch (e) {
-            logger.error(e);
-        }
+        await this.drizzle
+            .update(commands)
+            .set({ permission })
+            .where(and(eq(commands.channel, channel), eq(commands.command, command)));
     }
     /**
      * @param {string} channel
@@ -769,11 +703,7 @@ export class DB {
      */
     async newCommand(channel, command, enabled, permission) {
         channel = channel.replace(/#+/, "");
-        try {
-            await this.db.query(statements.commands.newCommand, [channel, command, enabled, permission]);
-        } catch (e) {
-            logger.error(e);
-        }
+        await this.drizzle.insert(commands).values({ command, channel, enabled, permission }).onConflictDoNothing();
     }
     // #endregion commands
 }
