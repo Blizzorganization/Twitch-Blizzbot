@@ -177,7 +177,7 @@ export class DB {
      */
     async newChannel(channel) {
         channel = channel.replace(/#+/g, "");
-        await this.drizzle.insert(streamers).values({ name: channel, automessage: true });
+        await this.drizzle.insert(streamers).values({ name: channel, automessage: true }).onConflictDoNothing();
     }
     /**
      * retrieve a new channel from the database
