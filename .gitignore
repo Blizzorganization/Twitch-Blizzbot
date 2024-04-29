@@ -15,3 +15,5 @@ backup/
 channellogs/
 data/
 logs
+.cache
+.direnv
