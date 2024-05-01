@@ -7,3 +7,4 @@ configs/*
 logs/**/*
 *.json
 *.md
+flake.lock
