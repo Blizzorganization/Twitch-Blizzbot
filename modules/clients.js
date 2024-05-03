@@ -1,5 +1,5 @@
 import { logger } from "twitch-blizzbot/logger";
-import { DB } from "./db.js";
+import { DB } from "./db/index.js";
 import slashsetup from "./slashsetup.js";
 
 /**

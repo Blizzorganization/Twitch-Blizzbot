@@ -36,11 +36,17 @@
           treefmt = {
             projectRootFile = "flake.nix";
             programs = {
-              prettier.enable = true;
+              biome.enable = true;
               nixfmt-rfc-style.enable = true;
             };
           };
-          devShells.default = pkgs.mkShell { buildInputs = with pkgs; [ nodejs_20 nodePackages.yarn ]; };
+          devShells.default = pkgs.mkShell {
+            buildInputs = with pkgs; [
+              nodejs_20
+              nodePackages.yarn
+              biome
+            ];
+          };
         };
       flake = {
         # The usual flake attributes can be defined here, including system-

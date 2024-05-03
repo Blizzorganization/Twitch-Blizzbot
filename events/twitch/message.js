@@ -239,15 +239,15 @@ async function handleInternalCommand(client, target, context, msg, self, args, c
  *
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
- * @param {import("tmi.js").ChatUserstate} context
- * @param {string} msg
- * @param {boolean} self
- * @param {string[]} args
+ * @param {import("tmi.js").ChatUserstate} _context
+ * @param {string} _msg
+ * @param {boolean} _self
+ * @param {string[]} _args
  * @param {string} commandName
  * @param {number} userPermission
  * @returns {Promise<boolean>} whether there was a command.
  */
-async function handleCustomCommand(client, target, context, msg, self, args, commandName, userPermission) {
+async function handleCustomCommand(client, target, _context, _msg, _self, _args, commandName, userPermission) {
     const ccmd = await client.clients.db.getCcmd(target, `!${commandName}`);
     const timeSinceLastExecution = Date.now() - client.cooldowns.get(target.replace("#", ""));
     const userHasModPermission = userPermission >= permissions.mod;

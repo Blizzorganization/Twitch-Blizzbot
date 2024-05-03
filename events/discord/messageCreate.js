@@ -31,9 +31,9 @@ export async function event(client, message) {
                 await client.clients.twitch.say(channel, args.join(" "));
             }
             break;
+        // biome-ignore lint/suspicious/noFallthroughSwitchClause: we want to execute the command normally, just add the admincmd flag
         case client.config.channels.adminCommands:
             admincmd = true;
-        // eslint-disable-next-line no-fallthrough
         case client.config.channels.commands:
             {
                 if (!message.content.startsWith(client.config.prefix)) return;

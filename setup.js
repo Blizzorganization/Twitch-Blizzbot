@@ -1,10 +1,9 @@
 #!node
-/* eslint-disable no-console */
 import { existsSync, readFileSync, writeFileSync } from "fs";
-import lodash from "lodash";
 import { EOL } from "os";
 import { createInterface } from "readline";
 import { promisify } from "util";
+import lodash from "lodash";
 
 const { merge } = lodash;
 

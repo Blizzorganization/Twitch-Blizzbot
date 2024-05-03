@@ -1,6 +1,7 @@
+import { inspect } from "util";
 import { getTable } from "twitch-blizzbot/functions";
 import { logger } from "twitch-blizzbot/logger";
-import { inspect } from "util";
+
 /**
  * @name dbquery
  * @namespace ConsoleCommands
@@ -25,11 +26,10 @@ export async function run(clients, args) {
         : logger.info(`\n${getTable(data.rows)}`);
 }
 /**
- * @param  {import("twitch-blizzbot/clients").Clients} clients
+ * @param  {import("twitch-blizzbot/clients").Clients} _clients
  * @param  {string} line
  * @returns {[string[], string]} the completion
  */
-export function completer(clients, line) {
-    // eslint-disable-next-line no-sparse-arrays
-    return [, line];
+export function completer(_clients, line) {
+    return [[], line];
 }

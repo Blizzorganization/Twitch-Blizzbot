@@ -1,8 +1,8 @@
 import { ActionRowBuilder, ButtonBuilder, EmbedBuilder } from "discord.js";
+import { ButtonStyle } from "discord.js";
+import _ from "lodash";
 import { calcWatchtime, getTable } from "twitch-blizzbot/functions";
 import { logger } from "twitch-blizzbot/logger";
-import _ from "lodash";
-import { ButtonStyle } from "discord.js";
 /**
  * @param  {import("twitch-blizzbot/discordclient").DiscordClient} client
  * @param  {import("discord.js").ButtonInteraction} interaction

@@ -1,6 +1,6 @@
-import { Collection } from "discord.js";
 import EventEmitter from "events";
 import { createInterface } from "readline";
+import { Collection } from "discord.js";
 import { loadCommands } from "./functions.js";
 import { logger } from "./logger.js";
 /**
@@ -28,7 +28,7 @@ export class ConsoleClient extends EventEmitter {
          * @returns {[string[], string]} the completion
          */
         function _completer(line) {
-            const completions = commands.map((val, key) => key);
+            const completions = commands.map((_val, key) => key);
             const hits = completions.filter((c) => c.startsWith(line) || line.startsWith(c));
             if (line.startsWith(`${hits[0]} `)) {
                 return commands.get(hits[0]).completer(this.clients, line);
@@ -58,7 +58,7 @@ export class ConsoleClient extends EventEmitter {
         this.processStats = setInterval(async () => {
             await this.collectMetrics(pidu);
         }, 10000);
-        // eslint-disable-next-line no-empty-function
+        // biome-ignore lint/suspicious/noEmptyBlockStatements: this is allowed to fail.
         this.collectMetrics(pidu).catch(() => {});
     }
 

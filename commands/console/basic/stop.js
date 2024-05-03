@@ -8,10 +8,10 @@ export async function run(clients) {
     process.exit(0);
 }
 /**
- * @param  {import("twitch-blizzbot/clients").Clients} clients
+ * @param  {import("twitch-blizzbot/clients").Clients} _clients
  * @param  {string} line
  * @returns {[string[], string]} the completion
  */
-export function completer(clients, line) {
+export function completer(_clients, line) {
     return [["stop"], line];
 }

@@ -1,5 +1,3 @@
-/* eslint-disable no-sparse-arrays */
-
 import { logger } from "twitch-blizzbot/logger";
 
 /**
@@ -27,7 +25,7 @@ export async function run(clients, args) {
  * @returns {[string[], string]} the completion
  */
 export function completer(clients, line) {
-    if (clients.twitch.config.channels.length == 1) return [, line];
+    if (clients.twitch.config.channels.length == 1) return [[], line];
     const args = line.split(" ");
     if (args.length > 2) return [, line];
     const cmd = args.shift();

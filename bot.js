@@ -7,7 +7,6 @@ import { logger } from "twitch-blizzbot/logger";
 import { TwitchClient } from "twitch-blizzbot/twitchclient";
 import { createConfig } from "./setup.js";
 
-// eslint-disable-next-line no-console
 logger.info("starting Twitch Blizzbot");
 if (process.argv0.length >= 18) {
     process.title = `Twitch-Blizzbot@${JSON.parse(readFileSync("./package.json", "utf8")).version}`;
@@ -22,6 +21,7 @@ const config = JSON.parse(readFileSync("./configs/config.json").toString());
 // starting bot
 logger.debug("starting bot");
 const clients = new Clients(config);
+/** @type {DiscordClient} */
 let discordClient;
 const twitchClient = new TwitchClient(config.twitch);
 clients.twitch = twitchClient;
@@ -37,7 +37,9 @@ if (config.useDiscord == true) {
     discordClient = new DiscordClient(config.discord);
     clients.discord = discordClient;
     discordClient.clients = clients;
+    /** @type {Promise<void>} */
     const dcReady = new Promise((resolve) => discordClient.once("ready", () => resolve()));
+    /** @type {Promise<void>} */
     const twReady = new Promise((resolve) => twitchClient.once("connected", () => resolve()));
     await Promise.all([dcReady, twReady]).then(() => {
         setTimeout(() => {

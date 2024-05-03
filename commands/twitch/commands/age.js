@@ -11,11 +11,11 @@ export const alias = ["alter"];
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
  * @param {import("tmi.js").ChatUserstate} context
- * @param {string} msg
- * @param {boolean} self
+ * @param {string} _msg
+ * @param {boolean} _self
  * @param {string[]} args
  */
-export async function run(client, target, context, msg, self, args) {
+export async function run(client, target, context, _msg, _self, args) {
     let user;
     user = args[0]?.toLowerCase().replace("@", "");
     if (!user || user == "") user = context["display-name"];

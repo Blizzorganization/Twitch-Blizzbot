@@ -1,6 +1,6 @@
+import { existsSync, readdirSync } from "fs";
 import sqlite from "better-sqlite3";
 import Enmap from "enmap";
-import { existsSync, readdirSync } from "fs";
 import { logger } from "twitch-blizzbot/logger";
 
 /**
@@ -85,11 +85,11 @@ export async function run(clients, args) {
 }
 
 /**
- * @param  {import("twitch-blizzbot/clients").Clients} clients
+ * @param  {import("twitch-blizzbot/clients").Clients} _clients
  * @param  {string} line
  * @returns {[string[], string]} the completion
  */
-export function completer(clients, line) {
+export function completer(_clients, line) {
     const modes = ["watchtime", "customcommands", "blacklist"];
     let hits;
     const args = line.split(" ");
@@ -101,8 +101,7 @@ export function completer(clients, line) {
             }
             break;
         case 3:
-            // eslint-disable-next-line no-sparse-arrays
-            if (args[2].toLowerCase() === "blacklist") return [, line];
+            if (args[2].toLowerCase() === "blacklist") return [[], line];
             if (!existsSync("./data/")) {
                 hits = [`${args[1]} data_directory_does_not_exist`];
             } else {

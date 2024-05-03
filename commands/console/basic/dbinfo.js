@@ -1,10 +1,6 @@
-import fs from "fs";
 import { getTable } from "twitch-blizzbot/functions";
 import { logger } from "twitch-blizzbot/logger";
-import Util from "util";
 
-global.util = Util;
-global.fs = fs;
 /**
  * @name dbinfo
  * @namespace ConsoleCommands
@@ -37,11 +33,10 @@ export async function run(clients) {
     logger.info(`\n${getTable({ size, lines })}`);
 }
 /**
- * @param  {import("twitch-blizzbot/clients").Clients} clients
+ * @param  {import("twitch-blizzbot/clients").Clients} _clients
  * @param  {string} line
  * @returns {[string[], string]} the completion
  */
-export function completer(clients, line) {
-    // eslint-disable-next-line no-sparse-arrays
-    return [, line];
+export function completer(_clients, line) {
+    return [[], line];
 }

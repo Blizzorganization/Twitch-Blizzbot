@@ -4,11 +4,11 @@ import { logger } from "twitch-blizzbot/logger";
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} channel
  * @param {string} username
- * @param {number} months
+ * @param {number} _months
  * @param {string} message
  * @param {import("tmi.js").SubUserstate} userstate
  */
-export async function event(client, channel, username, months, message, userstate) {
+export async function event(client, channel, username, _months, message, userstate) {
     const tierlist = { 1000: "Tier 1", 2000: "Tier 2", 3000: "Tier 3", Prime: "Twitch Prime" };
     const cumulativeMonths = userstate["msg-param-cumulative-months"];
     const tiers = userstate["msg-param-sub-plan"];

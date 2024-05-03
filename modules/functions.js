@@ -8,7 +8,7 @@ import { logger } from "./logger.js";
  */
 /**
  * load commands
- * @param {Map} commandmap a Map to store commands for execution
+ * @param {Map<string,unknown>} commandmap a Map to store commands for execution
  * @param {string} commanddir path to command directory relative to project root
  * @param {string[]} helplist
  * @throws {CustomError} missing command directory
@@ -99,7 +99,7 @@ export function currentMonth() {
 }
 
 const ts = new Transform({
-    transform(chunk, enc, cb) {
+    transform(chunk, _enc, cb) {
         cb(null, chunk);
     },
 });

@@ -1,5 +1,5 @@
-import { Collection } from "discord.js";
 import { createWriteStream, existsSync, mkdirSync, readFileSync } from "fs";
+import { Collection } from "discord.js";
 import { scheduleJob } from "node-schedule";
 import { Client } from "tmi.js";
 import { loadCommands, loadEvents } from "./functions.js";
@@ -47,7 +47,7 @@ export class TwitchClient extends Client {
         // @ts-expect-error -- set externally
         this.clients = undefined;
         /** @type {Record<string, import("../typings/dbtypes.js").Blacklist[]>}*/
-        this.blacklist = undefined;
+        this.blacklist = {};
         if (!existsSync("./channellogs")) mkdirSync("./channellogs");
         this.once("connected", () => {
             this.newChannellogs(opts.channels);

@@ -1,4 +1,3 @@
-/* eslint-disable no-sparse-arrays */
 import { logger } from "twitch-blizzbot/logger";
 
 /**

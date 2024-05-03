@@ -10,12 +10,12 @@ export const alias = ["emotes"];
  * @namespace TwitchCommands
  * @param {import("twitch-blizzbot/twitchclient").TwitchClient} client
  * @param {string} target
- * @param {import("tmi.js").ChatUserstate} context
- * @param {string} msg
- * @param {boolean} self
+ * @param {import("tmi.js").ChatUserstate} _context
+ * @param {string} _msg
+ * @param {boolean} _self
  * @param {string[]} args
  */
-export async function run(client, target, context, msg, self, args) {
+export async function run(client, target, _context, _msg, _self, args) {
     if (!args || args.length == 0) {
         await client.say(target, "Zur Auswahl stehen: sub | bttv");
         return;

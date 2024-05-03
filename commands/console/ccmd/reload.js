@@ -21,10 +21,10 @@ export async function run(clients) {
     logger.info("Alle Datein wurden erfolgreich neu eingelesen.");
 }
 /**
- * @param  {import("twitch-blizzbot/clients").Clients} clients
+ * @param  {import("twitch-blizzbot/clients").Clients} _clients
  * @param  {string} line
  * @returns {[string[], string]} the completion
  */
-export function completer(clients, line) {
+export function completer(_clients, line) {
     return [["reload"], line];
 }

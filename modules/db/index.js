@@ -2,17 +2,18 @@ import { and, eq, inArray, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import _ from "lodash";
 import pg from "pg";
-import { permissions } from "./constants.js";
-import { aliases } from "./db/schema/aliases.js";
-import { blacklist } from "./db/schema/blacklist.js";
-import { commands } from "./db/schema/commands.js";
-import { counters } from "./db/schema/counters.js";
-import { customcommands } from "./db/schema/customcommands.js";
-import { streamers } from "./db/schema/streamer.js";
-import { userlink } from "./db/schema/userlink.js";
-import { watchtime } from "./db/schema/watchtime.js";
-import { currentMonth } from "./functions.js";
-import { logger } from "./logger.js";
+import { permissions } from "../constants.js";
+import { currentMonth } from "../functions.js";
+import { logger } from "../logger.js";
+import { aliases } from "./schema/aliases.js";
+import { blacklist } from "./schema/blacklist.js";
+import { commands } from "./schema/commands.js";
+import { counters } from "./schema/counters.js";
+import { customcommands } from "./schema/customcommands.js";
+import { streamers } from "./schema/streamer.js";
+import { userlink } from "./schema/userlink.js";
+import { watchtime } from "./schema/watchtime.js";
+
 /**
  * @typedef watchtimeuser
  * @property {string} viewer
@@ -28,12 +29,12 @@ const { Pool } = pg;
 export class DB {
     #doingWatchtime = false;
     /**
-     * @param {import("../typings/dbtypes.js").Config} config
+     * @param {import("../../typings/dbtypes.js").Config} config
      */
     constructor(config) {
         this.db = new Pool(config);
         this.dbname = config.database;
-        /** @type {import("./clients.js").Clients}*/
+        /** @type {import("../clients.js").Clients}*/
         this.clients = undefined;
         this.ensureTables().catch((e) => {
             logger.error("Failed to ensure tables: ", e);
@@ -42,7 +43,9 @@ export class DB {
             logger: {
                 logQuery(query, params) {
                     logger.debug(
-                        `[DB] Executing query ${query} with params ${new Intl.ListFormat().format(params.map((p) => `${p}`))}`,
+                        `[DB] Executing query ${query} with params ${new Intl.ListFormat().format(
+                            params.map((p) => `${p}`),
+                        )}`,
                     );
                 },
             },
@@ -160,7 +163,7 @@ export class DB {
             }
             for (const stmt of todoTables) {
                 logger.debug(`creating table ${stmt[0]}`);
-                await tx.query(sql.raw(stmt[1]));
+                await tx.execute(sql.raw(stmt[1]));
             }
         });
     }
@@ -210,7 +213,7 @@ export class DB {
     /**
      * @param {string} channel
      * @param {string} name
-     * @returns {Promise<import("../typings/dbtypes.js").ResolvedAlias|null>} command data
+     * @returns {Promise<import("../../typings/dbtypes.js").ResolvedAlias|null>} command data
      */
     async resolveAlias(channel, name) {
         channel = channel.replace(/#+/g, "");
@@ -397,7 +400,7 @@ export class DB {
             .onConflictDoNothing();
     }
     /**
-     * @param  {import("../typings/dbtypes.js").CustomCommand[]} cmdData
+     * @param  {import("../../typings/dbtypes.js").CustomCommand[]} cmdData
      * @param  {string} channel
      * @param  {"user"|"mod"} cmdType
      */
