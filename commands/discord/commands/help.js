@@ -11,17 +11,18 @@ export const adminOnly = false;
 export async function run(client, message) {
     const embed = new EmbedBuilder()
         .setColor(0xedbc5d)
+        // @ts-ignore
         .setThumbnail(client.user.avatarURL({ extension: "png" }))
         .setTitle("**__Der Bot kann folgende Befehle:__**")
         .addFields(
-            { name: "!twitchname", value: "Fügt einen neuen Command in den Bot auf Twitch ein." },
-            { name: "!top10", value: "Gibt die aktuellen Top10 der Watchtime liste wieder" },
-            { name: "!watchtime [Twitch-Name]", value: "Gibt die aktuelle watchtime des angegebenen Nutzers wieder" },
+            { name: "/twitchname", value: "Fügt einen neuen Command in den Bot auf Twitch ein." },
+            { name: "/top10", value: "Gibt die aktuellen Top10 der Watchtime liste wieder" },
+            { name: "/watchtime [Twitch-Name]", value: "Gibt die aktuelle watchtime des angegebenen Nutzers wieder" },
             {
-                name: "!link [Twitch-Name]",
+                name: "/link [Twitch-Name]",
                 value: "Um deinen Twitchaccount mit Discord zu verbinden so das du nur noch !watchtime eingeben muss",
             },
-            { name: "!unlink", value: "Entfernt die Verbindung zu deinem Twitch Account" },
+            { name: "/unlink", value: "Entfernt die Verbindung zu deinem Twitch Account" },
         );
 
     await message.channel.send({ embeds: [embed] });
