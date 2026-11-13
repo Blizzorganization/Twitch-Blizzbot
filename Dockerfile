@@ -7,7 +7,7 @@ COPY --chown=vp:vp package.json pnpm-lock.yaml pnpm-workspace.yaml .node-version
 RUN vp install --frozen-lockfile
 
 COPY --chown=vp:vp . .
-RUN vp build
+RUN vp -C web-client build
 
 
 RUN cp "$(vp env which node | head -1)" /tmp/node
@@ -26,7 +26,7 @@ ENV NODE_ENV=production
 COPY --from=build /tmp/node /usr/local/bin/node
 
 COPY --from=build /app/web-client/dist ./web-client/dist
-
+COPY src src
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./
