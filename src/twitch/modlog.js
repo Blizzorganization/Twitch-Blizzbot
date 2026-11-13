@@ -18,25 +18,7 @@ import { apiConfigured, helix, broadcasterId, getBotIdentity } from "./api.js";
  * Braucht zusätzliche Scopes (siehe oauth.js) - nach dem Update einmal im Dashboard neu autorisieren.
  */
 
-const WS_HOST = "eventsub.wss.twitch.tv";
 const WS_URL = "wss://eventsub.wss.twitch.tv/ws";
-
-/**
- * Reconnect-Adresse aus "session_reconnect" absichern: nur Twitchs eigener EventSub-Server ist erlaubt.
- * Protokoll und Host stehen fest im Code; aus der Nachricht werden nur Pfad und Query übernommen.
- */
-function safeReconnectUrl(raw) {
-    let u;
-    try {
-        u = new URL(String(raw));
-    } catch {
-        return WS_URL;
-    }
-    if (u.protocol !== "wss:" || u.hostname !== WS_HOST) return WS_URL;
-    const rest = `${u.pathname}${u.search}`.replace(/^\/+/, "");
-    return "wss://eventsub.wss.twitch.tv/" + rest;
-}
-
 const RETRY_MS = 10_000;
 const LIMIT_RETRY_MS = 5 * 60_000; // bei Twitch-Verbindungslimit (429) nur alle 5 Minuten erneut versuchen
 const ACTIONS = new Set(["delete", "timeout", "ban"]);
@@ -97,9 +79,11 @@ function scheduleRetry(channel, state) {
     state.retry.unref?.();
 }
 
-function connect(channel, state, url = WS_URL, isReconnect = false) {
+// Verbindet immer mit der festen Twitch-Adresse. Die reconnect_url aus "session_reconnect" wird bewusst nicht
+// verwendet (Sicherheit: keine Verbindungsziele aus empfangenen Daten); stattdessen neue Sitzung + neu abonnieren.
+function connect(channel, state) {
     if (state.stopped) return;
-    const ws = new WebSocket(url);
+    const ws = new WebSocket(WS_URL);
     const previous = state.ws;
     state.ws = ws;
 
@@ -116,41 +100,40 @@ function connect(channel, state, url = WS_URL, isReconnect = false) {
             if (type === "session_welcome") {
                 state.keepalive = msg.payload?.session?.keepalive_timeout_seconds ?? 10;
                 armKeepalive(state, ws);
-                if (isReconnect) {
-                    // Subscriptions wandern bei einem von Twitch angeforderten Reconnect automatisch mit.
-                    try {
-                        previous?.close();
-                    } catch {
-                        /* ignorieren */
+                try {
+                    await subscribe(channel, state, msg.payload.session.id);
+                    // Nach einem von Twitch angeforderten Reconnect: alte Verbindung erst schließen, wenn die neue steht.
+                    if (previous && previous !== ws) {
+                        try {
+                            previous.close();
+                        } catch {
+                            /* ignorieren */
+                        }
                     }
-                } else {
-                    try {
-                        await subscribe(channel, state, msg.payload.session.id);
-                    } catch (e) {
-                        const limit = /429|transports limit/i.test(String(e.message));
-                        if (limit) {
-                            // Zu viele WebSocket-Verbindungen für diesen Account: später erneut versuchen, nur einmal melden.
-                            state.backoff = true;
-                            if (!state.problem) {
-                                state.problem = true;
-                                logger.warn(
-                                    `Moderator-Aktionen: Erfassung für ${channel} nicht möglich (${e.message}). ` +
-                                        `Ich versuche es alle 5 Minuten erneut und melde, sobald es wieder klappt.`,
-                                );
-                            }
-                        } else {
-                            // Meist fehlende Berechtigungen (Scopes): nicht endlos neu versuchen, sondern einmal klar melden.
+                } catch (e) {
+                    const limit = /429|transports limit/i.test(String(e.message));
+                    if (limit) {
+                        // Zu viele WebSocket-Verbindungen für diesen Account: später erneut versuchen, nur einmal melden.
+                        state.backoff = true;
+                        if (!state.problem) {
+                            state.problem = true;
                             logger.warn(
                                 `Moderator-Aktionen: Erfassung für ${channel} nicht möglich (${e.message}). ` +
-                                    `Im Dashboard den Twitch-Zugang neu autorisieren (neue Berechtigungen nötig).`,
+                                    `Ich versuche es alle 5 Minuten erneut und melde, sobald es wieder klappt.`,
                             );
-                            state.stopped = true;
                         }
-                        ws.close();
+                    } else {
+                        // Meist fehlende Berechtigungen (Scopes): nicht endlos neu versuchen, sondern einmal klar melden.
+                        logger.warn(
+                            `Moderator-Aktionen: Erfassung für ${channel} nicht möglich (${e.message}). ` +
+                                `Im Dashboard den Twitch-Zugang neu autorisieren (neue Berechtigungen nötig).`,
+                        );
+                        state.stopped = true;
                     }
+                    ws.close();
                 }
             } else if (type === "session_reconnect") {
-                connect(channel, state, safeReconnectUrl(msg.payload?.session?.reconnect_url), true);
+                connect(channel, state);
             } else if (type === "notification" && msg.payload?.subscription?.type === "channel.moderate") {
                 const id = msg.metadata.message_id;
                 if (state.seen.has(id)) return;
