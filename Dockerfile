@@ -1,4 +1,4 @@
-FROM ghcr.io/voidzero-dev/vite-plus as build
+FROM ghcr.io/voidzero-dev/vite-plus AS build
 WORKDIR /app
 
 # Abhängigkeiten zuerst (besseres Caching); postinstall baut das Dashboard
