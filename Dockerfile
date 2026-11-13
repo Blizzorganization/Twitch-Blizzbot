@@ -4,6 +4,7 @@ WORKDIR /app
 # Abhängigkeiten zuerst (besseres Caching); postinstall baut das Dashboard
 
 COPY --chown=vp:vp package.json pnpm-lock.yaml pnpm-workspace.yaml .node-version* ./
+COPY --chown=vp:vp ./web-client/package.json web-client/package.json
 RUN vp install --frozen-lockfile
 
 COPY --chown=vp:vp . .
