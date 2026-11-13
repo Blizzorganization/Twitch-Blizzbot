@@ -1,11 +1,12 @@
 import express from "express";
 import cors from "cors";
+import rateLimit from "express-rate-limit";
 import path from "node:path";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 import { config } from "../config.js";
 import { logger } from "../utils/logger.js";
-import { isWeakSecret, createLoginLimiter, createRateLimiter, securityHeaders } from "./security.js";
+import { isWeakSecret, createLoginLimiter, securityHeaders } from "./security.js";
 import { auth, adminTokenUsable } from "./context.js";
 import { createAuthRoutes } from "./auth-routes.js";
 import { registerMeta } from "./routes/meta.js";
@@ -60,8 +61,10 @@ export function startWebServer() {
 
     // Allgemeine Anfrage-Begrenzung pro IP (großzügig, das Dashboard läuft normal weiter) und eine strengere für
     // Anmeldung/Einrichtung/Twitch-Callback (zusätzlich zur Sperre nach Fehlversuchen).
-    const apiRateLimiter = createRateLimiter({ windowMs: 60_000, limit: 1000 });
-    const authRateLimiter = createRateLimiter({ windowMs: 60_000, limit: 30, message: "Zu viele Anmeldeversuche. Bitte kurz warten." });
+    // Hinter einem Reverse-Proxy WEB_TRUST_PROXY setzen, sonst teilen sich alle Besucher die IP des Proxys.
+    const limiterOptions = { windowMs: 60_000, standardHeaders: "draft-7", legacyHeaders: false, validate: { xForwardedForHeader: false } };
+    const apiRateLimiter = rateLimit({ ...limiterOptions, limit: 1000, message: { error: "Zu viele Anfragen. Bitte kurz warten." } });
+    const authRateLimiter = rateLimit({ ...limiterOptions, limit: 30, message: { error: "Zu viele Anmeldeversuche. Bitte kurz warten." } });
     app.use(apiRateLimiter);
     app.use("/api/auth", authRateLimiter);
     app.use(express.json({ limit: "5mb" })); // groß genug für Sicherungs-Dateien (Import)

@@ -19,21 +19,24 @@ import { apiConfigured, helix, broadcasterId, getBotIdentity } from "./api.js";
  */
 
 const WS_HOST = "eventsub.wss.twitch.tv";
-const WS_URL = `wss://${WS_HOST}/ws`;
+const WS_URL = "wss://eventsub.wss.twitch.tv/ws";
 
 /**
  * Reconnect-Adresse aus "session_reconnect" absichern: nur Twitchs eigener EventSub-Server ist erlaubt.
- * Der Host wird fest vorgegeben, aus der Nachricht werden nur Pfad und Query übernommen.
+ * Protokoll und Host stehen fest im Code; aus der Nachricht werden nur Pfad und Query übernommen.
  */
 function safeReconnectUrl(raw) {
+    let u;
     try {
-        const u = new URL(String(raw));
-        if (u.protocol === "wss:" && u.hostname === WS_HOST) return `wss://${WS_HOST}${u.pathname}${u.search}`;
+        u = new URL(String(raw));
     } catch {
-        /* ungültige URL -> Standard-Adresse */
+        return WS_URL;
     }
-    return WS_URL;
+    if (u.protocol !== "wss:" || u.hostname !== WS_HOST) return WS_URL;
+    const rest = `${u.pathname}${u.search}`.replace(/^\/+/, "");
+    return "wss://eventsub.wss.twitch.tv/" + rest;
 }
+
 const RETRY_MS = 10_000;
 const LIMIT_RETRY_MS = 5 * 60_000; // bei Twitch-Verbindungslimit (429) nur alle 5 Minuten erneut versuchen
 const ACTIONS = new Set(["delete", "timeout", "ban"]);

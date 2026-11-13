@@ -49,35 +49,6 @@ export function createLoginLimiter({ windowMs = 15 * 60_000, maxPerIp = 20, maxP
 }
 
 /** Sicherheits-Header für alle Antworten. */
-/**
- * Allgemeine Anfrage-Begrenzung pro IP (fester Zeitraum). Ohne zusätzliches Paket, damit sich der Lockfile nicht ändert.
- * Bei Überschreitung: 429 mit Retry-After. Hinter einem Reverse-Proxy WEB_TRUST_PROXY setzen, sonst zählt die Proxy-IP.
- */
-export function createRateLimiter({ windowMs = 60_000, limit = 1000, message = "Zu viele Anfragen. Bitte kurz warten." } = {}) {
-    const hits = new Map(); // ip -> { count, reset }
-    setInterval(() => {
-        const now = Date.now();
-        for (const [ip, h] of hits) if (h.reset <= now) hits.delete(ip);
-    }, windowMs).unref();
-    return function rateLimiter(req, res, next) {
-        const now = Date.now();
-        const ip = req.ip ?? req.socket?.remoteAddress ?? "unknown";
-        let h = hits.get(ip);
-        if (!h || h.reset <= now) {
-            h = { count: 0, reset: now + windowMs };
-            hits.set(ip, h);
-        }
-        h.count++;
-        res.setHeader("RateLimit-Limit", String(limit));
-        res.setHeader("RateLimit-Remaining", String(Math.max(0, limit - h.count)));
-        if (h.count > limit) {
-            res.setHeader("Retry-After", String(Math.ceil((h.reset - now) / 1000)));
-            return res.status(429).json({ error: message });
-        }
-        next();
-    };
-}
-
 export function securityHeaders(req, res, next) {
     res.setHeader("X-Content-Type-Options", "nosniff");
     res.setHeader("X-Frame-Options", "DENY");
