@@ -1,15 +1,37 @@
-FROM node:22-alpine
+FROM ghcr.io/voidzero-dev/vite-plus as build
 WORKDIR /app
 
 # Abhängigkeiten zuerst (besseres Caching); postinstall baut das Dashboard
-COPY package.json package-lock.json .npmrc ./
-COPY web-client/package.json web-client/
-COPY web-client ./web-client
-RUN npm install --no-audit --no-fund
 
-COPY . .
-RUN npm run web:build
+COPY --chown=vp:vp package.json pnpm-lock.yaml pnpm-workspace.yaml .node-version* ./
+RUN vp install --frozen-lockfile
 
+COPY --chown=vp:vp . .
+RUN vp build
+
+
+RUN cp "$(vp env which node | head -1)" /tmp/node
+
+
+FROM ghcr.io/voidzero-dev/vite-plus:latest AS deps
+WORKDIR /app
+COPY --chown=vp:vp package.json pnpm-lock.yaml pnpm-workspace.yaml .node-version* ./
+RUN vp install --frozen-lockfile --prod
+
+
+FROM debian:bookworm-slim AS runtime
+WORKDIR /app
 ENV NODE_ENV=production
+
+COPY --from=build /tmp/node /usr/local/bin/node
+
+COPY --from=build /app/web-client/dist ./web-client/dist
+
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=build /app/package.json ./
+
+USER nobody
 EXPOSE 3080
+
 CMD ["node", "src/index.js"]
