@@ -18,7 +18,22 @@ import { apiConfigured, helix, broadcasterId, getBotIdentity } from "./api.js";
  * Braucht zusätzliche Scopes (siehe oauth.js) - nach dem Update einmal im Dashboard neu autorisieren.
  */
 
-const WS_URL = "wss://eventsub.wss.twitch.tv/ws";
+const WS_HOST = "eventsub.wss.twitch.tv";
+const WS_URL = `wss://${WS_HOST}/ws`;
+
+/**
+ * Reconnect-Adresse aus "session_reconnect" absichern: nur Twitchs eigener EventSub-Server ist erlaubt.
+ * Der Host wird fest vorgegeben, aus der Nachricht werden nur Pfad und Query übernommen.
+ */
+function safeReconnectUrl(raw) {
+    try {
+        const u = new URL(String(raw));
+        if (u.protocol === "wss:" && u.hostname === WS_HOST) return `wss://${WS_HOST}${u.pathname}${u.search}`;
+    } catch {
+        /* ungültige URL -> Standard-Adresse */
+    }
+    return WS_URL;
+}
 const RETRY_MS = 10_000;
 const LIMIT_RETRY_MS = 5 * 60_000; // bei Twitch-Verbindungslimit (429) nur alle 5 Minuten erneut versuchen
 const ACTIONS = new Set(["delete", "timeout", "ban"]);
@@ -132,7 +147,7 @@ function connect(channel, state, url = WS_URL, isReconnect = false) {
                     }
                 }
             } else if (type === "session_reconnect") {
-                connect(channel, state, msg.payload.session.reconnect_url, true);
+                connect(channel, state, safeReconnectUrl(msg.payload?.session?.reconnect_url), true);
             } else if (type === "notification" && msg.payload?.subscription?.type === "channel.moderate") {
                 const id = msg.metadata.message_id;
                 if (state.seen.has(id)) return;

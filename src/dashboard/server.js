@@ -5,7 +5,7 @@ import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 import { config } from "../config.js";
 import { logger } from "../utils/logger.js";
-import { isWeakSecret, createLoginLimiter, securityHeaders } from "./security.js";
+import { isWeakSecret, createLoginLimiter, createRateLimiter, securityHeaders } from "./security.js";
 import { auth, adminTokenUsable } from "./context.js";
 import { createAuthRoutes } from "./auth-routes.js";
 import { registerMeta } from "./routes/meta.js";
@@ -57,6 +57,13 @@ export function startWebServer() {
         app.use(cors({ origin: config.web.corsOrigin }));
     }
     const loginLimiter = createLoginLimiter();
+
+    // Allgemeine Anfrage-Begrenzung pro IP (großzügig, das Dashboard läuft normal weiter) und eine strengere für
+    // Anmeldung/Einrichtung/Twitch-Callback (zusätzlich zur Sperre nach Fehlversuchen).
+    const apiRateLimiter = createRateLimiter({ windowMs: 60_000, limit: 1000 });
+    const authRateLimiter = createRateLimiter({ windowMs: 60_000, limit: 30, message: "Zu viele Anmeldeversuche. Bitte kurz warten." });
+    app.use(apiRateLimiter);
+    app.use("/api/auth", authRateLimiter);
     app.use(express.json({ limit: "5mb" })); // groß genug für Sicherungs-Dateien (Import)
 
     // Fehlersuche: Anfragen, die länger als 1 s dauern, landen mit Pfad und Dauer im Log.
