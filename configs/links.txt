@@ -1,0 +1,6 @@
+# Erlaubte Links/Domains (eine pro Zeile). Nachrichten mit diesen Teilstücken werden nicht gelöscht.
+# Zeilen mit # werden ignoriert.
+twitch.tv
+clips.twitch.tv
+youtube.com
+youtu.be

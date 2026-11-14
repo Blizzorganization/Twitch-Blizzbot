@@ -1,5 +1,6 @@
 node_modules
+web-client/node_modules
+web-client/dist
+configs/.env
 .git
-.gitignore
-*.md
-dist
+*.zip

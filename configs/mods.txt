@@ -1,0 +1,1 @@
+# Nur relevant, wenn TWITCH_PERMIT=true: Nur diese Twitch-Namen (klein geschrieben) gelten als Mods.

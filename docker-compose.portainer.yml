@@ -1,0 +1,31 @@
+# Stack für Portainer: nur der Bot (Variante MIT externer Datenbank; mit eigenem DB-Container: docker-compose.portainer-mit-db.yml).
+# Die PostgreSQL-Datenbank läuft extern (PGHOST/PGPORT/... als Variablen).
+# Variablen (TWITCH_CLIENT_ID usw.) in Portainer unter "Environment variables" eintragen.
+services:
+  bot:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "3080:3080"   # Dashboard; hinter einem HTTPS-Reverse-Proxy besser nur intern freigeben
+    environment:
+      PGHOST: ${PGHOST}
+      PGPORT: ${PGPORT:-5432}
+      PGUSER: ${PGUSER}
+      PGPASSWORD: ${PGPASSWORD}
+      PGDATABASE: ${PGDATABASE}
+      TWITCH_BOT_USERNAME: ${TWITCH_BOT_USERNAME}
+      TWITCH_OAUTH_TOKEN: ${TWITCH_OAUTH_TOKEN}
+      TWITCH_CHANNELS: ${TWITCH_CHANNELS}
+      TWITCH_CLIENT_ID: ${TWITCH_CLIENT_ID}
+      TWITCH_CLIENT_SECRET: ${TWITCH_CLIENT_SECRET}
+      WEB_ENABLED: "true"
+      WEB_PORT: 3080
+      WEB_JWT_SECRET: ${WEB_JWT_SECRET}
+      WEB_ADMIN_TOKEN: ${WEB_ADMIN_TOKEN}
+      WEB_PUBLIC_URL: ${WEB_PUBLIC_URL}
+      WEB_TRUST_PROXY: ${WEB_TRUST_PROXY:-}
+      DISCORD_ENABLED: ${DISCORD_ENABLED:-false}
+      DISCORD_TOKEN: ${DISCORD_TOKEN:-}
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-}
+      DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:-}
+      DISCORD_TWITCH_CHANNEL: ${DISCORD_TWITCH_CHANNEL:-}
