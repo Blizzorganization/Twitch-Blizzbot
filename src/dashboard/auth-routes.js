@@ -91,8 +91,12 @@ export function createAuthRoutes(loginLimiter) {
             const redirectUri = `${base}/api/auth/twitch/callback`;
             const { accessToken, refreshToken } = await step("Code gegen Token tauschen", () => exchangeCode(code, redirectUri));
             const validated = await step("Token prüfen", () => validateToken(accessToken));
-            const id = await step("Kanal-ID holen", () => broadcasterId(channel));
-            if (validated.userId && validated.userId !== id) {
+            // Die Kanal-ID kommt aus dem frisch autorisierten Token selbst (validate liefert Login + ID). Eine Helix-Abfrage
+            // mit dem Kanal-Token wäre beim ERSTEN Autorisieren unmöglich, weil es dann noch gar keinen Token gibt.
+            let id = validated.userId;
+            const wrongAccount = validated.login ? validated.login.toLowerCase() !== String(channel).toLowerCase() : false;
+            if (!id) id = await step("Kanal-ID holen", () => broadcasterId(channel));
+            if (wrongAccount) {
                 return res.redirect(
                     `${base}/?twitchAuth=wrong-account&channel=${encodeURIComponent(channel)}` +
                         `&message=${encodeURIComponent("Es wurde ein anderer Twitch-Account autorisiert, nicht der Broadcaster-Account dieses Kanals. Bitte erneut versuchen und dabei mit dem Streamer-Account selbst einloggen.")}`,

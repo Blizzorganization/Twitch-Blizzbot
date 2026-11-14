@@ -1,4 +1,5 @@
-# Stack für Portainer: nur der Bot. Die PostgreSQL-Datenbank läuft extern (PGHOST/PGPORT/... als Variablen).
+# Stack für Portainer: nur der Bot (Variante MIT externer Datenbank; mit eigenem DB-Container: docker-compose.portainer-mit-db.yml).
+# Die PostgreSQL-Datenbank läuft extern (PGHOST/PGPORT/... als Variablen).
 # Variablen (TWITCH_CLIENT_ID usw.) in Portainer unter "Environment variables" eintragen.
 services:
   bot:

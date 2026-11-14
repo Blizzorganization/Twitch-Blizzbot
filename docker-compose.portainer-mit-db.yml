@@ -1,0 +1,45 @@
+# Stack für Portainer: Bot MIT eigenem Datenbank-Container (Variante ohne externe Datenbank).
+# Nur PGPASSWORD wird gesetzt; Benutzer/Datenbank heißen 'blizzbot'.
+# Variablen (TWITCH_CLIENT_ID usw.) in Portainer unter "Environment variables" eintragen.
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: blizzbot
+      POSTGRES_PASSWORD: ${PGPASSWORD}
+      POSTGRES_DB: blizzbot
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  bot:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "3080:3080"   # Dashboard; hinter einem HTTPS-Reverse-Proxy besser nur intern freigeben
+    environment:
+      PGHOST: db
+      PGPORT: 5432
+      PGUSER: blizzbot
+      PGPASSWORD: ${PGPASSWORD}
+      PGDATABASE: blizzbot
+      TWITCH_BOT_USERNAME: ${TWITCH_BOT_USERNAME}
+      TWITCH_OAUTH_TOKEN: ${TWITCH_OAUTH_TOKEN}
+      TWITCH_CHANNELS: ${TWITCH_CHANNELS}
+      TWITCH_CLIENT_ID: ${TWITCH_CLIENT_ID}
+      TWITCH_CLIENT_SECRET: ${TWITCH_CLIENT_SECRET}
+      WEB_ENABLED: "true"
+      WEB_PORT: 3080
+      WEB_JWT_SECRET: ${WEB_JWT_SECRET}
+      WEB_ADMIN_TOKEN: ${WEB_ADMIN_TOKEN}
+      WEB_PUBLIC_URL: ${WEB_PUBLIC_URL}
+      WEB_TRUST_PROXY: ${WEB_TRUST_PROXY:-}
+      DISCORD_ENABLED: ${DISCORD_ENABLED:-false}
+      DISCORD_TOKEN: ${DISCORD_TOKEN:-}
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:-}
+      DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:-}
+      DISCORD_TWITCH_CHANNEL: ${DISCORD_TWITCH_CHANNEL:-}
+volumes:
+  pgdata:

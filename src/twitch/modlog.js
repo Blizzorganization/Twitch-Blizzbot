@@ -79,11 +79,9 @@ function scheduleRetry(channel, state) {
     state.retry.unref?.();
 }
 
-// Verbindet immer mit der festen Twitch-Adresse. Die reconnect_url aus "session_reconnect" wird bewusst nicht
-// verwendet (Sicherheit: keine Verbindungsziele aus empfangenen Daten); stattdessen neue Sitzung + neu abonnieren.
-function connect(channel, state) {
+function connect(channel, state, url = WS_URL, isReconnect = false) {
     if (state.stopped) return;
-    const ws = new WebSocket(WS_URL);
+    const ws = new WebSocket(url);
     const previous = state.ws;
     state.ws = ws;
 
@@ -100,40 +98,41 @@ function connect(channel, state) {
             if (type === "session_welcome") {
                 state.keepalive = msg.payload?.session?.keepalive_timeout_seconds ?? 10;
                 armKeepalive(state, ws);
-                try {
-                    await subscribe(channel, state, msg.payload.session.id);
-                    // Nach einem von Twitch angeforderten Reconnect: alte Verbindung erst schließen, wenn die neue steht.
-                    if (previous && previous !== ws) {
-                        try {
-                            previous.close();
-                        } catch {
-                            /* ignorieren */
-                        }
+                if (isReconnect) {
+                    // Subscriptions wandern bei einem von Twitch angeforderten Reconnect automatisch mit.
+                    try {
+                        previous?.close();
+                    } catch {
+                        /* ignorieren */
                     }
-                } catch (e) {
-                    const limit = /429|transports limit/i.test(String(e.message));
-                    if (limit) {
-                        // Zu viele WebSocket-Verbindungen für diesen Account: später erneut versuchen, nur einmal melden.
-                        state.backoff = true;
-                        if (!state.problem) {
-                            state.problem = true;
+                } else {
+                    try {
+                        await subscribe(channel, state, msg.payload.session.id);
+                    } catch (e) {
+                        const limit = /429|transports limit/i.test(String(e.message));
+                        if (limit) {
+                            // Zu viele WebSocket-Verbindungen für diesen Account: später erneut versuchen, nur einmal melden.
+                            state.backoff = true;
+                            if (!state.problem) {
+                                state.problem = true;
+                                logger.warn(
+                                    `Moderator-Aktionen: Erfassung für ${channel} nicht möglich (${e.message}). ` +
+                                        `Ich versuche es alle 5 Minuten erneut und melde, sobald es wieder klappt.`,
+                                );
+                            }
+                        } else {
+                            // Meist fehlende Berechtigungen (Scopes): nicht endlos neu versuchen, sondern einmal klar melden.
                             logger.warn(
                                 `Moderator-Aktionen: Erfassung für ${channel} nicht möglich (${e.message}). ` +
-                                    `Ich versuche es alle 5 Minuten erneut und melde, sobald es wieder klappt.`,
+                                    `Im Dashboard den Twitch-Zugang neu autorisieren (neue Berechtigungen nötig).`,
                             );
+                            state.stopped = true;
                         }
-                    } else {
-                        // Meist fehlende Berechtigungen (Scopes): nicht endlos neu versuchen, sondern einmal klar melden.
-                        logger.warn(
-                            `Moderator-Aktionen: Erfassung für ${channel} nicht möglich (${e.message}). ` +
-                                `Im Dashboard den Twitch-Zugang neu autorisieren (neue Berechtigungen nötig).`,
-                        );
-                        state.stopped = true;
+                        ws.close();
                     }
-                    ws.close();
                 }
             } else if (type === "session_reconnect") {
-                connect(channel, state);
+                connect(channel, state, msg.payload.session.reconnect_url, true);
             } else if (type === "notification" && msg.payload?.subscription?.type === "channel.moderate") {
                 const id = msg.metadata.message_id;
                 if (state.seen.has(id)) return;

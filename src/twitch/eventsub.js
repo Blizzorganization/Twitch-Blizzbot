@@ -27,7 +27,7 @@ export async function validateToken(accessToken) {
     const res = await fetch("https://id.twitch.tv/oauth2/validate", { headers: { Authorization: `OAuth ${accessToken}` } });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.message ?? `Token-Validierung fehlgeschlagen (${res.status})`);
-    return { scopes: data.scopes ?? [], expiresIn: data.expires_in ?? null, clientId: data.client_id, userId: data.user_id };
+    return { scopes: data.scopes ?? [], expiresIn: data.expires_in ?? null, clientId: data.client_id, userId: data.user_id, login: data.login };
 }
 
 async function persistTokenRow(channel, token) {
