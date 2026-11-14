@@ -79,9 +79,9 @@ function scheduleRetry(channel, state) {
     state.retry.unref?.();
 }
 
-function connect(channel, state, url = WS_URL, isReconnect = false) {
+function connect(channel, state, isReconnect = false) {
     if (state.stopped) return;
-    const ws = new WebSocket(url);
+    const ws = new WebSocket(WS_URL); // immer die feste Twitch-Adresse, nie eine Adresse aus einer Nachricht
     const previous = state.ws;
     state.ws = ws;
 
@@ -132,7 +132,7 @@ function connect(channel, state, url = WS_URL, isReconnect = false) {
                     }
                 }
             } else if (type === "session_reconnect") {
-                connect(channel, state, msg.payload.session.reconnect_url, true);
+                connect(channel, state, true); // reconnect_url von Twitch wird bewusst nicht benutzt (neue Sitzung zur festen Adresse)
             } else if (type === "notification" && msg.payload?.subscription?.type === "channel.moderate") {
                 const id = msg.metadata.message_id;
                 if (state.seen.has(id)) return;
