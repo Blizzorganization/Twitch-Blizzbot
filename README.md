@@ -16,19 +16,15 @@ Nur **additiv** kommt dazu (alte Daten bleiben unberührt): `customcommands.cool
 
 ## Installation
 
-Voraussetzungen: **Node.js 22 oder neuer** und **pnpm** (einmalig: `npm install -g pnpm`).
-
 ```bash
 cp configs/example.env configs/.env   # und ausfüllen
-docker compose up -d                  # PostgreSQL starten (oder alte DB nutzen)
-pnpm install                          # installiert Bot + Dashboard
-pnpm -C web-client build              # baut das Dashboard (web-client/dist)
-pnpm start
+docker compose up -d        # PostgreSQL starten (oder alte DB nutzen)
+npm install                 # installiert Bot + Dashboard (npm-Workspaces) in EINEN gemeinsamen node_modules-Ordner
+                             # und baut das Dashboard automatisch (postinstall)
+npm start
 ```
 
-Das Projekt nutzt **pnpm-Workspaces** (`pnpm-workspace.yaml`): der Bot liegt im Projekt-Root, das Dashboard in `web-client/`. `pnpm install` im Root installiert beide Teile. `pnpm -C web-client build` baut das Dashboard neu, `pnpm -C web-client dev` startet den Dashboard-Dev-Server (Vite mit Hot-Reload, leitet `/api` an `http://localhost:3080` weiter). `pnpm dev` startet den Bot mit automatischem Neustart bei Code-Änderungen.
-
-**Wichtig:** `npm install` funktioniert nicht (Fehler `Unsupported URL Type "catalog:"`). Einige Versionen (vite-plus) stehen zentral im `catalog` der `pnpm-workspace.yaml`, und das versteht nur pnpm. Siehe auch "Paketverwaltung (pnpm)" unten.
+Das Projekt nutzt **npm-Workspaces**: `bot/` (Root) und `bot/web-client/` teilen sich einen einzigen `node_modules`-Ordner im Projekt-Root, es gibt keinen separaten `web-client/node_modules` mehr. `npm install` im Root installiert beide Teile; `npm run web:build` baut nur das Dashboard neu, `npm run web:dev` startet den Dashboard-Dev-Server (Vite mit Hot-Reload).
 
 Dashboard: `http://localhost:3080`. Beim ersten Aufruf legst du dort deinen ersten Benutzer (Name + Passwort) an; dieser wird automatisch **Haupt-Admin**. Danach meldest du dich normal damit an. `WEB_ADMIN_TOKEN` ist nur ein Notfallzugang (z. B. falls die Nutzerdatenbank leer/kaputt ist) und kann auf dem Login-Bildschirm über "Mit Admin-Token anmelden" genutzt werden (zählt dabei immer als Haupt-Admin).
 
@@ -219,9 +215,9 @@ Nur ein Giveaway, eine Umfrage und eine Wette können gleichzeitig pro Kanal lau
 - **Pflicht-Geheimnisse:** `WEB_JWT_SECRET` muss gesetzt, mindestens 16 Zeichen lang und kein Platzhalter (`changeme`, `bitte-aendern` ...) sein, sonst startet das Dashboard nicht (der Bot läuft weiter, das Log nennt den Grund). `WEB_ADMIN_TOKEN` gilt nur, wenn er genauso stark ist; sonst ist der Notfall-Zugang per Token deaktiviert (Warnung im Log). Zufallswert erzeugen: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`.
 - **Ersteinrichtung:** Solange noch kein Benutzer existiert, verlangt das Anlegen des Haupt-Admins zusätzlich den `WEB_ADMIN_TOKEN` (Feld auf der Login-Seite), damit nicht jeder Besucher ihn anlegen kann.
 - **Anmelde-Begrenzung:** Fehlgeschlagene Anmeldungen werden begrenzt (10 pro Benutzername und 20 pro IP-Adresse in 15 Minuten, danach Antwort 429). Steht ein Reverse-Proxy vor dem Bot, `WEB_TRUST_PROXY=true` setzen, sonst sehen alle Besucher wie eine einzige IP aus.
-- **Anfrage-Begrenzung:** Zusätzlich begrenzt `express-rate-limit` alle Anfragen ans Dashboard auf 1000 pro Minute und IP-Adresse, die Routen unter `/api/auth` (Ersteinrichtung, Login, Twitch-Rückkehr) auf 30 pro Minute. Darüber antwortet der Server mit 429 und einem `Retry-After`-Header. Auch hier gilt: hinter einem Reverse-Proxy `WEB_TRUST_PROXY` setzen, sonst teilen sich alle Besucher das Limit.
+- **Anfrage-Begrenzung:** Zusätzlich begrenzt `express-rate-limit` alle Anfragen ans Dashboard auf 1000 pro Minute und IP-Adresse, die Routen unter `/api/auth` (Ersteinrichtung, Login, Twitch-Rückkehr) auf 30 pro Minute. Darüber antwortet der Server mit 429. Auch hier gilt: hinter einem Reverse-Proxy `WEB_TRUST_PROXY` setzen, sonst teilen sich alle Besucher das Limit.
+- **Moderator-Aktionen (EventSub):** Die Erfassung verbindet sich nur mit der fest eingetragenen Twitch-Adresse `wss://eventsub.wss.twitch.tv/ws`. Fordert Twitch einen Reconnect an, wird die mitgeschickte `reconnect_url` bewusst nicht benutzt: der Bot baut eine neue Sitzung zur festen Adresse auf, abonniert neu und schließt die alte Verbindung erst danach (doppelte Meldungen werden herausgefiltert).
 - **Benutzerverwaltung:** Admins können Konten von Haupt-Admin und anderen Admins weder ändern (Passwort, Name, Rolle) noch löschen; das darf nur der Haupt-Admin. Ein gelöschter Benutzer verliert seinen Zugang sofort (sein Anmelde-Token wird nicht mehr akzeptiert).
-- **Moderator-Aktionen (EventSub):** Die Erfassung verbindet sich nur mit der fest eingetragenen Twitch-Adresse `wss://eventsub.wss.twitch.tv/ws`. Fordert Twitch einen Reconnect an, wird die mitgeschickte `reconnect_url` bewusst nicht benutzt: der Bot baut eine neue Sitzung zur festen Adresse auf, abonniert neu und schließt die alte Verbindung erst danach (kein Verbindungsziel aus empfangenen Daten, doppelte Meldungen werden herausgefiltert).
 - **Sonstiges:** Sicherheits-Header (u. a. Content-Security-Policy, kein Einbetten in fremde Seiten), kein CORS ohne `WEB_CORS_ORIGIN`, zeitkonstanter Vergleich des Admin-Tokens, Datenbankfehler gehen nicht im Klartext an den Browser. Das Dashboard gehört hinter HTTPS (Reverse-Proxy).
 
 ## Übersicht, Loyalty-System und Diagnose (Dashboard)
@@ -355,18 +351,16 @@ Der Bot prüft 45 Sekunden nach dem Start und danach alle 6 Stunden, ob die gesp
 - **Chat-Token ohne Refresh-Token** (`TWITCH_OAUTH_TOKEN` allein): läuft er in weniger als 7 Tagen ab, kommt eine Warnung, ist er abgelaufen, eine Fehlermeldung. Mit `TWITCH_BOT_REFRESH_TOKEN` erneuert der Bot ihn selbst und prüft ihn nicht gesondert.
 - **Log:** Ein neues Problem steht einmal als Warnung im Log (`Token-Prüfung: …`), ebenso, wenn es behoben ist. Nicht bei jeder Prüfung erneut.
 
-## Paketverwaltung (pnpm)
+## npm-Hinweis zu esbuild
 
-- **Neue Pakete** immer mit `pnpm add <paket>` (Bot) bzw. `pnpm -C web-client add <paket>` (Dashboard) hinzufügen, nicht mit npm.
-- **`pnpm-lock.yaml` immer mit committen.** Der Docker-Build installiert mit `--frozen-lockfile`; passt die Lockfile nicht zur `package.json` (z. B. neues Paket in der `package.json` eingetragen, aber `pnpm install` nicht ausgeführt), bricht der Build ab.
-- Die Version von vite-plus (Build-Werkzeug fürs Dashboard, Befehl `vp`) steht zentral im `catalog` der `pnpm-workspace.yaml`; `vite` wird dort auf die passende vite-plus-Version umgeleitet.
+Neuere npm-Versionen blockieren Install-Skripte von Abhängigkeiten, bis man sie freigibt, und warnen dann (`npm warn install-scripts … esbuild`). `esbuild` gehört zum Dashboard-Build (Vite) und braucht sein Install-Skript. Die Freigabe steht an drei Stellen, damit sie sicher greift: `allowScripts` in der `package.json` im Hauptordner **und** in `web-client/` (einmal fest auf die Version aus der Warnung, einmal für jede Version) sowie `allow-scripts=esbuild` in der `.npmrc` im Hauptordner. Bleibt die Warnung trotzdem, hilft: `npm install-scripts approve esbuild --no-allow-scripts-pin` (im Hauptordner ausführen).
 
 ## Docker, Portainer und GitHub
 
-- **Dockerfile:** mehrstufig. Stufe 1 installiert alle Abhängigkeiten (inkl. `web-client/package.json`) und baut das Dashboard, Stufe 2 installiert nur die Produktions-Abhängigkeiten, das fertige Image (`debian:bookworm-slim`) enthält Node, `src/`, das gebaute Dashboard und `node_modules`. Es läuft als Benutzer `nobody` auf Port 3080. `configs/.env` kommt nicht ins Image (`.dockerignore`) – die Einstellungen werden als Umgebungsvariablen übergeben.
+- **Dockerfile:** baut auf `node:22-alpine`, installiert alles mit npm, baut das Dashboard und startet den Bot auf Port 3080. `configs/.env` kommt nicht ins Image (`.dockerignore`) – die Einstellungen werden als Umgebungsvariablen übergeben.
 - **`docker-compose.yml`:** startet nur die PostgreSQL-Datenbank für die lokale Entwicklung.
 - **`docker-compose.portainer.yml`:** Stack für Portainer, nur der Bot; die Datenbank läuft extern (`PGHOST`, `PGPORT` ...). Alle Variablen in Portainer unter "Environment variables" eintragen.
-- **GitHub Actions:** `cd.yml` baut bei jedem Push auf `master` das Docker-Image (amd64 + arm64) und veröffentlicht es als `ghcr.io/<owner>/<repo>:latest` und `:<commit>`. `codeql.yml` prüft jeden Push und Pull Request auf `master` mit CodeQL auf Sicherheitslücken.
+- **GitHub Actions:** `cd.yml` baut bei jedem Push auf `master` das Docker-Image und veröffentlicht es als `ghcr.io/<owner>/<repo>:latest` und `:<commit>`. `codeql.yml` prüft jeden Push und Pull Request auf `master` mit CodeQL auf Sicherheitslücken.
 
 ## Netzwerk: IPv4 bevorzugt
 

@@ -1,4 +1,4 @@
 node_modules/
 configs/.env
 web-client/dist/*
-.direnv
+package-lock.json

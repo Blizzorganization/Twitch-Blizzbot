@@ -120,7 +120,7 @@ export function startWebServer() {
         app.get("*", (req, res) => res.sendFile(path.join(dist, "index.html")));
     } else {
         app.get("/", (req, res) =>
-            res.send("API läuft. Frontend bauen mit: pnpm install && pnpm -C web-client build"),
+            res.send("API läuft. Frontend bauen mit: cd web-client && npm install && npm run build"),
         );
     }
 

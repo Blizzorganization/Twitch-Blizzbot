@@ -1,35 +1,40 @@
 {
   "name": "twitch-blizzbot-v2",
   "version": "2.0.0",
-  "private": true,
   "description": "Twitch Chat Bot mit Custom Commands, Blacklist, Alerts, Cooldowns, Web-Interface und Discord-Anbindung",
+  "type": "module",
+  "main": "src/index.js",
+  "private": true,
   "workspaces": [
     "web-client"
   ],
-  "type": "module",
-  "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "dev": "node --watch src/index.js"
+    "dev": "node --watch src/index.js",
+    "web:dev": "npm run dev --workspace web-client",
+    "web:build": "npm run build --workspace web-client",
+    "postinstall": "npm run web:build --if-present"
   },
   "dependencies": {
     "@twurple/api": "^8.2.0",
     "@twurple/auth": "^8.2.0",
     "@twurple/chat": "^8.2.0",
     "@twurple/eventsub-ws": "^8.2.0",
-    "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
     "discord.js": "14.28.0",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "jsonwebtoken": "^9.0.2",
     "pg": "^8.11.3",
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
     "express-rate-limit": "^7.5.0"
   },
-  "devDependencies": {
-    "vite-plus": "catalog:"
-  },
   "engines": {
-    "node": ">=22"
+    "node": ">=18"
+  },
+  "pnpm": {
+    "allowedDeprecatedVersions": {
+      "discord.js": "14.28.0"
+    }
   }
 }
