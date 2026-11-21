@@ -1,4 +1,5 @@
 /** Dashboard-Routen: Automessages */
+import { logAudit } from "../../db/audit.js";
 import { listAutomessages, addAutomessage, updateAutomessage, deleteAutomessage, setAutomessageEnabled, isAutomessageEnabled } from "../../db/automessages.js";
 import { getChannelSettings } from "../../db/channel-settings.js";
 import { wrap, channelOf, channelAccessMiddleware } from "../context.js";
@@ -20,7 +21,10 @@ export function registerAutomessages(api) {
         res.status(201).json({ ok: true, id: await addAutomessage(channelOf(req), message, delayMinutes) });
     }));
     api.put("/automessages/enabled", channelAccessMiddleware, wrap(async (req, res) => {
-        await setAutomessageEnabled(channelOf(req), !!req.body.enabled);
+        const channel = channelOf(req);
+        const was = await isAutomessageEnabled(channel);
+        await setAutomessageEnabled(channel, !!req.body.enabled);
+        if (was !== !!req.body.enabled) logAudit({ actor: req.user.username, action: req.body.enabled ? "enable" : "disable", targetType: "module", target: "Automessages", channel, details: { setting: "automessage" } });
         res.json({ ok: true });
     }));
     api.put("/automessages/:id", channelAccessMiddleware, wrap(async (req, res) => {

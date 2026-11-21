@@ -41,8 +41,15 @@ export function registerDiscord(api) {
         const channel = channelOf(req);
         if (!known(channel)) return res.status(400).json({ error: "Unbekannter Kanal." });
         // UserError (ungültige/doppelte IDs) wird von wrap als 400 beantwortet
+        const wasEnabled = discordSettingsFor(channel)?.enabled;
         await saveDiscordSettings(channel, req.body ?? {});
-        logAudit({ actor: req.user.username, action: "edit", targetType: "discord", target: channel, channel, details: {} });
+        if (wasEnabled !== undefined && wasEnabled !== discordSettingsFor(channel).enabled) {
+            // reiner Ein-/Ausschalten wie bei den anderen Modulen
+            const on = discordSettingsFor(channel).enabled;
+            logAudit({ actor: req.user.username, action: on ? "enable" : "disable", targetType: "module", target: "Discord", channel, details: { setting: "discord" } });
+        } else {
+            logAudit({ actor: req.user.username, action: "edit", targetType: "discord", target: channel, channel, details: {} });
+        }
         reloadDiscord(); // Registrierung bei Discord läuft im Hintergrund (kann dauern); Fehler stehen im Log
         res.json({ ok: true, warning: null, settings: { ...EMPTY, ...discordSettingsFor(channel) }, status: discordStatus() });
     }));

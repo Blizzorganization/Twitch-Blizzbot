@@ -5,7 +5,25 @@ import { globalLinks, globalTlds } from "../../twitch/moderation.js";
 import { restartEventSub } from "../../twitch/eventsub.js";
 import { syncLevelingState } from "../../services/leveling.js";
 import { refreshBotMods } from "../../db/bot-mods.js";
+import { logAudit } from "../../db/audit.js";
 import { wrap, channelOf, channelAccessMiddleware } from "../context.js";
+
+/** Schalter, die im Dashboard als Modul an/aus laufen -> Anzeigename im Audit-Log. */
+const MODULE_LABELS = {
+    greetingsEnabled: "Begrüßungen",
+    timersEnabled: "Timer",
+    blacklistEnabled: "Blacklist",
+    linkFilter: "Link-Filter",
+    capsFilter: "Spam-Filter: Caps",
+    emoteFilter: "Spam-Filter: Emotes",
+    repeatFilter: "Spam-Filter: Wiederholungen",
+    charSpamFilter: "Spam-Filter: Zeichen",
+    botModsOnly: "Verify-Mods",
+    levelingEnabled: "Level-/XP-System",
+    pointsEnabled: "Punkte-System",
+    watchtimeEnabled: "Watchtime",
+    rewardsEnabled: "Reward-System",
+};
 
 export function registerSettings(api) {
     /* Kanal-Einstellungen (Cooldown, Raid, Automessage-Intervall, Link-Filter – pro Kanal, sonst eingebauter Standard) */
@@ -82,7 +100,15 @@ export function registerSettings(api) {
             // Twitch-Namen: ohne @, klein, höchstens 25 Zeichen, ohne Doppelte
             req.body.watchtimeExcluded = [...new Set(req.body.watchtimeExcluded.map((n) => String(n).trim().replace(/^@/, "").toLowerCase()).filter((n) => n && n.length <= 25))];
         }
-        await updateChannelSettings(channelOf(req), req.body);
+        const channel = channelOf(req);
+        const before = await getChannelSettings(channel); // für das Audit-Log: welche Module wurden ein-/ausgeschaltet?
+        await updateChannelSettings(channel, req.body);
+        for (const [key, label] of Object.entries(MODULE_LABELS)) {
+            if (!(key in req.body)) continue;
+            const now = !!req.body[key];
+            if (now === !!before[key]) continue;
+            logAudit({ actor: req.user.username, action: now ? "enable" : "disable", targetType: "module", target: label, channel, details: { setting: key } });
+        }
         if ("botModsOnly" in req.body) await refreshBotMods(); // Rechte sofort umstellen
         if ("levelingEnabled" in req.body) await syncLevelingState(channelOf(req)); // Level-Up-Meldungen sofort stoppen/freigeben
         // Reward-System ein-/ausgeschaltet: Verbindung zu Twitch (EventSub) passend auf- bzw. abbauen

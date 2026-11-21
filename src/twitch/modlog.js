@@ -115,7 +115,7 @@ function connect(channel, state, isReconnect = false) {
                             state.backoff = true;
                             if (!state.problem) {
                                 state.problem = true;
-                                logger.warn(
+                                logger.error(
                                     `Moderator-Aktionen: Erfassung für ${channel} nicht möglich (${e.message}). ` +
                                         `Ich versuche es alle 5 Minuten erneut und melde, sobald es wieder klappt.`,
                                 );

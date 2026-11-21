@@ -198,7 +198,7 @@ export async function startEventSub() {
             const limit = error?.statusCode === 429 || /429|transports limit/i.test(String(error?.message ?? ""));
             if (!limit || ++failures < MAX_SUBSCRIBE_FAILURES) return;
             failure = "Twitch-Verbindungslimit (429): für diesen Account sind schon 3 WebSocket-Verbindungen belegt";
-            logger.warn(
+            logger.error(
                 `Punkte-Reward-Erfassung (EventSub) wird gestoppt: ${failure}. Läuft der Bot noch an einer anderen Stelle ` +
                     `(zweite Instanz, alter Bot, anderes Tool mit derselben Twitch-App)? Mit DIAGNOSE=true zeigt der Start, welche Sessions Twitch sieht. ` +
                     `Nach dem Beenden der anderen Verbindung: Reward-System im Dashboard aus- und wieder einschalten oder den Bot neu starten.`,

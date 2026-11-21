@@ -20,9 +20,9 @@ export function AuditLog() {
     const [debounced, setDebounced] = useState("");
     const [actionFilter, setActionFilter] = useState("");
     const [typeFilter, setTypeFilter] = useState("");
-    const ACTION_LABELS = { create: "angelegt", edit: "bearbeitet", delete: "gelöscht", stop: "gestoppt", draw: "gezogen", end: "beendet", lock: "gesperrt", resolve: "ausgewertet", cancel: "abgebrochen", export: "exportiert", import: "importiert" };
+    const ACTION_LABELS = { enable: "eingeschaltet", disable: "ausgeschaltet", create: "angelegt", edit: "bearbeitet", delete: "gelöscht", stop: "gestoppt", draw: "gezogen", end: "beendet", lock: "gesperrt", resolve: "ausgewertet", cancel: "abgebrochen", export: "exportiert", import: "importiert" };
     const TYPE_LABELS = {
-        command: "Command", alias: "Alias", counter: "Zähler", user: "Benutzer",
+        command: "Command", module: "Modul", discord: "Discord", alias: "Alias", counter: "Zähler", user: "Benutzer",
         "user-channels": "Kanalrechte", "link-permit": "Link-Freigabe", "bot-mod": "Verify-Mod", giveaway: "Giveaway", poll: "Umfrage", prediction: "Wette", quote: "Zitat", backup: "Sicherung", greeting: "Begrüßung", "bot-mod": "Bot-Moderator", watchtime: "Watchtime",
     };
 
