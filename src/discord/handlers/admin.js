@@ -17,9 +17,12 @@ function groupAliases(rows) {
 }
 
 /** Verwaltungs-Commands (/add, /edit, /del je mit command/alias/blacklist, dazu /view /commands /aliase /blacklist). */
-export async function handleAdmin(interaction) {
-    const channel = (interaction.options.getString("channel") ?? config.discord.twitchChannel ?? "").toLowerCase();
-    if (!channel) return "Es ist kein Twitch-Kanal konfiguriert (DISCORD_TWITCH_CHANNEL).";
+export async function handleAdmin(interaction, settings) {
+    // Der Server gehört zu genau einem Twitch-Kanal (Dashboard: Verwaltung -> Discord). Eine abweichende Kanal-Angabe wird abgelehnt.
+    const channel = settings.channel;
+    const asked = interaction.options.getString("channel")?.replace(/#+/g, "").trim().toLowerCase();
+    if (asked && asked !== channel) return `⛔ Dieser Server gehört zum Twitch-Kanal **${channel}**, nicht zu **${asked}**.`;
+    const color = settings.embedColor;
     const g = (n) => interaction.options.getString(n);
 
     const actor = `${interaction.user.tag} (Discord)`;
@@ -98,6 +101,7 @@ export async function handleAdmin(interaction) {
             const aliases = (await listAliases(channel)).filter((a) => a.command === resolved).map((a) => `${P}${a.alias}`);
             const isMod = (cmd.permission ?? 0) >= PERMISSIONS.MODERATOR;
             const embed = commandInfoEmbed({
+                color,
                 botAvatarUrl: interaction.client.user.displayAvatarURL(),
                 prefix: P,
                 name: resolved,
@@ -116,6 +120,7 @@ export async function handleAdmin(interaction) {
             const aliases = await listAliases(channel, { onlyEnabled: true }); // Aliase ausgeschalteter Commands erscheinen nicht
             const counters = await allCounters(channel);
             const embed = botCommandsEmbed({
+                color,
                 botAvatarUrl: interaction.client.user.displayAvatarURL(),
                 everyone,
                 mod,
@@ -132,7 +137,7 @@ export async function handleAdmin(interaction) {
                 : "Es gibt noch keine Aliase.";
         }
         case "blacklist": {
-            if (config.discord.blacklistChannelId) {
+            if (settings.blacklistChannelId) {
                 await sendBlacklist(channel);
                 return "✅ Die Blacklist wurde in den Blacklist-Kanal gesendet.";
             }

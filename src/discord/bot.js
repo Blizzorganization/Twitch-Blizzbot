@@ -4,6 +4,7 @@ import { logger } from "../utils/logger.js";
 import { logEvent } from "../db/events.js";
 import { adminDefs, publicDefs, ADMIN_NAMES, PUBLIC_REPLY_NAMES } from "./definitions.js";
 import { isAllowed } from "./util.js";
+import { loadDiscordSettings, seedDiscordSettingsFromEnv, activeDiscordSettings, effectivePublicGuildIds, settingsForGuild, discordSettingsFor } from "../db/discord-settings.js";
 import { blacklistPayload } from "./blacklist-channel.js";
 import { handleAdmin } from "./handlers/admin.js";
 import { handlePublic, top10Payload } from "./handlers/public.js";
@@ -20,14 +21,20 @@ import { getClient, setClient, clearClient, markStarted, markReady, markError, s
  *   state.js              Client + Status (fürs Dashboard)
  *   embeds.js             alle Embeds
  */
-export { sendBlacklist } from "./blacklist-channel.js";
+export { sendBlacklist, hasBlacklistChannel } from "./blacklist-channel.js";
 export { discordStatus } from "./state.js";
 
 async function handleButton(interaction) {
-    const [kind, arg] = interaction.customId.split(":");
-    if (kind === "top10") return interaction.update(await top10Payload(Math.max(1, Number(arg) || 1)));
+    const [kind, arg, chan] = interaction.customId.split(":");
+    if (kind === "top10") {
+        // Der Kanal steckt im Button; er muss zu dem Server passen, auf dem geklickt wurde
+        const s = settingsForGuild(interaction.guildId, "public");
+        if (!s || s.channel !== chan) return interaction.reply({ content: "⛔ Dieser Server gehört nicht zu diesem Kanal.", flags: MessageFlags.Ephemeral });
+        return interaction.update(await top10Payload(Math.max(1, Number(arg) || 1), s));
+    }
     if (kind === "refresh-blacklist") {
-        if (!isAllowed(interaction)) return interaction.reply({ content: "⛔ Dafür fehlt dir die Berechtigung.", flags: MessageFlags.Ephemeral });
+        const s = settingsForGuild(interaction.guildId, "admin");
+        if (!s || s.channel !== arg || !isAllowed(interaction, s)) return interaction.reply({ content: "⛔ Dafür fehlt dir die Berechtigung.", flags: MessageFlags.Ephemeral });
         return interaction.update(await blacklistPayload(arg));
     }
 }
@@ -38,20 +45,23 @@ async function handleInteraction(interaction) {
         if (!interaction.isChatInputCommand()) return;
 
         if (ADMIN_NAMES.has(interaction.commandName)) {
-            if (!isAllowed(interaction)) {
+            const s = settingsForGuild(interaction.guildId, "admin");
+            if (!s) return interaction.reply({ content: "⛔ Dieser Server ist für keinen Twitch-Kanal eingerichtet (Dashboard: Verwaltung → Discord).", flags: MessageFlags.Ephemeral });
+            if (!isAllowed(interaction, s)) {
                 return interaction.reply({ content: "⛔ Dafür fehlt dir die Berechtigung.", flags: MessageFlags.Ephemeral });
             }
-            const result = await handleAdmin(interaction);
+            const result = await handleAdmin(interaction, s);
             // /add /edit /del /view /commands sind bewusst NICHT "versteckt": andere Moderatoren sollen
             // im Kanal sehen, wenn jemand einen Command anlegt/ändert/löscht bzw. sich die Übersicht ansieht.
             const ephemeral = !PUBLIC_REPLY_NAMES.has(interaction.commandName);
             const base = ephemeral ? { flags: MessageFlags.Ephemeral } : {};
             const payload = typeof result === "string" ? { content: result, ...base } : { ...base, ...result };
             await interaction.reply(payload);
-            logEvent((interaction.options.getString("channel") ?? config.discord.twitchChannel ?? "").toLowerCase(),
-                "discord_command", interaction.user.tag, { command: interaction.commandName });
+            logEvent(s.channel, "discord_command", interaction.user.tag, { command: interaction.commandName });
         } else {
-            await interaction.reply(await handlePublic(interaction));
+            const s = settingsForGuild(interaction.guildId, "public");
+            if (!s) return await interaction.reply({ content: "⛔ Dieser Server ist für keinen Twitch-Kanal eingerichtet.", flags: MessageFlags.Ephemeral });
+            await interaction.reply(await handlePublic(interaction, s));
         }
     } catch (e) {
         logger.error("Discord-Fehler:", e);
@@ -61,31 +71,75 @@ async function handleInteraction(interaction) {
     }
 }
 
-/** Registriert die Slash-Commands pro Server (Verwaltung und/oder Nutzer, je nach Konfiguration). */
-async function registerCommands() {
-    const { token, clientId, guildIds } = config.discord;
-    // Ohne eigene DISCORD_PUBLIC_GUILD_ID laufen Verwaltungs- und Nutzer-Commands wie bisher auf denselben Server(n).
-    const publicGuildIds = config.discord.publicGuildIds.length ? config.discord.publicGuildIds : guildIds;
+const registeredGuilds = new Set(); // Server, auf denen wir zuletzt Commands registriert haben (zum Aufräumen)
 
-    const rest = new REST({ version: "10" }).setToken(token);
-    // Pro Server NUR EINMAL registrieren (ein zweiter PUT würde den ersten überschreiben), mit der
-    // Vereinigung aus Verwaltungs- und/oder Nutzer-Commands, je nachdem wofür dieser Server konfiguriert ist.
-    const allGuildIds = new Set([...guildIds, ...publicGuildIds]);
-    let total = 0;
-    for (const id of allGuildIds) {
-        const body = [...(guildIds.includes(id) ? adminDefs : []), ...(publicGuildIds.includes(id) ? publicDefs : [])];
-        await rest.put(Routes.applicationGuildCommands(clientId, id), { body });
-        total += body.length;
-        logger.info(`Discord-Commands registriert auf Server ${id}: ${body.length} (${guildIds.includes(id) ? "Verwaltung" : ""}${guildIds.includes(id) && publicGuildIds.includes(id) ? " + " : ""}${publicGuildIds.includes(id) ? "Nutzer" : ""})`);
+/**
+ * Registriert die Slash-Commands pro Server. Die Zuordnung kommt aus den Einstellungen aller eingeschalteten Kanäle:
+ * Server aus guild_ids bekommen die Verwaltungs-Commands, Server aus public_guild_ids (leer = wie guild_ids) die Nutzer-Commands.
+ * Pro Server wird nur EINMAL registriert (ein zweiter PUT würde den ersten überschreiben). Server, die nicht mehr
+ * eingetragen sind, werden geleert.
+ */
+async function registerCommands() {
+    const { token, clientId } = config.discord;
+    const plan = new Map(); // guildId -> { admin, pub }
+    for (const s of activeDiscordSettings()) {
+        for (const id of s.guildIds) plan.set(id, { ...(plan.get(id) ?? {}), admin: true });
+        for (const id of effectivePublicGuildIds(s)) plan.set(id, { ...(plan.get(id) ?? {}), pub: true });
     }
+    const rest = new REST({ version: "10" }).setToken(token);
+    let total = 0;
+    for (const [id, { admin, pub }] of plan) {
+        const body = [...(admin ? adminDefs : []), ...(pub ? publicDefs : [])];
+        try {
+            await rest.put(Routes.applicationGuildCommands(clientId, id), { body });
+            total += body.length;
+            logger.debug(`Discord-Commands registriert auf Server ${id}: ${body.length} (${admin ? "Verwaltung" : ""}${admin && pub ? " + " : ""}${pub ? "Nutzer" : ""})`);
+        } catch (e) {
+            logger.warn(`Discord-Commands auf Server ${id} nicht registrierbar (Bot dort eingeladen? Scope applications.commands?): ${e?.message ?? e}`);
+        }
+    }
+    for (const id of registeredGuilds) {
+        if (plan.has(id)) continue;
+        try {
+            await rest.put(Routes.applicationGuildCommands(clientId, id), { body: [] });
+            logger.debug(`Discord-Commands von Server ${id} entfernt (nicht mehr eingetragen).`);
+        } catch (e) {
+            logger.warn(`Discord-Commands auf Server ${id} konnten nicht entfernt werden: ${e?.message ?? e}`);
+        }
+    }
+    registeredGuilds.clear();
+    for (const id of plan.keys()) registeredGuilds.add(id);
     setRegisteredCommands(total);
 }
 
+let reloadChain = Promise.resolve();
+
+/**
+ * Lädt die Einstellungen neu und registriert die Commands neu (nach Änderungen im Dashboard, ohne Neustart).
+ * Die Registrierung bei Discord kann dauern (je Server ein Web-Aufruf), darum läuft sie im Hintergrund und
+ * mehrere Änderungen hintereinander werden nacheinander abgearbeitet. Die Einstellungen selbst gelten sofort.
+ */
+export function reloadDiscord() {
+    const run = async () => {
+        await loadDiscordSettings();
+        if (!config.discord.enabled || !getClient()) return;
+        const started = Date.now();
+        await registerCommands();
+        logger.debug(`Discord-Commands neu registriert (${Date.now() - started} ms).`);
+    };
+    reloadChain = reloadChain.then(run).catch((e) => logger.warn(`Discord-Commands konnten nicht neu registriert werden: ${e?.message ?? e}`));
+    return reloadChain;
+}
+
 export async function startDiscordBot() {
-    const { token, clientId, guildIds } = config.discord;
+    const { token, clientId } = config.discord;
     markStarted();
     try {
-        if (!token || !clientId || !guildIds.length) throw new Error("DISCORD_TOKEN, DISCORD_CLIENT_ID und DISCORD_GUILD_ID müssen gesetzt sein.");
+        if (!token || !clientId) throw new Error("DISCORD_TOKEN und DISCORD_CLIENT_ID müssen gesetzt sein.");
+        // Einstellungen pro Kanal liegen in der DB; beim ersten Start werden die alten .env-Werte übernommen
+        if (await seedDiscordSettingsFromEnv()) logger.info("Discord: bisherige .env-Werte als Einstellung für Kanal \"" + config.discord.twitchChannel + "\" übernommen (ab jetzt im Dashboard: Verwaltung → Discord).");
+        await loadDiscordSettings();
+        if (!activeDiscordSettings().some((s) => s.guildIds.length)) logger.info("Discord: noch kein Kanal eingerichtet (Dashboard: Verwaltung → Discord). Der Bot verbindet sich trotzdem.");
         await registerCommands();
 
         // GuildMessages + MessageContent werden für die "say"-Funktion benötigt (Nachrichten aus einem Discord-Kanal

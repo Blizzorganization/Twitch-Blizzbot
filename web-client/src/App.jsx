@@ -13,6 +13,7 @@ import { ActionsSection } from "./tabs/Actions.jsx";
 import { AccountPanel } from "./tabs/Account.jsx";
 import { Users } from "./tabs/Users.jsx";
 import { Backup } from "./tabs/Backup.jsx";
+import { Discord } from "./tabs/Discord.jsx";
 import { AuditLog } from "./tabs/AuditLog.jsx";
 import { Alerts } from "./tabs/Alerts.jsx";
 import { LoyaltySection } from "./tabs/Loyalty.jsx";
@@ -46,6 +47,7 @@ export function buildGroups({ channel, meta }) {
         { id: "Verwaltung", admin: true, subs: [
             { id: "Benutzer", render: () => <Users /> },
             { id: "Audit-Log", render: () => <AuditLog /> },
+            { id: "Discord", render: () => <Discord channel={channel} /> },
             { id: "Sicherung", render: () => <Backup channel={channel} /> },
         ] },
     ];

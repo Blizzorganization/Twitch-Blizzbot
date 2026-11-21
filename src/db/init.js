@@ -131,6 +131,17 @@ const EXTENSIONS = [
         message TEXT NOT NULL,
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
     );`,
+    // Discord pro Twitch-Kanal (Server, Admin-Rolle, Blacklist-/Say-Kanal, Embed-Farbe); Dashboard: Verwaltung -> Discord
+    `CREATE TABLE IF NOT EXISTS discord_settings (
+        channel VARCHAR(25) PRIMARY KEY REFERENCES streamer(name) ON UPDATE CASCADE ON DELETE CASCADE,
+        enabled BOOLEAN NOT NULL DEFAULT TRUE,
+        guild_ids TEXT NOT NULL DEFAULT '',
+        public_guild_ids TEXT NOT NULL DEFAULT '',
+        admin_role_id VARCHAR(30),
+        blacklist_channel_id VARCHAR(30),
+        say_channel_id VARCHAR(30),
+        embed_color VARCHAR(7)
+    );`,
     // Timer/Erinnerungen (!timer): bleiben über Neustarts erhalten
     `CREATE TABLE IF NOT EXISTS timers (
         id SERIAL PRIMARY KEY,

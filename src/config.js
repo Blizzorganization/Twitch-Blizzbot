@@ -53,6 +53,8 @@ export const config = {
         enabled: required("DISCORD_ENABLED", "false") === "true",
         token: required("DISCORD_TOKEN"),
         clientId: required("DISCORD_CLIENT_ID"),
+        // Die Werte ab hier (guildIds ... embedColor) sind nur noch die EINMALIGE Übernahme in die Datenbank (discord_settings, siehe
+        // db/discord-settings.js). Maßgeblich sind danach die Einstellungen pro Kanal im Dashboard (Verwaltung -> Discord).
         // Server(e), auf denen die Verwaltungs-Commands (/add /edit /del ...) registriert werden. Komma-getrennt für mehrere Server.
         guildIds: (required("DISCORD_GUILD_ID", "") || "").split(",").map((s) => s.trim()).filter(Boolean),
         // Optional: eigene(r) Server für die Nutzer-Commands (/watchtime /link /unlink /info), falls diese auf

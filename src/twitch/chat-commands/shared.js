@@ -7,7 +7,7 @@ export const P = PERMISSIONS;
 export const EMOTES = { logo: "blizzorLogo", blacklistAdded: "TPFufun" };
 
 /** Wird von index.js gesetzt (Discord-Anbindung für !blacklist), optional. */
-export const hooks = { sendBlacklist: null };
+export const hooks = { sendBlacklist: null, hasBlacklistChannel: null };
 
 /** Wird von commands.js befüllt, damit einzelne Commands (z. B. !switch) Namen/Aliase auflösen können, ohne zirkulär zu importieren. */
 export const registry = { resolveName: () => undefined };

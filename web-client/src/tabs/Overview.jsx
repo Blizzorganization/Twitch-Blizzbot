@@ -83,7 +83,7 @@ export function StatusOverview({ channel }) {
                         ? "Getrennt"
                         : st.discord.connected
                             ? "Verbunden"
-                            : st.discord.configured ? `Getrennt${st.discord.lastError ? " – " + st.discord.lastError : ""}` : "Unvollständig konfiguriert (Token/Client-ID/Server)"} />
+                            : st.discord.configured ? `Getrennt${st.discord.lastError ? " – " + st.discord.lastError : ""}` : "Unvollständig konfiguriert (Token/Client-ID oder noch kein Kanal unter Verwaltung → Discord)"} />
                 <Item label="API-Token (Kanal)" ok={st.channelToken} text={st.channelToken ? "Verbunden" : "Fehlt – unter Verwaltung → Benutzer autorisieren"} />
                 {st.bot && <Item label="Bot-Account" ok={st.bot.hasToken ? true : null} text={st.bot.hasToken ? (st.bot.login ?? "Autorisiert") : "Nicht autorisiert"} />}
                 <Item label="Moderator-Aktionen" ok={!!st.modLog?.connected} text={modLogText} />

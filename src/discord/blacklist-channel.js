@@ -1,5 +1,5 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
-import { config } from "../config.js";
+import { discordSettingsFor } from "../db/discord-settings.js";
 import { getTable } from "../utils/table.js";
 import { listBlacklist } from "../db/blacklist.js";
 import { getClient } from "./state.js";
@@ -16,11 +16,18 @@ export async function blacklistPayload(channel) {
     };
 }
 
-/** Schickt die Blacklist in den Discord-Blacklist-Kanal (wie !blacklist im alten Bot). */
+/** Hat der Kanal in den Discord-Einstellungen einen Blacklist-Kanal (und Discord ist für ihn eingeschaltet)? */
+export function hasBlacklistChannel(channel) {
+    const s = discordSettingsFor(channel);
+    return !!(s?.enabled && s.blacklistChannelId);
+}
+
+/** Schickt die Blacklist in den Discord-Blacklist-Kanal des Twitch-Kanals (wie !blacklist im alten Bot). */
 export async function sendBlacklist(channel) {
-    const id = config.discord.blacklistChannelId;
-    if (!getClient() || !id) throw new Error("Discord-Blacklist-Kanal ist nicht konfiguriert");
+    const s = discordSettingsFor(channel);
+    const id = s?.enabled ? s.blacklistChannelId : "";
+    if (!getClient() || !id) throw new Error("Für diesen Kanal ist kein Discord-Blacklist-Kanal eingerichtet");
     const target = await getClient().channels.fetch(id);
-    if (!target?.isTextBased()) throw new Error("DISCORD_BLACKLIST_CHANNEL_ID ist kein Textkanal");
+    if (!target?.isTextBased()) throw new Error("Der eingetragene Blacklist-Kanal ist kein Textkanal");
     await target.send(await blacklistPayload(channel));
 }

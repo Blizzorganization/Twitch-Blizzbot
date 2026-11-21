@@ -1,4 +1,5 @@
 import { config } from "../config.js";
+import { allDiscordSettings, activeDiscordSettings } from "../db/discord-settings.js";
 
 /** Gemeinsamer Zustand des Discord-Teils: der Client und ein paar Statusangaben für das Dashboard. */
 let client;
@@ -14,16 +15,18 @@ export const setRegisteredCommands = (n) => { info.registeredCommands = n; };
 
 /** Status für das Dashboard (Übersicht). */
 export function discordStatus() {
-    const { token, clientId, guildIds, blacklistChannelId, sayChannelId } = config.discord;
+    const { token, clientId } = config.discord;
+    const active = activeDiscordSettings();
     return {
         enabled: !!config.discord.enabled,
-        configured: !!(token && clientId && guildIds.length),
+        configured: !!(token && clientId && active.some((s) => s.guildIds.length)),
         connected: !!client?.isReady?.(),
         guilds: client?.guilds?.cache?.size ?? 0,
+        channels: active.length,
         registeredCommands: info.registeredCommands,
         connectedSince: info.readyAt,
         lastError: info.lastError,
-        blacklistChannel: !!blacklistChannelId,
-        sayChannel: !!sayChannelId,
+        blacklistChannel: allDiscordSettings().some((s) => s.enabled && s.blacklistChannelId),
+        sayChannel: allDiscordSettings().some((s) => s.enabled && s.sayChannelId),
     };
 }

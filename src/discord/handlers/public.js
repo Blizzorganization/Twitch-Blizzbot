@@ -10,19 +10,20 @@ import { getUser, getFollowedAt } from "../../twitch/api.js";
 import { watchtimeEmbed, profileEmbed, top10Embed, linkingInfoEmbed, quoteEmbed } from "../embeds.js";
 
 /** Nutzer-Commands für alle Mitglieder (/watchtime /profil /top10 /link /unlink /info /zitat). */
-export async function top10Payload(page) {
-    const channel = config.discord.twitchChannel;
+export async function top10Payload(page, settings) {
+    const channel = settings.channel;
     const rows = await watchtimeList(channel, "alltime", 10, page);
-    const embed = top10Embed({ channel, rows, page, formatRow: (r) => calcWatchtime(r.watchtime) });
+    const embed = top10Embed({ color: settings.embedColor, channel, rows, page, formatRow: (r) => calcWatchtime(r.watchtime) });
     const row = new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId(`top10:${page - 1}`).setLabel("Vorherige Seite").setStyle(ButtonStyle.Primary).setDisabled(page <= 1),
-        new ButtonBuilder().setCustomId(`top10:${page + 1}`).setLabel("Nächste Seite").setStyle(ButtonStyle.Primary).setDisabled(rows.length < 10),
+        new ButtonBuilder().setCustomId(`top10:${page - 1}:${channel}`).setLabel("Vorherige Seite").setStyle(ButtonStyle.Primary).setDisabled(page <= 1),
+        new ButtonBuilder().setCustomId(`top10:${page + 1}:${channel}`).setLabel("Nächste Seite").setStyle(ButtonStyle.Primary).setDisabled(rows.length < 10),
     );
     return { embeds: [embed], components: [row] };
 }
 
-export async function handlePublic(interaction) {
-    const channel = config.discord.twitchChannel;
+export async function handlePublic(interaction, settings) {
+    const channel = settings.channel;
+    const color = settings.embedColor;
     switch (interaction.commandName) {
         case "watchtime": {
             const dcuser = interaction.options.getUser("user") ?? interaction.user;
@@ -34,6 +35,7 @@ export async function handlePublic(interaction) {
             if (!wt) return { content: "Diesen Nutzer kenne ich nicht." };
             const max = (await getWatchtime(channel, config.twitch.username.toLowerCase(), month)) || wt;
             const embed = watchtimeEmbed({
+                color,
                 botAvatarUrl: interaction.client.user.avatarURL({ extension: "png" }),
                 monthly,
                 twuser,
@@ -62,6 +64,7 @@ export async function handlePublic(interaction) {
                 logger.debug(`profil: Discord-Profilbild nicht ladbar: ${e.message}`);
             }
             const embed = profileEmbed({
+                color,
                 avatarUrl,
                 twuser,
                 level: stats.level,
@@ -71,14 +74,14 @@ export async function handlePublic(interaction) {
             return { embeds: [embed] };
         }
         case "top10":
-            return top10Payload(1);
+            return top10Payload(1, settings);
         case "zitat": {
             const id = interaction.options.getInteger("nummer");
             const quote = id ? await getQuote(channel, id) : await randomQuote(channel);
             if (!quote) {
                 return { content: id ? `Zitat #${id} gibt es nicht.` : "Es sind noch keine Zitate hinterlegt." };
             }
-            return { embeds: [quoteEmbed({ channel, quote })] };
+            return { embeds: [quoteEmbed({ color, channel, quote })] };
         }
         case "link": {
             const name = interaction.options.getString("name").toLowerCase();
@@ -113,6 +116,7 @@ export async function handlePublic(interaction) {
                 logger.debug(`twitchname: API nicht verfügbar: ${e.message}`);
             }
             const embed = linkingInfoEmbed({
+                color,
                 avatarUrl: dcuser.avatarURL(),
                 discordName: dcuser.username,
                 twitchName: twuser,

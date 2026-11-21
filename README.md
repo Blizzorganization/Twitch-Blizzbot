@@ -19,12 +19,11 @@ Nur **additiv** kommt dazu (alte Daten bleiben unberührt): `customcommands.cool
 ```bash
 cp configs/example.env configs/.env   # und ausfüllen
 docker compose up -d        # PostgreSQL starten (oder alte DB nutzen)
-npm install                 # installiert Bot + Dashboard (npm-Workspaces) in EINEN gemeinsamen node_modules-Ordner
-                             # und baut das Dashboard automatisch (postinstall)
-npm start
+npm install                 # oder: pnpm install - installiert Bot + Dashboard und baut das Dashboard automatisch (postinstall)
+npm start                   # oder: pnpm start
 ```
 
-Das Projekt nutzt **npm-Workspaces**: `bot/` (Root) und `bot/web-client/` teilen sich einen einzigen `node_modules`-Ordner im Projekt-Root, es gibt keinen separaten `web-client/node_modules` mehr. `npm install` im Root installiert beide Teile; `npm run web:build` baut nur das Dashboard neu, `npm run web:dev` startet den Dashboard-Dev-Server (Vite mit Hot-Reload).
+Das Projekt läuft mit **npm oder pnpm** (beides ist gleichwertig; pnpm ist optional). `bot/` (Root) und `bot/web-client/` (Dashboard) werden mit einem `install` im Root installiert. Dashboard neu bauen: `npm run web:build` (bzw. `pnpm run web:build`), Entwicklung mit Hot-Reload: `npm run web:dev`. Im Docker-Build wird pnpm benutzt, wenn eine `pnpm-lock.yaml` im Projekt liegt, sonst npm.
 
 Dashboard: `http://localhost:3080`. Beim ersten Aufruf legst du dort deinen ersten Benutzer (Name + Passwort) an; dieser wird automatisch **Haupt-Admin**. Danach meldest du dich normal damit an. `WEB_ADMIN_TOKEN` ist nur ein Notfallzugang (z. B. falls die Nutzerdatenbank leer/kaputt ist) und kann auf dem Login-Bildschirm über "Mit Admin-Token anmelden" genutzt werden (zählt dabei immer als Haupt-Admin).
 
@@ -249,9 +248,28 @@ Unter **Chat → Alerts** siehst und bearbeitest du die Texte für Sub, Resub, B
 
 Das Dashboard-Login bleibt im Browser gespeichert (`localStorage`), solange der Bot-Prozess durchläuft. **Nach jedem Neustart des Bots** (und damit des Web-Servers) werden alle zuvor ausgestellten Login-Tokens automatisch ungültig – wer das Dashboard danach öffnet, sieht wieder den Login-Bildschirm, statt automatisch eingeloggt zu bleiben. Der `WEB_ADMIN_TOKEN`-Notfallzugang ist davon unberührt (er ist kein Login-Token, sondern ein statischer Schlüssel). Nach dem Login landet man immer zuerst in der "Übersicht".
 
-## Discord
+## Discord pro Twitch-Kanal (Dashboard: Verwaltung → Discord)
 
-Verwaltung (für „Server verwalten" bzw. `DISCORD_ADMIN_ROLE_ID`): `/add`, `/edit`, `/del` (jeweils mit Unterpunkt `command`, `alias` bzw. `blacklist`, z. B. `/add alias command:<command> alias:<alias>`, `/add blacklist wort:<wort> aktion:<0-10>`; `/edit` kennt `command` und `blacklist`), `/view /commands /aliase /blacklist`. Für alle: `/watchtime` (optional `monat`), `/profil` (Embed „Nutzer- Profil“: Twitch-Name, Level, Punkt und ein Fortschrittsbalken mit Prozent bis zum nächsten Level; Thumbnail ist das Discord-Profilbild des Nutzers; wie `/watchtime` mit optional `twitchuser`/`user`, sonst der verknüpfte Twitch-Name), `/top10` (mit Seitenknöpfen), `/link`, `/unlink`, `/info` (früher `/twitchname`: Discord-/Twitch-Name, Account-Alter, Follow-Dauer), `/zitat` (optional `nummer`, sonst zufällig; nutzt den Twitch-Kanal von `DISCORD_TWITCH_CHANNEL`).
+Es läuft **ein** Discord-Bot (`DISCORD_ENABLED`, `DISCORD_TOKEN`, `DISCORD_CLIENT_ID` in der `.env`). Alles Weitere wird **pro Twitch-Kanal** im Dashboard unter **Verwaltung → Discord** (Kanal oben wählen) eingerichtet und steht in der Tabelle `discord_settings`:
+
+| Einstellung | Bedeutung |
+|---|---|
+| Aktiv | Discord für diesen Kanal an/aus |
+| Server (Verwaltung) | Server-ID(s), Komma-getrennt: dort laufen `/add`, `/edit`, `/del`, `/view` … (und, falls unten nichts steht, auch die Nutzer-Commands) |
+| Server (Nutzer-Commands) | optional: eigene Server für `/watchtime`, `/profil`, `/top10`, `/link` … **Leer = alles läuft über die Server der Verwaltung** (wie bisher `DISCORD_PUBLIC_GUILD_ID`) |
+| Admin-Rolle | Rolle, die die Verwaltungs-Commands nutzen darf (zusätzlich zum Recht „Server verwalten“) |
+| Blacklist-Kanal | Discord-Kanal für `!blacklist`; ohne Eintrag antwortet der Bot im Twitch-Chat |
+| Say-Kanal | Nachrichten dort postet der Bot 1:1 in den Chat dieses Twitch-Kanals |
+| Embed-Farbe | Hex-Wert, z. B. `#edbc5d` |
+
+- Der Bot erkennt am **Discord-Server**, zu welchem Twitch-Kanal ein Command gehört. Ein Server darf (je Befehlsart) nur zu **einem** Kanal gehören; das Dashboard lehnt Doppelbelegungen ab. Auf einem Server gilt die Kanal-Angabe `channel:` nur für den eigenen Kanal.
+- Nach dem Speichern werden die Slash-Commands automatisch neu registriert (ohne Neustart); Server, die nicht mehr eingetragen sind, werden geleert.
+- **Übergang:** Haben Bestandsinstallationen die alten Variablen noch in der `.env`, übernimmt der Bot sie beim ersten Start (`DISCORD_GUILD_ID`, `DISCORD_PUBLIC_GUILD_ID`, `DISCORD_ADMIN_ROLE_ID`, `DISCORD_BLACKLIST_CHANNEL_ID`, `DISCORD_SAY_CHANNEL_ID`, `DISCORD_EMBED_COLOR`, Kanal aus `DISCORD_TWITCH_CHANNEL`) einmalig als Einstellung des bisherigen Kanals – aber nur, solange die Tabelle leer ist. Danach zählt nur noch das Dashboard.
+- Ohne Einstellungen verbindet sich der Bot trotzdem, hat aber keine Slash-Commands, bis der erste Kanal eingerichtet ist.
+
+### Discord-Commands
+
+Verwaltung (für „Server verwalten" bzw. der eingetragenen Admin-Rolle): `/add`, `/edit`, `/del` (jeweils mit Unterpunkt `command`, `alias` bzw. `blacklist`, z. B. `/add alias command:<command> alias:<alias>`, `/add blacklist wort:<wort> aktion:<0-10>`; `/edit` kennt `command` und `blacklist`), `/view /commands /aliase /blacklist`. Für alle: `/watchtime` (optional `monat`), `/profil` (Embed „Nutzer- Profil“: Twitch-Name, Level, Punkt und ein Fortschrittsbalken mit Prozent bis zum nächsten Level; Thumbnail ist das Discord-Profilbild des Nutzers; wie `/watchtime` mit optional `twitchuser`/`user`, sonst der verknüpfte Twitch-Name), `/top10` (mit Seitenknöpfen), `/link`, `/unlink`, `/info` (früher `/twitchname`: Discord-/Twitch-Name, Account-Alter, Follow-Dauer), `/zitat` (optional `nummer`, sonst zufällig; nutzt den Twitch-Kanal von `DISCORD_TWITCH_CHANNEL`).
 
 **Status:** In der Dashboard-Übersicht zeigt eine Karte "Discord", ob der Bot verbunden ist; darunter stehen Serveranzahl, registrierte Slash-Commands und ob Blacklist-/Say-Kanal gesetzt sind. Schlägt der Start fehl, steht der Grund dort (nur für Admins).
 
@@ -260,30 +278,13 @@ Verwaltung (für „Server verwalten" bzw. `DISCORD_ADMIN_ROLE_ID`): `/add`, `/e
 - **`/view name:<command> [channel]`** zeigt den vollständigen, unveränderten Antworttext eines Custom Commands (oder, wenn `name` ein Alias ist, des Ziel-Commands) als Embed an ("Command-Info:", mit Aliasen – gibt es keine, steht „Es sind keine Aliase zu diesem Befehl vorhanden“ – und Cooldown; Fußzeile "CCMD"/"MCMD" je nach Rechtestufe) – wie `!view` im alten Bot, hier als Slash-Command.
 - **`/commands [channel]`** zeigt wie `!cmd` im alten Bot die komplette Übersicht als Embed: NUR Custom Commands, Mod-Commands, Aliase und Zähler (keine fest einprogrammierten Standard-Commands).
 - **`/add`, `/edit`, `/del`, `/view` und `/commands` antworten sichtbar im Kanal** (nicht "versteckt"/ephemeral wie die übrigen Verwaltungs-Commands), damit andere Moderatoren mitbekommen, wenn jemand einen Command anlegt, ändert oder löscht bzw. sich die Übersicht ansieht.
-- Alle Discord-Embeds liegen zentral in `src/discord/embeds.js` und teilen sich eine gemeinsame Farbe, einstellbar über `DISCORD_EMBED_COLOR` in der `configs/.env` (Hex, z. B. `#1abc9c`; ohne Angabe gilt der bisherige Standard).
-- **"say"-Funktion:** Jede Nachricht, die im Discord-Kanal `DISCORD_SAY_CHANNEL_ID` geschrieben wird, postet der Bot 1:1 in den Twitch-Chat von `DISCORD_SAY_TWITCH_CHANNEL` (Standard: `DISCORD_TWITCH_CHANNEL`). Nachrichten von Bots werden ignoriert. Dafür braucht der Bot den **"Message Content Intent"** – im [Discord Developer Portal](https://discord.com/developers/applications) unter *Bot → Privileged Gateway Intents* aktivieren, sonst sieht der Bot den Nachrichtentext nicht.
+- Alle Discord-Embeds liegen zentral in `src/discord/embeds.js`; die Farbe stellst du pro Kanal im Dashboard ein (Verwaltung → Discord, Hex, z. B. `#1abc9c`; ohne Angabe gilt der Standard).
+- **"say"-Funktion:** Jede Nachricht, die im Say-Kanal eines Twitch-Kanals (Dashboard: Verwaltung → Discord) geschrieben wird, postet der Bot 1:1 in den Twitch-Chat dieses Kanals. Nachrichten von Bots werden ignoriert. Dafür braucht der Bot den **"Message Content Intent"** – im [Discord Developer Portal](https://discord.com/developers/applications) unter *Bot → Privileged Gateway Intents* aktivieren, sonst sieht der Bot den Nachrichtentext nicht.
 - Bot mit den Scopes `bot` **und** `applications.commands` einladen (fehlt `applications.commands`, erscheinen keine Slash-Commands); `DISCORD_TOKEN`, `DISCORD_CLIENT_ID` und `DISCORD_GUILD_ID` müssen gesetzt sein, sonst startet der Discord-Teil gar nicht. Neu registrierte Slash-Commands können serverseitig bis zu einigen Minuten brauchen, bis Discord sie anzeigt.
 
-### Nur einen Twitch-Kanal angeben
+### Alte `.env`-Variablen
 
-Für die Verwaltungs-Commands, `/watchtime` & Co. und die "say"-Funktion reicht jetzt eine einzige Angabe:
-
-```
-DISCORD_TWITCH_CHANNEL=dein_kanal
-```
-
-`DISCORD_SAY_TWITCH_CHANNEL` bleibt als **optionaler** Override erhalten, falls die "say"-Funktion einen anderen Kanal bespielen soll als der Rest. Die älteren Variablen `DISCORD_DEFAULT_CHANNEL` und `DISCORD_WATCHTIME_CHANNEL` gibt es nicht mehr; ohne `DISCORD_TWITCH_CHANNEL` gilt der erste Kanal aus `TWITCH_CHANNELS`.
-
-### Verwaltung und Nutzer-Commands auf getrennten Servern
-
-Standardmäßig laufen alle Slash-Commands auf dem/den in `DISCORD_GUILD_ID` angegebenen Server(n). Sollen die **Nutzer-Commands** (`/watchtime`, `/profil`, `/top10`, `/link`, `/unlink`, `/info`) auf einem **anderen** Discord-Server laufen als die **Verwaltungs-Commands** (`/add`, `/edit`, `/del`, `/view`, `/addbl`, …), trägst du den Nutzer-Server in `DISCORD_PUBLIC_GUILD_ID` ein:
-
-```
-DISCORD_GUILD_ID=123   # Server mit den Verwaltungs-Commands
-DISCORD_PUBLIC_GUILD_ID=456   # Server mit den Nutzer-Commands
-```
-
-Beide Werte akzeptieren auch mehrere, Komma-getrennte Server-IDs. Auf jedem Server werden nur die Commands registriert, für die er konfiguriert ist – `/add` taucht dann auf Server 456 gar nicht erst auf, `/watchtime` nicht auf Server 123. Der Bot muss auf **beiden** Servern eingeladen sein (Scopes `bot` + `applications.commands`). Lässt du `DISCORD_PUBLIC_GUILD_ID` leer, bleibt alles wie bisher auf einem gemeinsamen Server.
+`DISCORD_GUILD_ID`, `DISCORD_PUBLIC_GUILD_ID`, `DISCORD_ADMIN_ROLE_ID`, `DISCORD_TWITCH_CHANNEL`, `DISCORD_BLACKLIST_CHANNEL_ID`, `DISCORD_SAY_CHANNEL_ID` und `DISCORD_EMBED_COLOR` werden nur noch einmalig beim ersten Start in die Datenbank übernommen (siehe oben). `DISCORD_SAY_TWITCH_CHANNEL` entfällt: Der Say-Kanal gehört jetzt immer zum Twitch-Kanal, bei dem er eingetragen ist.
 
 ## Unterschiede zum alten Bot
 
@@ -357,7 +358,7 @@ Neuere npm-Versionen blockieren Install-Skripte von Abhängigkeiten, bis man sie
 
 ## Docker, Portainer und GitHub
 
-- **Dockerfile:** baut auf `node:22-alpine`, installiert alles mit npm, baut das Dashboard und startet den Bot auf Port 3080. `configs/.env` kommt nicht ins Image (`.dockerignore`) – die Einstellungen werden als Umgebungsvariablen übergeben.
+- **Dockerfile:** baut auf `node:22-alpine`, installiert alles mit pnpm (`--frozen-lockfile`), wenn eine `pnpm-lock.yaml` im Repo liegt, sonst mit npm, baut das Dashboard und startet den Bot auf Port 3080. `configs/.env` kommt nicht ins Image (`.dockerignore`) – die Einstellungen werden als Umgebungsvariablen übergeben.
 - **`docker-compose.yml`:** startet nur die PostgreSQL-Datenbank für die lokale Entwicklung.
 - **`docker-compose.portainer.yml`:** Stack für Portainer, nur der Bot; die Datenbank läuft extern (`PGHOST`, `PGPORT` ...). Alle Variablen in Portainer unter "Environment variables" eintragen.
 - **GitHub Actions:** `cd.yml` baut bei jedem Push auf `master` das Docker-Image und veröffentlicht es als `ghcr.io/<owner>/<repo>:latest` und `:<commit>`. `codeql.yml` prüft jeden Push und Pull Request auf `master` mit CodeQL auf Sicherheitslücken.

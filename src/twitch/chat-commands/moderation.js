@@ -42,7 +42,7 @@ export const moderationCommands = {
         desc: "Zeigt die komplette Blacklist an (per Discord-Anbindung oder im Chat).",
         silent: true,
         run: async (ctx) => {
-            if (hooks.sendBlacklist) {
+            if (hooks.sendBlacklist && hooks.hasBlacklistChannel?.(ctx.channel)) {
                 await hooks.sendBlacklist(ctx.channel);
                 return ctx.say(`${ctx.user} Blacklist wurde gesendet`);
             }

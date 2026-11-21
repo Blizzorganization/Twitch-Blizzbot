@@ -6,12 +6,12 @@ import { config } from "../config.js";
  * Die Farbe ist für ALLE Embeds gemeinsam: Standard 0xedbc5d, überschreibbar über
  * DISCORD_EMBED_COLOR in der configs/.env (z. B. "#1abc9c").
  */
-export const COLOR = config.discord.embedColor;
+export const COLOR = 0xedbc5d; // Standard; pro Kanal per Parameter `color` überschreibbar (Dashboard: Verwaltung -> Discord)
 
 /** "/view": Command-Info mit Antworttext, Aliasen und Cooldown (Fußzeile CCMD/MCMD). */
-export function commandInfoEmbed({ botAvatarUrl, prefix, name, response, aliases, cooldown, isMod }) {
+export function commandInfoEmbed({ color, botAvatarUrl, prefix, name, response, aliases, cooldown, isMod }) {
     return new EmbedBuilder()
-        .setColor(COLOR)
+        .setColor(color ?? COLOR)
         .setTitle("__Command-Info:__")
         .setThumbnail(botAvatarUrl)
         .setDescription(`**${prefix}${name}**\n${response}`)
@@ -44,8 +44,8 @@ function chunkItems(items, sep, limit = 1024) {
  * Wie im alten Bot erscheinen nur Bereiche, für die es Daten gibt; ist gar nichts angelegt, steht ein Hinweis da.
  * Ist eine Liste länger als ein Embed-Feld erlaubt (1024 Zeichen), läuft sie in einem Folgefeld ohne Titel weiter.
  */
-export function botCommandsEmbed({ botAvatarUrl, everyone, mod, aliases, counters }) {
-    const embed = new EmbedBuilder().setColor(COLOR).setTitle("__Bot_Commands:__").setThumbnail(botAvatarUrl);
+export function botCommandsEmbed({ color, botAvatarUrl, everyone, mod, aliases, counters }) {
+    const embed = new EmbedBuilder().setColor(color ?? COLOR).setTitle("__Bot_Commands:__").setThumbnail(botAvatarUrl);
     const sections = [
         ["Der Bot kann folgende Commands:", everyone, ", "],
         ["Mod-Commands", mod, ", "],
@@ -63,9 +63,9 @@ export function botCommandsEmbed({ botAvatarUrl, everyone, mod, aliases, counter
 }
 
 /** "/watchtime". */
-export function watchtimeEmbed({ botAvatarUrl, monthly, twuser, watchtimeText, percent }) {
+export function watchtimeEmbed({ color, botAvatarUrl, monthly, twuser, watchtimeText, percent }) {
     return new EmbedBuilder()
-        .setColor(COLOR)
+        .setColor(color ?? COLOR)
         .setThumbnail(botAvatarUrl)
         .setTitle(monthly ? "**__Watchtime (aktueller Monat)__**" : "**__Watchtime__**")
         .addFields(
@@ -76,11 +76,11 @@ export function watchtimeEmbed({ botAvatarUrl, monthly, twuser, watchtimeText, p
 }
 
 /** "/profil": Level, Punkte und Fortschritt zum nächsten Level. */
-export function profileEmbed({ avatarUrl, twuser, level, points, percent }) {
+export function profileEmbed({ color, avatarUrl, twuser, level, points, percent }) {
     const filled = Math.max(0, Math.min(10, Math.round(percent / 10)));
     const bar = "▓".repeat(filled) + "░".repeat(10 - filled);
     return new EmbedBuilder()
-        .setColor(COLOR)
+        .setColor(color ?? COLOR)
         .setThumbnail(avatarUrl)
         .setTitle("**__Nutzer- Profil__**")
         .addFields(
@@ -92,10 +92,10 @@ export function profileEmbed({ avatarUrl, twuser, level, points, percent }) {
 }
 
 /** "/top10" (Seite "page" von "rows" = [{viewer, watchtime}]). */
-export function top10Embed({ channel, rows, page, formatRow }) {
+export function top10Embed({ color, channel, rows, page, formatRow }) {
     const embed = new EmbedBuilder()
         .setTitle("**__Watchtime:__**")
-        .setColor(COLOR)
+        .setColor(color ?? COLOR)
         .setDescription(channel ?? "-")
         .setFooter({ text: `Seite ${page}` });
     for (const r of rows) embed.addFields({ name: r.viewer, value: formatRow(r), inline: false });
@@ -104,9 +104,9 @@ export function top10Embed({ channel, rows, page, formatRow }) {
 }
 
 /** "/info": Discord-/Twitch-Verknüpfungsinfo. */
-export function linkingInfoEmbed({ avatarUrl, discordName, twitchName, age, followAge }) {
+export function linkingInfoEmbed({ color, avatarUrl, discordName, twitchName, age, followAge }) {
     return new EmbedBuilder()
-        .setColor(COLOR)
+        .setColor(color ?? COLOR)
         .setThumbnail(avatarUrl)
         .setTitle("**__Linkinginfo__**")
         .addFields(
@@ -118,9 +118,9 @@ export function linkingInfoEmbed({ avatarUrl, discordName, twitchName, age, foll
 }
 
 /** "/zitat": ein Zitat aus dem Zitat-Archiv des Kanals. */
-export function quoteEmbed({ channel, quote }) {
+export function quoteEmbed({ color, channel, quote }) {
     const embed = new EmbedBuilder()
-        .setColor(COLOR)
+        .setColor(color ?? COLOR)
         .setTitle(`**__Zitat #${quote.id}__**`)
         .setDescription(`„${quote.text}“`);
     const footer = [channel, quote.created_at ? new Date(quote.created_at).toLocaleDateString("de-DE") : null].filter(Boolean).join(" · ");

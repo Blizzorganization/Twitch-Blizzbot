@@ -4,7 +4,7 @@ import { logger } from "./utils/logger.js";
 import { pool, measureDb } from "./db/pool.js";
 import { ensureTables } from "./db/init.js";
 import { startTwitchBot, stopTwitchBot } from "./twitch/bot.js";
-import { startDiscordBot, stopDiscordBot, sendBlacklist } from "./discord/bot.js";
+import { startDiscordBot, stopDiscordBot, sendBlacklist, hasBlacklistChannel } from "./discord/bot.js";
 import { hooks } from "./twitch/commands.js";
 import { importAutomessagesFile } from "./db/automessages.js";
 import { startWebServer } from "./dashboard/server.js";
@@ -54,7 +54,9 @@ async function main() {
     if (config.web.enabled) webServer = startWebServer();
 
     if (config.discord.enabled) {
-        if (config.discord.blacklistChannelId) hooks.sendBlacklist = sendBlacklist; // !blacklist im Twitch-Chat -> Discord
+        // !blacklist im Twitch-Chat -> Discord, aber nur für Kanäle mit eingerichtetem Blacklist-Kanal (sonst Antwort im Chat)
+        hooks.sendBlacklist = sendBlacklist;
+        hooks.hasBlacklistChannel = hasBlacklistChannel;
         startDiscordBot().catch((e) => logger.error("Discord-Bot konnte nicht starten:", e));
     }
 

@@ -11,9 +11,9 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
-    "web:dev": "npm run dev --workspace web-client",
-    "web:build": "npm run build --workspace web-client",
-    "postinstall": "npm run web:build --if-present"
+    "web:dev": "npm --prefix web-client run dev",
+    "web:build": "npm --prefix web-client run build",
+    "postinstall": "npm run web:build"
   },
   "dependencies": {
     "@twurple/api": "^8.2.0",

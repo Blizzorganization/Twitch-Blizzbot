@@ -29,6 +29,7 @@ import { registerLoyalty } from "./routes/loyalty.js";
 import { registerOverview } from "./routes/overview.js";
 import { registerUsers } from "./routes/users.js";
 import { registerAudit } from "./routes/audit.js";
+import { registerDiscord } from "./routes/discord.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -109,6 +110,7 @@ export function startWebServer() {
     registerOverview(api);
     registerUsers(api);
     registerAudit(api);
+    registerDiscord(api);
 
     app.use("/api", api);
 

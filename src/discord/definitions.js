@@ -2,7 +2,7 @@ import { PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { PERMISSION_NAMES } from "../config.js";
 
 const permChoices = Object.values(PERMISSION_NAMES).map((n) => ({ name: n, value: n }));
-const channelOpt = (o) => o.setName("channel").setDescription("Twitch-Kanal (Standard: konfigurierter Kanal)").setRequired(false);
+const channelOpt = (o) => o.setName("channel").setDescription("Twitch-Kanal (nur der Kanal dieses Servers)").setRequired(false);
 
 /* ------------------------------ Slash-Commands ------------------------------ */
 
