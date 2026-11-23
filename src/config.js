@@ -90,6 +90,8 @@ export const config = {
     web: {
         enabled: required("WEB_ENABLED", "true") === "true",
         port: Number(required("WEB_PORT", "3080")),
+        // Wie lange Audit-Log-Einträge aufbewahrt werden (Tage, 1-365). Änderbar per .env, ohne das Dashboard neu zu bauen.
+        auditLogDays: Math.min(365, Math.max(1, Math.floor(Number(required("AUDIT_LOG_DAYS", "7"))) || 7)),
         // Reine Notfall-/Erstzugangs-Anmeldung. Für den täglichen Gebrauch bitte einen Nutzer anlegen (Tab "Benutzer").
         adminToken: required("WEB_ADMIN_TOKEN", ""),
         // Nur nötig, wenn das Dashboard von einer ANDEREN Adresse als der des Bots aufgerufen wird (z. B. der Vite-Dev-Server).

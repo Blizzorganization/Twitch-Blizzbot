@@ -2,7 +2,10 @@
 import { config } from "../../config.js";
 import { logger } from "../../utils/logger.js";
 import { getStats, setTotalSubs, getModActionStats, getModeratorActionStats, resetModeratorActionStats } from "../../db/events.js";
-import { isAutomessageEnabled } from "../../db/automessages.js";
+import { isAutomessageEnabled, listAutomessages } from "../../db/automessages.js";
+import { listBotMods } from "../../db/bot-mods.js";
+import { listBlacklist } from "../../db/blacklist.js";
+import { listGreetings } from "../../db/greetings.js";
 import { getChannelSettings } from "../../db/channel-settings.js";
 import { isChatConnected } from "../../twitch/bot.js";
 import { modLogStatus } from "../../twitch/modlog.js";
@@ -12,6 +15,23 @@ import { logAudit, getAuditStats } from "../../db/audit.js";
 import { tokenProblems, tokenCheckedAt } from "../../services/token-health.js";
 import { discordStatus } from "../../discord/state.js";
 import { isAdminUser, requireAdmin, wrap, channelOf, channelAccessMiddleware, streamStatus } from "../context.js";
+
+/** Hinweise "Modul an, aber Liste leer" (Modul tut dann nichts bzw. sperrt versehentlich aus). */
+async function emptyListHints(channel, s, automessageOn) {
+    const hints = [];
+    const count = async (fn) => { try { return (await fn(channel)).length; } catch { return null; } };
+    const [mods, words, autos, greets] = await Promise.all([
+        s.botModsOnly ? count(listBotMods) : null,
+        s.blacklistEnabled ? count(listBlacklist) : null,
+        automessageOn ? count(listAutomessages) : null,
+        s.greetingsEnabled ? count(listGreetings) : null,
+    ]);
+    if (mods === 0) hints.push({ tab: "Verify-Mods", text: "Verify-Mods ist an, aber die Liste ist leer – Bot-Befehle kann dann nur der Streamer nutzen." });
+    if (words === 0) hints.push({ tab: "Blacklist", text: "Die Blacklist ist an, enthält aber kein Wort – sie filtert nichts." });
+    if (autos === 0) hints.push({ tab: "Automessages", text: "Automessages sind an, aber es gibt keine Nachricht – es wird nichts gesendet." });
+    if (greets === 0) hints.push({ tab: "Begrüßungen", text: "Begrüßungen sind an, aber es ist keine Begrüßung angelegt." });
+    return hints;
+}
 
 export function registerOverview(api) {
     /* Status-Übersicht (Startseite): Chat, Live-Status, Module, Bot-Account, letzte Fehler */
@@ -28,7 +48,9 @@ export function registerOverview(api) {
             admin ? botTokenStatus() : null,
         ]);
         const tokenRow = tokenStatus.find((t) => t.channel === channel);
+        const hints = await emptyListHints(channel, s, automessageOn);
         res.json({
+            hints,
             chat: { connected: isChatConnected() },
             discord: config.discord.enabled ? { ...discordStatus(), lastError: admin ? discordStatus().lastError : null } : null,
             stream,
@@ -49,6 +71,7 @@ export function registerOverview(api) {
                     s.emoteFilter && "Emotes",
                     s.repeatFilter && "Wiederholungen",
                     s.charSpamFilter && "Zeichen",
+                    s.firstMsgFilter && "Erste Nachricht",
                 ].filter(Boolean),
             },
             channelToken: !!tokenRow?.hasToken,

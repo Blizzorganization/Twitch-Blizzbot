@@ -38,6 +38,7 @@ const FIELDS = {
     repeatMaxCount: { column: "repeat_max_count", default: () => 3 },
     // Zeichen-Spam: ein Zeichen X-mal hintereinander oder zu viele Sonderzeichen (Prozent, ab 10 Zeichen Länge)
     charSpamFilter: { column: "char_spam_filter", default: () => false },
+    firstMsgFilter: { column: "first_msg_filter", default: () => false }, // erste Nachricht eines neuen Chatters: Links löschen
     charRunMax: { column: "char_run_max", default: () => 15 },
     charSymbolPercent: { column: "char_symbol_percent", default: () => 60 },
     // Follow-Alert: mehr als followAlertMax Follower innerhalb von followAlertWindowSeconds = keine Meldungen mehr (Schutz vor Follower-Bots)

@@ -231,3 +231,4 @@ fieldset.plain-fieldset:disabled { opacity: .55; }
 .cmd-actions-edit { padding-top: 8px; }
 .cmd-actions-edit .cmd-edit { padding: 8px 0; max-width: none; }
 .cmd-actions-edit > .danger { width: 100%; margin-top: 8px; }
+.hint-box { margin: .5rem 0 1rem; } .hint-box .hint { margin: .2rem 0; }

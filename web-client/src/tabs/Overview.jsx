@@ -100,6 +100,14 @@ export function StatusOverview({ channel }) {
                 </p>
             )}
 
+            {st.hints?.length > 0 && (
+                <div className="hint-box">
+                    {st.hints.map((h) => (
+                        <p key={h.tab} className="hint warn">⚠ {h.text} <span className="muted">(Reiter „{h.tab}“)</span></p>
+                    ))}
+                </div>
+            )}
+
             <h4>Module</h4>
             {moduleGroups.map(([group, items]) => (
                 <div key={group} className="chip-group">

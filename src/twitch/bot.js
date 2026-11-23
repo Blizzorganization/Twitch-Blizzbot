@@ -75,6 +75,7 @@ function toTags(channel, username, msg, isAction) {
         // Anzahl der Twitch-Emotes in der Nachricht (für den Emote-Spam-Filter)
         emoteCount: countEmotes(msg),
         "message-type": isAction ? "action" : "chat",
+        isFirst: Boolean(msg.isFirst), // allererste Nachricht des Nutzers in diesem Kanal (Twitch-Tag first-msg)
     };
 }
 

@@ -68,8 +68,8 @@ export async function listAuditLog(limit = 30, offset = 0, { q, action, type } =
     return { rows, total: countRows[0].total };
 }
 
-/** Löscht Audit-Log-Einträge, die älter als die angegebene Anzahl Tage sind (Standard: 3 Tage). */
-export async function deleteOldAuditLog(days = 3) {
+/** Löscht Audit-Log-Einträge, die älter als die angegebene Anzahl Tage sind (Standard: 7 Tage). */
+export async function deleteOldAuditLog(days = 7) {
     const { rowCount } = await pool.query(`DELETE FROM audit_log WHERE created_at < now() - ($1 || ' days')::interval;`, [days]);
     return rowCount;
 }

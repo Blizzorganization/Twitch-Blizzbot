@@ -327,6 +327,7 @@ Im Dashboard unter **Moderation → Filter → „Spam-Filter“** (pro Kanal, s
 
 - **Wiederholungs-Filter:** löscht eine Nachricht, wenn derselbe Nutzer sie innerhalb von 60 Sekunden zum X-ten Mal schickt (Standard 3, Groß-/Kleinschreibung egal). Der Zähler liegt im Arbeitsspeicher.
 - **Zeichen-Spam-Filter:** löscht Nachrichten, in denen ein Zeichen X-mal hintereinander vorkommt (Standard 15) oder die zu mindestens X % aus Sonderzeichen bestehen (Standard 60 %, ab 10 Zeichen). Reine Emoji-Nachrichten zählen als Sonderzeichen.
+- **Erste-Nachricht-Filter:** löscht Links in der allerersten Chat-Nachricht eines neuen Chatters (auch Links der Erlaubt-Liste; ein Link-Permit gilt weiterhin). Standard aus.
 
 Links filtert der bestehende Link-Filter (gleiche Stelle im Dashboard).
 

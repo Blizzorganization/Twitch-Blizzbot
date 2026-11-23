@@ -36,6 +36,12 @@ const permitList = () => loadList("configs/mods.txt").map((l) => l.toLowerCase()
 
 /** Eigene Liste des Kanals (Dashboard) wenn vorhanden, sonst die globale Datei. */
 const permittedLinks = (settings) => (settings.allowedLinks ?? globalLinks()).map((l) => l.toLowerCase());
+/** true, wenn der Text einen Link enthält (http(s)://, www. oder Domain-Endung aus der TLD-Liste). */
+function padded_has_link(message, tlds) {
+    const padded = ` ${message} `;
+    return padded.includes(" www.") || tlds.some((t) => padded.includes(t)) || /(https?|s?ftp):\/\/\S/.test(message);
+}
+
 const deleteTlds = (settings) => (settings.tlds ?? globalTlds()).map((l) => l.toLowerCase());
 
 const linkTest = new RegExp(
@@ -155,6 +161,16 @@ export async function checkModAction(channel, tags, msg) {
                 logEvent(channel, "blacklist_hit", tags.username, { word: "link", action: 0 });
                 return true;
             }
+        }
+    }
+
+    // 2b) Erste Nachricht eines neuen Chatters: jeder Link wird gelöscht (auch "erlaubte" – Links-Permit gilt weiterhin)
+    if (settings.firstMsgFilter && tags.isFirst) {
+        const hasLink = padded_has_link(message, deleteTlds(settings));
+        if (hasLink && !(await hasLinkPermit(channel, tags.username))) {
+            await executeModAction(0, channel, tags, "erste-nachricht");
+            logEvent(channel, "blacklist_hit", tags.username, { word: "erste-nachricht", action: 0 });
+            return true;
         }
     }
 

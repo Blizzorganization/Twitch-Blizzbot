@@ -49,7 +49,7 @@ export function AuditLog() {
         <section>
             <h2>Audit-Log</h2>
             <p className="hint">
-                Protokoll aller Verwaltungsänderungen (Dashboard, Twitch-Chat &amp; Discord). Einträge älter als 3 Tage werden automatisch gelöscht.
+                Protokoll aller Verwaltungsänderungen (Dashboard, Twitch-Chat &amp; Discord). Einträge älter als {data.retentionDays ?? 7} Tage werden automatisch gelöscht.
             </p>
             {error && <p className="error">{error}</p>}
             <FilterBar query={query} setQuery={setQuery} shown={data.total} total={data.total}

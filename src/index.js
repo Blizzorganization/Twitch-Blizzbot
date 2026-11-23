@@ -14,14 +14,13 @@ import { startTokenHealth, stopTokenHealth } from "./services/token-health.js";
 
 let webServer; // http.Server von startWebServer(), für ein sauberes .close() beim Beenden
 
-const AUDIT_LOG_RETENTION_DAYS = 3;
-const AUDIT_LOG_CLEANUP_INTERVAL_MS = 60 * 60 * 1000; // stündlich reicht, Einträge sind ohnehin nur 3 Tage gültig
+const AUDIT_LOG_CLEANUP_INTERVAL_MS = 60 * 60 * 1000; // stündlich reicht, Einträge sind ohnehin nur wenige Tage gültig
 
-/** Löscht Audit-Log-Einträge älter als AUDIT_LOG_RETENTION_DAYS (Dashboard-Tab "Audit-Log"). */
+/** Löscht Audit-Log-Einträge älter als config.web.auditLogDays (Dashboard-Tab "Audit-Log"; Dauer per AUDIT_LOG_DAYS in der .env, Standard 7). */
 async function cleanupAuditLog() {
     try {
-        const n = await deleteOldAuditLog(AUDIT_LOG_RETENTION_DAYS);
-        if (n > 0) logger.info(`Audit-Log: ${n} Einträge älter als ${AUDIT_LOG_RETENTION_DAYS} Tage gelöscht.`);
+        const n = await deleteOldAuditLog(config.web.auditLogDays);
+        if (n > 0) logger.info(`Audit-Log: ${n} Einträge älter als ${config.web.auditLogDays} Tage gelöscht.`);
     } catch (e) {
         logger.warn(`Audit-Log-Aufräumen fehlgeschlagen: ${e.message}`);
     }

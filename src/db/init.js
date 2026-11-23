@@ -294,6 +294,7 @@ const EXTENSIONS = [
     `ALTER TABLE channel_settings ADD COLUMN IF NOT EXISTS repeat_filter BOOLEAN;`,
     `ALTER TABLE channel_settings ADD COLUMN IF NOT EXISTS repeat_max_count INTEGER;`,
     `ALTER TABLE channel_settings ADD COLUMN IF NOT EXISTS char_spam_filter BOOLEAN;`,
+    `ALTER TABLE channel_settings ADD COLUMN IF NOT EXISTS first_msg_filter BOOLEAN;`,
     `ALTER TABLE channel_settings ADD COLUMN IF NOT EXISTS char_run_max INTEGER;`,
     `ALTER TABLE channel_settings ADD COLUMN IF NOT EXISTS char_symbol_percent INTEGER;`,
     `ALTER TABLE channel_settings ADD COLUMN IF NOT EXISTS points_per_message INTEGER;`,

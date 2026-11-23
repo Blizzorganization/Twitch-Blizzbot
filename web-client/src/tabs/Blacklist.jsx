@@ -92,8 +92,7 @@ export function Filters({ channel }) {
             {settings && (
                 <Collapsible title="Link-Filter">
                     <div className="panel settings-panel">
-                        <BoolSetting label="Link-Filter aktiv" field={settings.linkFilter}
-                            onChange={(v) => patchSettings({ linkFilter: v })} onReset={() => patchSettings({ linkFilter: null })} />
+                        <StatusToggle label="Link-Filter" field={settings.linkFilter} onChange={(v) => patchSettings({ linkFilter: v })} />
                         <BoolSetting label="/me-Nachrichten von Nutzern ohne Rolle löschen" field={settings.deleteActionMessages}
                             onChange={(v) => patchSettings({ deleteActionMessages: v })} onReset={() => patchSettings({ deleteActionMessages: null })} />
                         <ListSetting label="Erlaubte Links (eine pro Zeile)" hint="Angezeigt wird die aktuell geltende Liste. Ohne eigene Liste ist das der Inhalt von configs/links.txt (für alle Kanäle); „Speichern“ legt eine eigene Liste für diesen Kanal an."
@@ -109,8 +108,7 @@ export function Filters({ channel }) {
                     <div className="panel settings-panel">
                     <h4>Caps</h4>
                     <div className="setting-group">
-                        <BoolSetting label="Caps-Filter aktiv" field={settings.capsFilter}
-                            onChange={(v) => patchSettings({ capsFilter: v })} onReset={() => patchSettings({ capsFilter: null })} />
+                        <StatusToggle label="Caps-Filter" field={settings.capsFilter} onChange={(v) => patchSettings({ capsFilter: v })} />
                         <NumberSetting label="Caps: erst ab so vielen Buchstaben prüfen" hint="Kurze Nachrichten wie „LOL“ bleiben so unbehelligt."
                             field={settings.capsMinLength} onChange={(v) => patchSettings({ capsMinLength: v })} onReset={() => patchSettings({ capsMinLength: null })} />
                         <NumberSetting label="Caps: löschen ab so viel Prozent Großbuchstaben" hint="Nur Buchstaben zählen, Zahlen und Satzzeichen nicht."
@@ -118,22 +116,24 @@ export function Filters({ channel }) {
                     </div>
                     <h4>Emotes</h4>
                     <div className="setting-group">
-                        <BoolSetting label="Emote-Spam-Filter aktiv" field={settings.emoteFilter}
-                            onChange={(v) => patchSettings({ emoteFilter: v })} onReset={() => patchSettings({ emoteFilter: null })} />
+                        <StatusToggle label="Emote-Spam-Filter" field={settings.emoteFilter} onChange={(v) => patchSettings({ emoteFilter: v })} />
                         <NumberSetting label="Emotes: löschen bei mehr als so vielen Emotes" hint="Gezählt werden Twitch-Emotes (7TV/BTTV/FFZ nicht)."
                             field={settings.emoteMaxCount} onChange={(v) => patchSettings({ emoteMaxCount: v })} onReset={() => patchSettings({ emoteMaxCount: null })} />
                     </div>
                     <h4>Wiederholungen</h4>
                     <div className="setting-group">
-                        <BoolSetting label="Wiederholungs-Filter aktiv" field={settings.repeatFilter}
-                            onChange={(v) => patchSettings({ repeatFilter: v })} onReset={() => patchSettings({ repeatFilter: null })} />
+                        <StatusToggle label="Wiederholungs-Filter" field={settings.repeatFilter} onChange={(v) => patchSettings({ repeatFilter: v })} />
                         <NumberSetting label="Wiederholungen: löschen ab dem so vielen Mal derselben Nachricht (innerhalb 60 Sekunden)" hint="Groß-/Kleinschreibung zählt nicht. Bei 3 wird die dritte gleiche Nachricht gelöscht."
                             field={settings.repeatMaxCount} onChange={(v) => patchSettings({ repeatMaxCount: v })} onReset={() => patchSettings({ repeatMaxCount: null })} />
                     </div>
+                    <h4>Erste Nachricht</h4>
+                    <div className="setting-group">
+                        <StatusToggle label="Erste-Nachricht-Filter" field={settings.firstMsgFilter} onChange={(v) => patchSettings({ firstMsgFilter: v })} />
+                        <p className="hint">Löscht Links in der allerersten Chat-Nachricht eines neuen Chatters (auch Links der Erlaubt-Liste; ein Link-Permit gilt weiterhin). Typisch für Spam-/Bot-Accounts.</p>
+                    </div>
                     <h4>Zeichen-Spam</h4>
                     <div className="setting-group">
-                        <BoolSetting label="Zeichen-Spam-Filter aktiv" field={settings.charSpamFilter}
-                            onChange={(v) => patchSettings({ charSpamFilter: v })} onReset={() => patchSettings({ charSpamFilter: null })} />
+                        <StatusToggle label="Zeichen-Spam-Filter" field={settings.charSpamFilter} onChange={(v) => patchSettings({ charSpamFilter: v })} />
                         <NumberSetting label="Zeichen-Spam: gleiches Zeichen so oft hintereinander" hint='Z. B. "aaaaaaaaaaaaaaa" oder "!!!!!!!!!!!!!!!".'
                             field={settings.charRunMax} onChange={(v) => patchSettings({ charRunMax: v })} onReset={() => patchSettings({ charRunMax: null })} />
                         <NumberSetting label="Zeichen-Spam: löschen ab so viel Prozent Sonderzeichen" hint="Alles außer Buchstaben, Ziffern und Leerzeichen, erst ab 10 Zeichen. Reine Emoji-Nachrichten zählen als Sonderzeichen."
