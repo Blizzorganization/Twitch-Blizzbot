@@ -14,7 +14,8 @@ export function AccountPanel({ onClose }) {
             const body = { username };
             if (password) body.password = password;
             const user = await api(`/users/${getUserId()}`, { method: "PUT", body });
-            setSession(getToken(), user.username, getIsAdmin(), getUserId(), getIsOwner());
+            // Bei geändertem Passwort macht der Server das alte Token ungültig und schickt ein neues mit - das muss übernommen werden
+            setSession(user.token ?? getToken(), user.username, getIsAdmin(), getUserId(), getIsOwner());
             setPassword("");
             setDone(true);
         } catch (err) {

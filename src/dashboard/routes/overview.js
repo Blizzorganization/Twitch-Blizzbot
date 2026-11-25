@@ -9,7 +9,7 @@ import { listGreetings } from "../../db/greetings.js";
 import { getChannelSettings } from "../../db/channel-settings.js";
 import { isChatConnected } from "../../twitch/bot.js";
 import { modLogStatus } from "../../twitch/modlog.js";
-import { eventSubActive, eventSubFailure } from "../../twitch/eventsub.js";
+import { eventSubActive, eventSubFailure, eventSubSkipReason } from "../../twitch/eventsub.js";
 import { listTokenStatus, botTokenStatus } from "../../twitch/api.js";
 import { logAudit, getAuditStats } from "../../db/audit.js";
 import { tokenProblems, tokenCheckedAt } from "../../services/token-health.js";
@@ -81,6 +81,7 @@ export function registerOverview(api) {
             modLog: modLogStatus().find((m) => m.channel === channel) ?? null,
             eventSub: eventSubActive(),
             eventSubFailure: eventSubFailure(),
+            eventSubSkipReason: eventSubSkipReason(channel),
             uptimeSeconds: Math.round(process.uptime()),
             errors: admin ? logger.recent(10) : null,
         });

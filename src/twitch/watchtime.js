@@ -21,7 +21,7 @@ export function startWatchtime() {
         return;
     }
     let running = false;
-    let warned = null; // zuletzt gemeldeter Fehlertext (null = zuletzt alles in Ordnung)
+    const warned = new Map(); // Kanal -> zuletzt gemeldeter Fehlertext (kein Eintrag = zuletzt alles in Ordnung)
 
     clearInterval(timer);
     timer = setInterval(async () => {
@@ -38,10 +38,13 @@ export function startWatchtime() {
                     const names = chatters.map((c) => c.toLowerCase()).filter((c) => c.length <= 25 && !excluded.has(c)); // ausgeschlossene Nutzer sammeln weder Watchtime noch Watch-XP/-Punkte
                     await addWatchtime(channel, names);
                     handleWatchLeveling(channel, names).catch((e) => logger.warn(`Watch-XP/Punkte für ${channel} fehlgeschlagen: ${e.message}`));
-                    warned = null; // alles in Ordnung: ein späterer Fehler wird wieder gemeldet
+                    if (warned.has(channel)) {
+                        warned.delete(channel); // alles in Ordnung: ein späterer Fehler wird wieder gemeldet
+                        logger.ok(`Watchtime-Erfassung für ${channel} läuft wieder.`);
+                    }
                 } catch (e) {
-                    if (warned !== e.message) {
-                        warned = e.message; // gleiche Fehlermeldung nicht jede halbe Minute wiederholen, eine neue/andere schon
+                    if (warned.get(channel) !== e.message) {
+                        warned.set(channel, e.message); // gleiche Fehlermeldung nicht jede halbe Minute wiederholen, eine neue/andere schon
                         const hint = /connection|timeout|ECONN|postgres/i.test(e.message) ? "" : " (Scope moderator:read:chatters?)";
                         logger.warn(`Watchtime-Erfassung für ${channel} fehlgeschlagen${hint}: ${e.message}`);
                     }

@@ -22,7 +22,7 @@ export function AuditLog() {
     const [typeFilter, setTypeFilter] = useState("");
     const ACTION_LABELS = { enable: "eingeschaltet", disable: "ausgeschaltet", create: "angelegt", edit: "bearbeitet", delete: "gelöscht", stop: "gestoppt", draw: "gezogen", end: "beendet", lock: "gesperrt", resolve: "ausgewertet", cancel: "abgebrochen", export: "exportiert", import: "importiert" };
     const TYPE_LABELS = {
-        command: "Command", module: "Modul", discord: "Discord", alias: "Alias", counter: "Zähler", user: "Benutzer",
+        command: "Command", "twitch-channel-token": "Twitch-Token (Kanal)", "twitch-bot-token": "Twitch-Token (Bot)", module: "Modul", discord: "Discord", alias: "Alias", counter: "Zähler", user: "Benutzer",
         "user-channels": "Kanalrechte", "link-permit": "Link-Freigabe", "bot-mod": "Verify-Mod", giveaway: "Giveaway", poll: "Umfrage", prediction: "Wette", quote: "Zitat", backup: "Sicherung", greeting: "Begrüßung", "bot-mod": "Bot-Moderator", watchtime: "Watchtime",
     };
 

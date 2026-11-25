@@ -7,7 +7,7 @@
  *   engagement.js  Umfragen, Wetten, Kanalpunkte-Rewards
  * Alle anderen Module importieren weiterhin aus "./api.js".
  */
-export { apiConfigured, getBotIdentity, storeBotToken, removeBotToken, botTokenStatus, invalidateTokenCache, storeToken, listTokenStatus } from "./api/tokens.js";
+export { apiConfigured, getBotIdentity, storeBotToken, removeBotToken, removeChannelToken, botTokenStatus, invalidateTokenCache, storeToken, listTokenStatus } from "./api/tokens.js";
 export { helix, broadcasterId } from "./api/client.js";
 export { searchCategory, setGame, MAX_TITLE_LENGTH, setTitle, getUser, getStream, getChannelInfo, getFollowedAt, getFollowerCount, getSubscriberInfo, getTwitchEmotes, getBttvEmotes, getSevenTvEmotes, getChatters } from "./api/channel.js";
 export { deleteMessage, banUser, setFollowersMode, sendShoutout } from "./api/moderation.js";

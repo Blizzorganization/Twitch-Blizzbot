@@ -66,6 +66,11 @@ export async function api(path, { method = "GET", body, channel, skipAuth = fals
         body: body ? JSON.stringify(body) : undefined,
     });
     const data = await res.json().catch(() => ({}));
+    // Token ungültig (z. B. Passwort wurde geändert, Benutzer gelöscht, Bot neu gestartet): zurück zur Anmeldung statt in einer Fehlermeldung hängen zu bleiben
+    if (res.status === 401 && !skipAuth && token) {
+        clearSession();
+        window.location.reload();
+    }
     if (!res.ok) throw new Error(data.error ?? data.result ?? `Fehler ${res.status}`);
     if (!skipAuth && toastText !== false) {
         const text = toastText ?? (method === "PUT" ? "Gespeichert" : method === "DELETE" ? "Gelöscht" : null);

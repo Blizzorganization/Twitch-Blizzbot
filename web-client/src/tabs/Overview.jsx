@@ -88,8 +88,8 @@ export function StatusOverview({ channel }) {
                 {st.bot && <Item label="Bot-Account" ok={st.bot.hasToken ? true : null} text={st.bot.hasToken ? (st.bot.login ?? "Autorisiert") : "Nicht autorisiert"} />}
                 <Item label="Moderator-Aktionen" ok={!!st.modLog?.connected} text={modLogText} />
                 <Item label="Reward-Erfassung"
-                    ok={st.modules.rewards && !st.eventSubFailure && st.eventSub}
-                    text={st.modules.rewards && st.eventSubFailure ? `Getrennt – ${st.eventSubFailure}` : st.modules.rewards && st.eventSub ? "Verbunden" : "Getrennt"} />
+                    ok={st.modules.rewards && !st.eventSubFailure && !st.eventSubSkipReason && st.eventSub}
+                    text={st.modules.rewards && st.eventSubFailure ? `Getrennt – ${st.eventSubFailure}` : st.modules.rewards && st.eventSub && !st.eventSubSkipReason ? "Verbunden" : "Getrennt"} />
                 <Item label="Laufzeit des Bots" text={formatUptime(st.uptimeSeconds)} />
             </div>
 

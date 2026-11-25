@@ -1,3 +1,9 @@
+/** Nach neuer Autorisierung: Mod-Log und (bei Kanal-Token) EventSub neu verbinden, damit die Übersicht ohne Bot-Neustart "Verbunden" zeigt. */
+function reconnectAfterAuth({ eventSub }) {
+    stopModLog().then(() => startModLog()).catch((e) => logger.warn(`Moderator-Aktionen-Erfassung konnte nicht neu gestartet werden: ${e.message}`));
+    if (eventSub) restartEventSub().catch((e) => logger.warn(`EventSub konnte nicht neu gestartet werden: ${e.message}`));
+}
+
 /** Öffentliche Dashboard-Routen (kein Token nötig): Ersteinrichtung, Login, Twitch-OAuth-Rückkehr. */
 import express from "express";
 import { config } from "../config.js";
@@ -5,7 +11,8 @@ import { logger } from "../utils/logger.js";
 import { signToken, verifyState } from "./auth.js";
 import { safeEqual } from "./security.js";
 import { broadcasterId, storeToken, storeBotToken } from "../twitch/api.js";
-import { validateToken } from "../twitch/eventsub.js";
+import { validateToken, restartEventSub } from "../twitch/eventsub.js";
+import { stopModLog, startModLog } from "../twitch/modlog.js";
 import { exchangeCode } from "../twitch/oauth.js";
 import { countUsers, createUser, verifyPassword } from "../db/users.js";
 import { logAudit } from "../db/audit.js";
@@ -81,6 +88,7 @@ export function createAuthRoutes(loginLimiter) {
                 }).then((r) => r.json()).catch(() => ({})))?.data?.[0]?.login;
                 await storeBotToken(accessToken, refreshToken, validated.userId, botLogin);
                 runTokenHealthCheck(); // Warnung verschwindet, sobald der neue Token geprüft ist
+                reconnectAfterAuth({ eventSub: false });
                 logAudit({ actor: "dashboard", action: "edit", targetType: "twitch-bot-token", target: botLogin ?? String(validated.userId), details: {} });
                 return res.redirect(`${base}/?twitchAuth=bot-success&message=${encodeURIComponent(botLogin ?? "")}`);
             } catch (e) {
@@ -104,6 +112,7 @@ export function createAuthRoutes(loginLimiter) {
             }
             await step("Token speichern", () => storeToken(channel, accessToken, refreshToken, validated.userId ?? id));
             runTokenHealthCheck();
+            reconnectAfterAuth({ eventSub: true });
             logAudit({ actor: "dashboard", action: "edit", targetType: "twitch-token", target: channel, channel, details: {} });
             res.redirect(`${base}/?twitchAuth=success&channel=${encodeURIComponent(channel)}`);
         } catch (e) {

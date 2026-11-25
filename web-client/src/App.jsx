@@ -108,7 +108,8 @@ export default function App() {
         api("/meta")
             .then((m) => {
                 setMeta(m);
-                setChannel((c) => c || m.channels[0] || "");
+                // Kanal des vorherigen Benutzers (Abmelden/Anmelden ohne Neuladen) verwerfen, wenn der neue Benutzer ihn nicht hat
+                setChannel((c) => (c && m.channels.includes(c) ? c : m.channels[0] || ""));
             })
             .catch((e) => {
                 setError(e.message);
@@ -125,7 +126,7 @@ export default function App() {
         const channelName = params.get("channel");
         const messages = {
             success: `Twitch-Autorisierung für "${channelName}" war erfolgreich. Der Token wurde gespeichert.`,
-            "bot-success": `Bot-Account${params.get("message") ? ` "${params.get("message")}"` : ""} wurde autorisiert. Er führt jetzt Löschen, Timeout, Ban und den Raid-Follower-Modus aus (für die Moderator-Statistik den Bot einmal neu starten).`,
+            "bot-success": `Bot-Account${params.get("message") ? ` "${params.get("message")}"` : ""} wurde autorisiert. Er führt jetzt Löschen, Timeout, Ban und den Raid-Follower-Modus aus.`,
             "wrong-account": params.get("message") || "Es wurde der falsche Twitch-Account autorisiert.",
             error: params.get("message") || "Die Twitch-Autorisierung ist fehlgeschlagen.",
         };
@@ -140,6 +141,8 @@ export default function App() {
     function logout() {
         clearSession();
         setAuthed(false);
+        setChannel("");
+        setMeta(null);
     }
 
     if (!authed) return <Login onLogin={() => setAuthed(true)} error={error} />;

@@ -151,9 +151,39 @@ export async function storeBotToken(accessToken, refreshToken, userId, login) {
     botIdentity = { id: userId, login: login ?? null };
 }
 
-/** Entfernt den Bot-Account-Token; danach übernimmt wieder der Streamer-Token. */
+/** Widerruft ein Access-Token bei Twitch (best effort: schlägt es fehl, wird nur gewarnt – lokal wird trotzdem gelöscht). */
+async function revokeAtTwitch(accessToken) {
+    const { clientId } = config.twitchApi;
+    if (!accessToken || !clientId) return false;
+    try {
+        const res = await fetch("https://id.twitch.tv/oauth2/revoke", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: new URLSearchParams({ client_id: clientId, token: accessToken }),
+            signal: AbortSignal.timeout(10_000),
+        });
+        if (res.ok) return true;
+        logger.warn(`Token-Widerruf bei Twitch nicht bestätigt (Status ${res.status}) – das Token wird nur lokal entfernt.`);
+    } catch (e) {
+        logger.warn(`Token-Widerruf bei Twitch fehlgeschlagen: ${e.message} – das Token wird nur lokal entfernt.`);
+    }
+    return false;
+}
+
+/** Entfernt das Streamer-Token eines Kanals (DB + Zwischenspeicher) und widerruft es bei Twitch. */
+export async function removeChannelToken(channel) {
+    channel = cleanChannel(channel);
+    const { rows } = await pool.query(`DELETE FROM twitch_tokens WHERE channel = $1 RETURNING access_token;`, [channel]);
+    tokens.delete(channel);
+    idCache.delete(channel);
+    if (!rows[0]) return { removed: false, revoked: false };
+    return { removed: true, revoked: await revokeAtTwitch(rows[0].access_token) };
+}
+
+/** Entfernt den Bot-Account-Token (und widerruft ihn bei Twitch); danach übernimmt wieder der Streamer-Token. */
 export async function removeBotToken() {
-    await pool.query(`DELETE FROM twitch_bot_token WHERE id = 1;`);
+    const { rows } = await pool.query(`DELETE FROM twitch_bot_token WHERE id = 1 RETURNING access_token;`);
+    if (rows[0]) await revokeAtTwitch(rows[0].access_token);
     tokens.delete(BOT_KEY);
     botIdentity = null;
 }

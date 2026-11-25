@@ -11,8 +11,11 @@ import { handleRedemptionEvent } from "../services/channel-reward.js";
 import { handleFollow } from "../services/follow-alert.js";
 import { handleHypeTrainEnd } from "../services/hype-train.js";
 import { getAlertEnabled } from "../db/alerts.js";
+import { startConduit, stopConduit, conduitActive } from "./eventsub-conduit.js";
 
 let listener = null;
+let skipped = new Map(); // Kanäle ohne EventSub-Erfassung -> Grund
+let conduitMode = false; // true, solange EventSub über einen Conduit läuft (siehe eventsub-conduit.js)
 let rewardChannelCount = 0; // Kanäle, für die gerade die Reward-Erfassung läuft (der Listener kann auch nur für Follow-Alerts laufen)
 let failure = null; // Text, wenn die Erfassung wegen wiederholter Twitch-Fehler (z. B. 429) selbst gestoppt wurde
 const MAX_SUBSCRIBE_FAILURES = 3; // so viele fehlgeschlagene Subscribe-Versuche in Folge, dann gibt der Bot auf (statt endlos alle 10 s)
@@ -61,6 +64,7 @@ export async function startEventSub() {
     });
     const channelByUserId = new Map();
     const features = new Map(); // channel -> { rewards, follow }
+    skipped = new Map(); // channel -> Grund, warum der Kanal NICHT dabei ist (Übersicht im Dashboard)
     authProvider.onRefresh(async (userId, newTokenData) => {
         const channel = channelByUserId.get(userId);
         if (!channel) return;
@@ -74,12 +78,14 @@ export async function startEventSub() {
         try {
             // Reward-System für diesen Kanal ausgeschaltet (Dashboard): dann nur noch Follow-Alerts (falls der Token den Scope hat)
             const rewardsOn = !!(await getChannelSettings(channel)).rewardsEnabled;
-            const id = await broadcasterId(channel);
+            // Token zuerst prüfen: broadcasterId() braucht selbst das Kanal-Token und würde ohne eines mit einer Fehlermeldung abbrechen
             const token = await loadTokenRow(channel);
             if (!token.accessToken) {
-                logger.warn(`EventSub: Für ${channel} ist kein Token hinterlegt, überspringe.`);
+                logger.info(`EventSub: Für ${channel} ist kein Token hinterlegt (im Dashboard unter Benutzer autorisieren) – Kanal wird übersprungen, die anderen laufen weiter.`);
+                skipped.set(channel, "kein Token hinterlegt");
                 continue;
             }
+            const id = await broadcasterId(channel);
             // Die echten Scopes müssen von Twitch abgefragt werden (nicht leer lassen!) - sonst denkt
             // twurples interne Prüfung, der Token hätte GAR KEINE Scopes, und bricht sofort mit
             // "does not have any of the requested scopes" ab, selbst wenn der Token sie tatsächlich hat.
@@ -92,6 +98,7 @@ export async function startEventSub() {
             if (rewardsOn && !wantRewards) logger.warn(`EventSub: Der Token für ${channel} hat nicht den Scope channel:read:redemptions - keine Reward-Erfassung.`);
             if (!wantRewards && !wantFollow && !wantHype) {
                 logger.info(`EventSub: Für ${channel} gibt es nichts zu erfassen (Reward-System aus bzw. Scope fehlt, kein Scope für Follow-Alerts), überspringe.`);
+                skipped.set(channel, "nichts zu erfassen (Reward-System aus bzw. Scope fehlt)");
                 continue;
             }
             // Zwei häufige, aber leicht zu übersehende Ursachen für Twitchs 403 "subscription missing
@@ -111,6 +118,7 @@ export async function startEventSub() {
                         `über die eigene, in TWITCH_CLIENT_ID hinterlegte App (erneut) autorisiert werden. ` +
                         `Erfassung für ${channel} wird übersprungen.`,
                 );
+                skipped.set(channel, "Token stammt von einer anderen Twitch-App");
                 continue;
             }
             if (validated.userId && validated.userId !== id) {
@@ -122,6 +130,7 @@ export async function startEventSub() {
                         `erwartet ${id}) - für Punkte-Reward-Einlösungen wird der Broadcaster-eigene Token benötigt. ` +
                         `Erfassung für ${channel} wird übersprungen, bis ein Broadcaster-Token hinterlegt ist.`,
                 );
+                skipped.set(channel, "Token gehört nicht dem Broadcaster");
                 continue;
             }
             await authProvider.addUser(
@@ -138,12 +147,33 @@ export async function startEventSub() {
             channelByUserId.set(id, channel);
             features.set(channel, { rewards: wantRewards, follow: wantFollow, hype: wantHype });
         } catch (e) {
+            skipped.set(channel, `nicht vorbereitet: ${e.message}`);
             logger.warn(`EventSub: Kanal ${channel} konnte nicht vorbereitet werden: ${e.message}`);
         }
     }
 
     if (!channelByUserId.size) {
         logger.info("Punkte-Reward-Erfassung (EventSub): kein Kanal zu erfassen (ausgeschaltet oder nicht vorbereitet) - keine Verbindung zu Twitch aufgebaut.");
+        return;
+    }
+
+    // Conduit-Modus (EVENTSUB_CONDUIT=true): alle Kanäle über eine einzige WebSocket-Verbindung statt twurple je Kanal
+    if (config.twitchApi.conduit) {
+        const entries = [...channelByUserId].map(([userId, channel]) => ({ userId, channel, ...features.get(channel) }));
+        rewardChannelCount = entries.filter((x) => x.rewards).length;
+        const logErr = (what, channel) => (err) => logger.warn(`${what} (${channel}) konnte nicht verarbeitet werden: ${err.message}`);
+        try {
+            await startConduit(entries, {
+                onRedemption: (channel, ev) => handleRedemptionEvent(channel, ev).catch(logErr("Reward-Einlösung", channel)),
+                onFollow: (channel, ev) => handleFollow(channel, ev.userDisplayName || ev.userName, ev.userName).catch(logErr("Follow-Alert", channel)),
+                onHypeEnd: (channel, ev) => handleHypeTrainEnd(channel, ev).catch(logErr("Hype-Train-Zusammenfassung", channel)),
+            }, skipped);
+            conduitMode = true;
+            logger.debug(`EventSub (Conduit) gestartet für: ${entries.map((x) => x.channel).join(", ")}`);
+        } catch (e) {
+            failure = `Conduit-Start fehlgeschlagen: ${e.message}`;
+            logger.error(`EventSub (Conduit): ${failure}`);
+        }
         return;
     }
 
@@ -254,10 +284,13 @@ async function logWebsocketUsage(channel) {
 }
 
 /** Läuft die Reward-Erfassung (EventSub) gerade? */
-export const eventSubActive = () => !!listener && rewardChannelCount > 0;
+export const eventSubActive = () => (conduitMode ? conduitActive() : !!listener) && rewardChannelCount > 0;
 
 /** Grund, falls die Erfassung wegen wiederholter Twitch-Fehler selbst gestoppt wurde (sonst null). */
 export const eventSubFailure = () => failure;
+
+/** Warum ein Kanal bei EventSub nicht dabei ist (z. B. kein Token) – sonst null. */
+export const eventSubSkipReason = (channel) => skipped.get(channel) ?? null;
 
 /** Startet die Erfassung neu (z. B. nachdem im Dashboard das Reward-System ein-/ausgeschaltet wurde). */
 export async function restartEventSub() {
@@ -268,6 +301,13 @@ export async function restartEventSub() {
 
 /** Trennt die EventSub-Verbindung sauber (für einen geordneten Shutdown, siehe index.js). */
 export async function stopEventSub() {
+    if (conduitMode) {
+        await stopConduit();
+        conduitMode = false;
+        rewardChannelCount = 0;
+        logger.info("EventSub (Conduit) getrennt.");
+        return;
+    }
     if (!listener) return;
     try {
         await listener.stop();

@@ -48,6 +48,8 @@ export const config = {
     twitchApi: {
         clientId: required("TWITCH_CLIENT_ID"),
         clientSecret: required("TWITCH_CLIENT_SECRET"),
+        // Standard an; false = alte Variante mit einer Verbindung je Kanal. Conduit = (alle Kanäle über EINE WebSocket-Verbindung statt je Kanal eine; Limit 3 pro Account)
+        conduit: required("EVENTSUB_CONDUIT", "true") !== "false",
     },
     discord: {
         enabled: required("DISCORD_ENABLED", "false") === "true",

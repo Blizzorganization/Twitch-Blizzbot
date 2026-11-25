@@ -67,6 +67,17 @@ export function Users() {
         }
     }
 
+    async function removeChannelToken(channel) {
+        if (!confirm(`Twitch-Token von „${channel}“ wirklich entfernen? Das Token wird bei Twitch widerrufen; Funktionen, die es brauchen (Rewards, Umfragen, Titel/Game …), laufen erst nach erneuter Autorisierung wieder.`)) return;
+        setError("");
+        try {
+            await api(`/twitch-auth/channel/${encodeURIComponent(channel)}`, { method: "DELETE" });
+            loadTokenStatus();
+        } catch (err) {
+            setError(err.message);
+        }
+    }
+
     async function authorize(e) {
         e.preventDefault();
         setError("");
@@ -155,6 +166,8 @@ export function Users() {
                             </select>
                         </label>
                         <button type="submit" disabled={!authChannel || authBusy}>Anwendung autorisieren</button>
+                        <button type="button" className="danger" disabled={!authChannel || authBusy || !tokenStatus.find((t) => t.channel === authChannel)?.hasToken}
+                            onClick={() => removeChannelToken(authChannel)}>Token entfernen</button>
                     </form>
                     {isMobile ? (
                         <CardList rows={tokenStatus} rowKey={(t) => t.channel}
