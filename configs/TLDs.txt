@@ -1,0 +1,12 @@
+# Endungen, die den Link-Filter auslösen (eine pro Zeile, mit Punkt). Gilt nur für Nutzer ohne Rolle.
+# Ist die Datei leer, wird nur nach "www." und http(s)://-Links gefiltert.
+.com
+.de
+.net
+.org
+.tv
+.gg
+.io
+.xyz
+.info
+.ly

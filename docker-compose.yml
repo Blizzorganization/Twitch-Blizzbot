@@ -1,0 +1,15 @@
+# Startet nur die PostgreSQL-Datenbank: docker compose up -d
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: blizzbot
+      POSTGRES_PASSWORD: blizzbot
+      POSTGRES_DB: blizzbot
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:

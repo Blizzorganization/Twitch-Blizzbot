@@ -1,17 +1,19 @@
-FROM node:20 as production
+FROM node:22-alpine
 WORKDIR /app
-COPY package.json yarn.lock ./
-RUN npm pkg delete scripts.prepare
-RUN corepack enable
-RUN yarn install --prod --frozen-lockfile
 
-COPY commands ./commands
-COPY events ./events
-COPY modules ./modules
-COPY bot.js setup.js ./
+# Abhängigkeiten zuerst (besseres Caching). Liegt eine pnpm-lock.yaml im Projekt, wird pnpm benutzt, sonst npm.
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml* .npmrc ./
+COPY web-client/package.json web-client/
+RUN if [ -f pnpm-lock.yaml ]; then \
+      npm install -g pnpm@10 && pnpm install --frozen-lockfile --ignore-scripts; \
+    else \
+      npm install --no-audit --no-fund --ignore-scripts; \
+    fi
 
+COPY . .
+# Dashboard bauen (Ergebnis: web-client/dist, wird vom Bot ausgeliefert)
+RUN npm run web:build
 
-USER node
-
-
-CMD ["yarn", "start"]
+ENV NODE_ENV=production
+EXPOSE 3080
+CMD ["node", "src/index.js"]
